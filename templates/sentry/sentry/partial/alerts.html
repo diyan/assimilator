@@ -1,0 +1,32 @@
+{% load sentry_helpers %}
+<div id="blk_alerts" class="messages-container"></div>
+<script>
+$(function(){
+  ReactDOM.render(React.createFactory(Sentry.Alerts)({
+     className: "alert-list"
+  }), document.getElementById('blk_alerts'));
+});
+</script>
+<div id="blk_indicators"></div>
+<script>
+$(function(){
+  ReactDOM.render(React.createFactory(Sentry.Indicators)({
+     className: "indicators-container"
+  }), document.getElementById('blk_indicators'));
+});
+</script>
+{% if messages %}
+  <div id="messages" class="messages-container">
+    {% for message in messages %}
+    	{% with message.tags|split:" " as message_tags %}
+          <div class="alert{% if message.tags %}{% for tag in message_tags %} alert-{{ tag }}{% endfor %}{% endif %}">
+            <div class="container">
+              <a class="close" data-dismiss="alert">×</a>
+              <span class="icon"></span>
+              {{ message|linebreaks }}
+            </div>
+          </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+{% endif %}
