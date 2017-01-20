@@ -1,6 +1,3 @@
-# TODO Consider remove hardcoded GOPATH and PATH
-#export GOPATH := $(HOME)/go
-#export PATH := $(GOPATH)/bin:$(PATH)
 .PHONY: build-go watch-go get-go-deps get-js-deps get-go-tools get-atom-plugins
 .PHONY: test-js ling-go lint-js help
 .DEFAULT_GOAL := help

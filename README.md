@@ -4,7 +4,10 @@ WIP. An attempt to port minimum valuable subset of Sentry from Python to the Gol
 ### Development enviroment setup on Arch Linux
 
 ```bash
-$ sudo pacman -S git go go-tools glide
+$ sudo pacman -S git vim go go-tools glide
+$ vim ~/.zlogin
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$PATH
 $ mkdir ~/go/assimilator && cd $_
 $ git clone git@github.com:diyan/assimilator.git
 $ make get-go-tools
