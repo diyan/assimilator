@@ -1,0 +1,23 @@
+package: github.com/diyan/assimilator
+import:
+- package: github.com/Sirupsen/logrus
+  version: v0.11.0
+- package: github.com/diyan/echox
+  subpackages:
+  - log
+  - middleware
+- package: github.com/echo-contrib/pongor
+- package: github.com/flosch/pongo2
+  version: v3.0
+- package: github.com/gocraft/dbr
+  version: v2.1
+- package: github.com/k0kubun/pp
+  version: v2.2.0
+- package: github.com/labstack/echo
+  version: v3.0.3
+  subpackages:
+  - middleware
+- package: github.com/lib/pq
+- package: github.com/pkg/errors
+  version: v0.8.0
+- package: github.com/x-cray/logrus-prefixed-formatter
