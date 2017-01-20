@@ -30,7 +30,8 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	//}
 	msg = err.Error()
 	if !c.Response().Committed {
-		if c.Request().Method == http.MethodHead { // Issue #608
+		// TODO Consider use `http.MethodHead` from Go 1.6+ and drop Go 1.5
+		if c.Request().Method == "HEAD" { // Issue #608
 			c.NoContent(code)
 		} else {
 			c.String(code, msg)
