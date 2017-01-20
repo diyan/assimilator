@@ -1,2 +1,4 @@
+/vendor
+/bin
 /ui/node_modules
 /ui/dist
