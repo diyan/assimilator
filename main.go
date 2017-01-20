@@ -30,7 +30,7 @@ func main() {
 	e.Logger = log.Logrus()
 	// Register default error handler
 	e.HTTPErrorHandler = web.HTTPErrorHandler
-	e.Renderer = pongor.GetRenderer()
+	e.Renderer = pongor.GetRenderer(pongor.PongorOption{Reload: true})
 	// TODO ForceColors only if codegangsta/gin detected
 	logrus.SetFormatter(&logrusfmt.TextFormatter{ShortTimestamp: true, ForceColors: true})
 	// Register access log logger
