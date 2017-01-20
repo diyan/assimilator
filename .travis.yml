@@ -10,13 +10,13 @@ go:
   - master
 env:
   - GOOS=linux GOARCH=amd64
-  - GOOS=linux GOARCH=386
-  - GOOS=linux GOARCH=arm
-  - GOOS=darwin GOARCH=amd64
-  - GOOS=darwin GOARCH=386
-  - GOOS=darwin GOARCH=arm
-  - GOOS=windows GOARCH=amd64
-  - GOOS=windows GOARCH=386
+#  - GOOS=linux GOARCH=386
+#  - GOOS=linux GOARCH=arm
+#  - GOOS=darwin GOARCH=amd64
+#  - GOOS=darwin GOARCH=386
+#  - GOOS=darwin GOARCH=arm
+#  - GOOS=windows GOARCH=amd64
+#  - GOOS=windows GOARCH=386
 before_install:
   - go get github.com/Masterminds/glide
 install:
