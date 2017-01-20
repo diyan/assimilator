@@ -1,0 +1,26 @@
+# https://travis-ci.org/diyan/assimilator
+language: go
+dist: trusty
+# Define 'sudo: false' to run on container-based workers
+sudo: false
+go:
+  - 1.5.x
+  - 1.6.x
+  - 1.7.x
+  - master
+env:
+  - GOOS=linux GOARCH=amd64
+  - GOOS=linux GOARCH=386
+  - GOOS=linux GOARCH=arm
+  - GOOS=darwin GOARCH=amd64
+  - GOOS=darwin GOARCH=386
+  - GOOS=darwin GOARCH=arm
+  - GOOS=windows GOARCH=amd64
+  - GOOS=windows GOARCH=386
+install:
+  - env
+  - make get-go-deps
+script:
+  - make build-go
+#after_success:
+#  - coveralls
