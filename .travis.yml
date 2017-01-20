@@ -17,6 +17,8 @@ env:
   - GOOS=darwin GOARCH=arm
   - GOOS=windows GOARCH=amd64
   - GOOS=windows GOARCH=386
+before_install:
+  - go get github.com/Masterminds/glide
 install:
   - env
   - make get-go-deps
