@@ -1,7 +1,7 @@
 # assimilator
 WIP. An attempt to port minimum valuable subset of Sentry from Python to the Golang.
 
-### Development enviroment setup on Arch Linux
+### Setup development enviroment on Arch Linux
 
 ```bash
 $ sudo pacman -S git vim go go-tools glide
@@ -13,6 +13,12 @@ $ git clone git@github.com:diyan/assimilator.git
 $ make get-go-tools
 $ make get-go-deps
 $ make watch-go
+```
+
+### Run Sentry in Docker containers
+```bash
+$ sentry/run_sentry_containers.sh
+$ docker exec -ti acme_sentry_web raven test http://763a78a695424ed687cf8b7dc26d3161:763a78a695424ed687cf8b7dc26d3161@localhost:9000/2
 ```
 
 ### TODOs
