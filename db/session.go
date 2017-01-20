@@ -6,7 +6,7 @@ import (
 )
 
 func GetSession() (*dbr.Session, error) {
-	conn, err := dbr.Open("postgres", "postgres://sentry:cP6su6UY@localhost/sentry?sslmode=disable", nil)
+	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/sentry?sslmode=disable", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "db connection failed")
 	}
