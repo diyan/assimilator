@@ -18,6 +18,7 @@ env:
 #  - GOOS=windows GOARCH=amd64
 #  - GOOS=windows GOARCH=386
 before_install:
+  - if go version | grep --quiet go1.5; then export GO15VENDOREXPERIMENT=1; fi
   - go get github.com/Masterminds/glide
 install:
   - env
