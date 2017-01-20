@@ -20,11 +20,15 @@ env:
   - GOOS=darwin GOARCH=arm
   - GOOS=windows GOARCH=amd64
   - GOOS=windows GOARCH=386
+  - GOOS=freebsd GOARCH=amd64
+  - GOOS=freebsd GOARCH=386
+  - GOOS=freebsd GOARCH=arm
 before_install:
   - if go version | grep --quiet go1.5; then export GO15VENDOREXPERIMENT=1; fi
   - go get github.com/Masterminds/glide
 install:
   - env
+  - ls -1 $HOME/.gimme/versions
   - make get-go-deps
 script:
   - make build-go
