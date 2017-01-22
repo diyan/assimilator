@@ -38,6 +38,7 @@ test-watch-go:  ## Continuous testing for Go sources
 
 test-js:  ## Run JavaScript tests
 	@echo "--> Building static assets"
+	# cd ui && SENTRY_EXTRACT_TRANSLATIONS=1 node_modules/.bin/webpack -p
 	cd ui && node_modules/.bin/webpack -p
 	@echo "--> Running JavaScript tests"
 	cd ui && npm run test

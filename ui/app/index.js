@@ -43,6 +43,7 @@ export default {
   Raven: require('raven-js'),
   React: require('react'),
   ReactDOM: require('react-dom'),
+  ReactBootstrap: require('react-bootstrap'),
   Reflux: require('reflux'),
   Router: require('react-router'),
   underscore: require('underscore'),
@@ -56,12 +57,12 @@ export default {
       DefaultIssuePlugin: plugins.DefaultIssuePlugin
     },
 
-    createHistory: require('history/lib/createBrowserHistory'),
     Alerts: require('./components/alerts'),
     AlertActions: require('./actions/alertActions'),
     AvatarSettings: require('./components/avatarSettings'),
     mixins: {
       ApiMixin: require('./mixins/apiMixin'),
+      TooltipMixin: require('./mixins/tooltip')
     },
     BarChart: require('./components/barChart'),
     i18n: require('./locale'),

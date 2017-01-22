@@ -45,9 +45,9 @@ func GetReactPageView(c echo.Context) error {
 	// TOOD implement generic ReactPageView
 	return c.Render(http.StatusOK, "react.html", map[string]interface{}{
 		"request":        struct{ LANGUAGE_CODE string }{LANGUAGE_CODE: "en"},
-		"sentry_version": struct{ build string }{build: "8.0.6"},
+		"sentry_version": struct{ build string }{build: "8.12.0"},
 		// TODO this does not work because foo is not exported
-		//"sentry_version":   template.SentryVersion{foo: "8.0.6"},
+		//"sentry_version":   template.SentryVersion{foo: "8.12.0"},
 		"CSRF_COOKIE_NAME": "sc", // TODO Move into settings
 		"ALLOWED_HOSTS":    "",
 	})

@@ -139,10 +139,10 @@ func getReactConfigParser(doc *pongo2.Parser, start *pongo2.Token, arguments *po
 		DSN:          "http://535d385540bc43c496aa02d14db75fc6@localhost:9001/1",
 		NeedsUpgrade: false,
 		Version: SentryVersion{
-			Current:          "8.0.6",
-			Build:            "8.0.6",
+			Current:          "8.12.0",
+			Build:            "8.12.0",
 			UpgradeAvailable: false,
-			Latest:           "8.0.6",
+			Latest:           "8.12.0",
 		},
 		Features:           []string{},
 		IsAuthenticated:    true,

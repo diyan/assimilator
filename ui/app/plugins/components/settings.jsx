@@ -7,7 +7,7 @@ import {
 } from '../../components/forms';
 import PluginComponentBase from '../../components/bases/pluginComponentBase';
 import LoadingIndicator from '../../components/loadingIndicator';
-import {t} from '../../locale';
+import {t, tct} from '../../locale';
 
 
 class PluginSettings extends PluginComponentBase {
@@ -19,6 +19,7 @@ class PluginSettings extends PluginComponentBase {
       initialData: null,
       formData: null,
       errors: {},
+      rawData: {},
       // override default FormState.READY if api requests are
       // necessary to even load the form
       state: FormState.LOADING
@@ -58,6 +59,7 @@ class PluginSettings extends PluginComponentBase {
           initialData[field.name] = field.value;
         });
         this.setState({
+          fieldList: data.config,
           formData: formData,
           initialData: initialData,
           errors: {}
@@ -75,6 +77,12 @@ class PluginSettings extends PluginComponentBase {
   fetchData() {
     this.api.request(this.getPluginEndpoint(), {
       success: data => {
+        if (!data.config) {
+          this.setState({
+            rawData: data
+          }, this.onLoadSuccess);
+          return;
+        }
         let formData = {};
         let initialData = {};
         data.config.forEach((field) => {
@@ -99,10 +107,33 @@ class PluginSettings extends PluginComponentBase {
     }
     let isSaving = this.state.state === FormState.SAVING;
     let hasChanges = !underscore.isEqual(this.state.initialData, this.state.formData);
+
+    let data = this.state.rawData;
+    if (data.config_error) {
+      let authUrl = data.auth_url;
+      if (authUrl.indexOf('?') === -1) {
+        authUrl += '?next=' + encodeURIComponent(document.location.pathname);
+      } else {
+        authUrl += '&next=' + encodeURIComponent(document.location.pathname);
+      }
+      return (
+        <div className="m-b-1">
+          <div className="alert alert-warning m-b-1">
+            {data.config_error}
+          </div>
+          <a className="btn btn-primary" href={authUrl}>
+            {t('Associate Identity')}
+          </a>
+        </div>
+      );
+    }
+
     if (this.state.state === FormState.ERROR && !this.state.fieldList) {
       return (
         <div className="alert alert-error m-b-1">
-          {t('An unknown error occurred.')}
+          {tct('An unknown error occurred. Need help with this? [link:Contact support]', {
+            link: <a href="https://sentry.io/support/"/>
+          })}
         </div>
       );
     }

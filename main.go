@@ -37,7 +37,7 @@ func main() {
 	e.Use(mwx.LogrusLogger(nil))
 	e.Use(web.RecoverMiddleware())
 	// TODO setup route to serve static files
-	e.Static("/_static", "_static")
+	e.Static("/_static/7a9894050589851ad3c1e1a2d1adb54ac08b8832/sentry", "ui")
 	e.Pre(mw.AddTrailingSlashWithConfig(mw.TrailingSlashConfig{
 		Skipper: func(c echo.Context) bool {
 			uri := c.Request().URL.String()

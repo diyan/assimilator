@@ -956,6 +956,14 @@
       }
     }
 
+    &.appletv .context-item-icon {
+      background-image: url(../images/icons/context/apple-tv.svg);
+    }
+
+    &.watch .context-item-icon {
+      background-image: url(../images/icons/context/apple-watch.svg);
+    }
+
     &.android-phone {
       .context-item-icon {
         background-image: url(../images/icons/context/android-phone.svg);
@@ -968,7 +976,7 @@
       }
     }
 
-    &.ios, &.macos, &.tvos, &.mac-os-x, &.mac {
+    &.ios, &.macos, &.tvos, &.mac-os-x, &.mac, &.watchos {
       .context-item-icon {
         background-image: url(../images/icons/context/ios.svg);
         top: -2px;
@@ -1246,6 +1254,10 @@ div.traceback > ul {
     margin-bottom: 0;
   }
 
+  h5 {
+    line-height: 1.2;
+  }
+
   .traceback {
     margin-top: 15px;
   }
@@ -1287,7 +1299,7 @@ div.traceback > ul {
       margin: 0;
       // line-height: 1.4;
       line-height: 16px;
-      background: lighten(@blue-light, 35);
+      background: lighten(@blue-light, 33);
 
       code {
         font-family: inherit;

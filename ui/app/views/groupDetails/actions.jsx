@@ -1,5 +1,5 @@
 import React from 'react';
-import {History} from 'react-router';
+import {browserHistory} from 'react-router';
 import ApiMixin from '../../mixins/apiMixin';
 import DropdownLink from '../../components/dropdownLink';
 import CustomSnoozeModal from '../../components/customSnoozeModal';
@@ -24,7 +24,6 @@ const GroupActions = React.createClass({
   mixins: [
     ApiMixin,
     GroupState,
-    History,
     TooltipMixin({
       selector: '.tip',
       container: 'body',
@@ -45,7 +44,7 @@ const GroupActions = React.createClass({
       complete: () => {
         IndicatorStore.remove(loadingIndicator);
 
-        this.history.pushState(null, `/${org.slug}/${project.slug}/`);
+        browserHistory.pushState(null, `/${org.slug}/${project.slug}/`);
       }
     });
   },
@@ -118,6 +117,9 @@ const GroupActions = React.createClass({
 
     let hasRelease = defined(group.lastRelease);
     let releaseTrackingUrl = '/' + this.getOrganization().slug + '/' + this.getProject().slug + '/settings/release-tracking/';
+
+    // account for both old and new style plugins
+    let hasIssueTracking = group.pluginActions.length || group.pluginIssues.length;
 
     return (
       <div className="group-actions">
@@ -199,7 +201,7 @@ const GroupActions = React.createClass({
                 <a onClick={this.onSnooze.bind(this, Snooze.ONEWEEK)}>{t('for 1 week')}</a>
               </MenuItem>
               <MenuItem noAnchor={true}>
-                <a onClick={this.customSnoozeClicked.bind(this)}>{t('until custom date...')}</a>
+                <a onClick={this.customSnoozeClicked}>{t('until custom date...')}</a>
               </MenuItem>
               <MenuItem noAnchor={true}>
                 <a onClick={this.onUpdate.bind(this, {status: 'ignored'})}>{t('forever')}</a>
@@ -252,7 +254,7 @@ const GroupActions = React.createClass({
         {group.pluginIssues && group.pluginIssues.map((plugin) => {
           return <IssuePluginActions key={plugin.slug} plugin={plugin}/>;
         })}
-        {!group.pluginIssues.length &&
+        {!hasIssueTracking &&
           <a href={`/${this.getOrganization().slug}/${this.getProject().slug}/settings/issue-tracking/`}
              className={'btn btn-default btn-sm btn-config-issue-tracking'}>
             {t('Link Issue Tracker')}

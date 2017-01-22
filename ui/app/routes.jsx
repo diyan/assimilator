@@ -28,6 +28,7 @@ import OrganizationAuditLog from './views/organizationAuditLog';
 import OrganizationDashboard from './views/organizationDashboard';
 import OrganizationDetails from './views/organizationDetails';
 import OrganizationRateLimits from './views/organizationRateLimits';
+import OrganizationRepositories from './views/organizationRepositories';
 import OrganizationStats from './views/organizationStats';
 import OrganizationTeams from './views/organizationTeams';
 import AllTeamsList from './views/organizationTeams/allTeamsList';
@@ -39,7 +40,8 @@ import ProjectDashboard from './views/projectDashboard';
 import ProjectDetails from './views/projectDetails';
 import ProjectEvents from './views/projectEvents';
 import ProjectFilters from './views/projectFilters';
-import ProjectInstall from './views/projectInstall';
+import ProjectGettingStarted from './views/projectInstall/gettingStarted';
+import ProjectDocsContext from './views/projectInstall/docsContext';
 import ProjectInstallOverview from './views/projectInstall/overview';
 import ProjectInstallPlatform from './views/projectInstall/platform';
 import ProjectReleases from './views/projectReleases';
@@ -108,24 +110,33 @@ function routes() {
         <IndexRoute component={errorHandler(OrganizationDashboard)}/>
 
         <Route path="/organizations/:orgId/audit-log/" component={errorHandler(OrganizationAuditLog)} />
+        <Route path="/organizations/:orgId/repos/" component={errorHandler(OrganizationRepositories)} />
         <Route path="/organizations/:orgId/teams/" component={errorHandler(OrganizationTeams)} />
+        <Route path="/organizations/:orgId/teams/:teamId/" component={errorHandler(TeamDetails)}>
+          <IndexRedirect to="settings/" />
+          <Route path="settings/" component={errorHandler(TeamSettings)} />
+          <Route path="members/" component={errorHandler(TeamMembers)} />
+        </Route>
+
         <Route path="/organizations/:orgId/all-teams/" component={errorHandler(OrganizationTeams)}>
           <IndexRoute component={errorHandler(AllTeamsList)}/>
         </Route>
         <Route path="/organizations/:orgId/issues/assigned/" component={errorHandler(MyIssuesAssignedToMe)} />
         <Route path="/organizations/:orgId/issues/bookmarks/" component={errorHandler(MyIssuesBookmarked)} />
         <Route path="/organizations/:orgId/issues/history/" component={errorHandler(MyIssuesViewed)} />
+
         <Route path="/organizations/:orgId/projects/choose/" component={errorHandler(ProjectChooser)} />
         <Route path="/organizations/:orgId/rate-limits/" component={errorHandler(OrganizationRateLimits)} />
         <Route path="/organizations/:orgId/stats/" component={errorHandler(OrganizationStats)} />
-        <Route path="/organizations/:orgId/teams/:teamId/" component={errorHandler(TeamDetails)}>
-          <IndexRedirect to="settings/" />
-          <Route path="settings/" component={errorHandler(TeamSettings)} />
-          <Route path="members/" component={errorHandler(TeamMembers)} />
-        </Route>
+
         <Route path="/organizations/:orgId/actions/set-callsigns/" component={errorHandler(SetCallsignsAction)} />
 
         {hooksOrgRoutes}
+
+        <Route path=":projectId/getting-started/" component={errorHandler(ProjectGettingStarted)}>
+          <IndexRoute component={errorHandler(ProjectInstallOverview)}/>
+          <Route path=":platform/" component={errorHandler(ProjectInstallPlatform)}/>
+        </Route>
 
         <Route path=":projectId/" component={errorHandler(ProjectDetails)}>
           <IndexRoute component={errorHandler(Stream)} />
@@ -142,15 +153,15 @@ function routes() {
           <Route path="settings/" component={errorHandler(ProjectSettings)}>
             <Route path="alerts/" component={errorHandler(ProjectAlertSettings)} />
             <Route path="alerts/rules/" component={errorHandler(ProjectAlertRules)} />
-            <Route path="install/" component={errorHandler(ProjectInstall)}>
-              <IndexRoute component={errorHandler(ProjectInstallOverview)}/>
-              <Route path=":platform/" component={errorHandler(ProjectInstallPlatform)}/>
-            </Route>
             <Route path="filters/" component={errorHandler(ProjectFilters)} />
             <Route path="saved-searches/" component={errorHandler(ProjectSavedSearches)} />
             <Route path="debug-symbols/" component={errorHandler(ProjectDebugSymbols)} />
             <Route path="user-feedback/" component={errorHandler(ProjectUserReportSettings)} />
             <Route path="csp/" component={errorHandler(ProjectCspSettings)} />
+            <Route path="install/" component={errorHandler(ProjectDocsContext)}>
+              <IndexRoute component={errorHandler(ProjectInstallOverview)}/>
+              <Route path=":platform/" component={errorHandler(ProjectInstallPlatform)}/>
+            </Route>
           </Route>
           <Redirect from="group/:groupId/" to="issues/:groupId/" />
           <Route path="issues/:groupId/" component={errorHandler(GroupDetails)}

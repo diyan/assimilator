@@ -1,4 +1,3 @@
-
 {% load i18n %}
 {% load sentry_api %}
 {% load sentry_dsn %}
@@ -44,8 +43,8 @@
   <script src="{% asset_url "sentry" "dist/app.js" %}"{% crossorigin %}></script>
 
   <script>
-    for (var n in window.exports.default) {
-      window[n] = window.exports.default[n];
+    for (var n in window.exports) {
+      window[n] = window.exports[n];
     }
     window.$ = window.jQuery;
 
@@ -228,7 +227,7 @@
           <a href="https://github.com/getsentry/sentry" rel="noreferrer">{% trans "Contribute" %}</a>
           {% if ONPREMISE %}<a href="/out/">{% trans "Migrate to SaaS" %}</a>{% endif %}
         </div>
-        {% if ONPREMISE %}<div class="version pull-left">Sentry {{ sentry_version.current }} {% if sentry_version.update_available %}<a href="#" title="You're running an old version of Sentry, did you know {{ sentry_version.latest }} is available?" class="tip icon-circle-arrow-up">&nbsp;</a>{% endif %}</div>{% endif %}
+        <div class="version pull-left">Sentry {{ sentry_version.current }} {% if sentry_version.update_available %}<a href="#" title="You're running an old version of Sentry, did you know {{ sentry_version.latest }} is available?" class="tip icon-circle-arrow-up">&nbsp;</a>{% endif %}</div>
         <a href="/" class="icon-sentry-logo"></a>
         {% endblock %}
       </div>

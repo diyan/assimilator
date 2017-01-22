@@ -185,7 +185,7 @@ const StreamGroup = React.createClass({
               }
               {data.logger &&
                 <li className="event-annotation">
-                  <Link to={`/${orgId}/${projectId}/`} query={{query: 'logger:' + data.logger}}>
+                  <Link to={{pathname: `/${orgId}/${projectId}/`, query: {query: 'logger:' + data.logger}}}>
                     {data.logger}
                   </Link>
                 </li>
@@ -204,7 +204,7 @@ const StreamGroup = React.createClass({
           <AssigneeSelector id={data.id} />
         </div>
         <div className="col-md-2 hidden-sm hidden-xs event-graph align-right">
-          <GroupChart id={data.id} statsPeriod={this.props.statsPeriod} />
+          <GroupChart id={data.id} statsPeriod={this.props.statsPeriod} data={data}/>
         </div>
         <div className="col-md-1 col-xs-2 event-count align-right">
           <Count value={data.count} />

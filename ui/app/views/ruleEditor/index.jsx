@@ -170,7 +170,7 @@ const RuleEditor = React.createClass({
 
             <div className="node-frequency-selector">
               <h6>
-                {tct('Perform these actions at most once every [frequency]', {
+                {tct('Perform these actions at most once every [frequency] for an issue.', {
                   frequency: (
                     <SelectInput ref="frequency"
                           className={(this.hasError('frequency') ? ' error' : '')}
@@ -184,6 +184,8 @@ const RuleEditor = React.createClass({
                       <option value="180">{t('3 hours')}</option>
                       <option value="720">{t('12 hours')}</option>
                       <option value="1440">{t('24 hours')}</option>
+                      <option value="10080">{t('one week')}</option>
+                      <option value="43200">{t('30 days')}</option>
                     </SelectInput>
                   )
                 })}
