@@ -10,26 +10,11 @@ import (
 )
 
 func ProjectTagsGetEndpoint(c echo.Context) error {
-	orgSlug := c.Param("organization_slug")
-	projectSlug := c.Param("project_slug")
-	db, err := db.GetSession()
+	projectID := MustGetProjectID(c)
+	db, err := db.GetSession(c)
 	if err != nil {
 		return err
 	}
-	projectID, err := db.SelectBySql(`
-		select p.ID
-			from sentry_project p
-				join sentry_team t on p.team_id = t.id
-				join sentry_organization o on t.organization_id = o.id
-		where o.slug = ? and p.slug = ? and p.status = ?`,
-		orgSlug, projectSlug, models.ProjectStatusVisible).
-		ReturnInt64()
-	if err != nil {
-		// TODO return ResourceDoesNotExist if record was not found
-		return err
-	}
-	// TODO check project permissions -> self.check_object_permissions(request, project)
-
 	tags := []*models.TagKey{}
 	_, err = db.SelectBySql(`
 		select fk.*

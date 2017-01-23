@@ -55,8 +55,7 @@ type ProjectRef struct {
 }
 
 func ProjectGroupIndexGetEndpoint(c echo.Context) error {
-	orgSlug := c.Param("organization_slug")
-	projectSlug := c.Param("project_slug")
+	projectID := MustGetProjectID(c)
 	statsPeriod := c.QueryParam("statsPeriod")
 	shortIDLookup, _ := strconv.ParseBool("shortIdLookup")
 	if !(statsPeriod == "" || statsPeriod == "24h" || statsPeriod == "14d") {
@@ -64,17 +63,7 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		return c.JSON(400, map[string]string{"detail": errInvalidStatsPeriod})
 	}
 	query := strings.TrimSpace(c.QueryParam("query"))
-	db, err := db.GetSession()
-	if err != nil {
-		return err
-	}
-	projectID, err := db.SelectBySql(`
-		select p.id
-			from sentry_project p
-				join sentry_organization o on p.organization_id = o.id
-		where o.slug = ? and p.slug = ?`,
-		orgSlug, projectSlug).
-		ReturnInt64()
+	db, err := db.GetSession(c)
 	if err != nil {
 		return err
 	}

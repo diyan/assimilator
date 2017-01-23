@@ -25,9 +25,8 @@ type UserOptions struct {
 }
 
 func ProjectMemberIndexGetEndpoint(c echo.Context) error {
-	orgSlug := c.Param("organization_slug")
-	projectSlug := c.Param("project_slug")
-	db, err := db.GetSession()
+	projectID := MustGetProjectID(c)
+	db, err := db.GetSession(c)
 	if err != nil {
 		return err
 	}
@@ -39,8 +38,8 @@ func ProjectMemberIndexGetEndpoint(c echo.Context) error {
 				join sentry_organizationmember om on u.id = om.user_id
 				join sentry_organization o on om.organization_id = o.id
 				join sentry_project p on o.id = p.organization_id
-		where o.slug = ? and p.slug = ? and u.is_active = true`,
-		orgSlug, projectSlug).
+		where p.project_id = ? and u.is_active = true`,
+		projectID).
 		LoadStructs(&users)
 	if err != nil {
 		return err
