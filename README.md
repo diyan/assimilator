@@ -21,7 +21,20 @@ $ sentry/run_sentry_containers.sh
 $ docker exec -ti acme_sentry_web raven test http://763a78a695424ed687cf8b7dc26d3161:763a78a695424ed687cf8b7dc26d3161@localhost:9000/2
 ```
 
+### Connect to the Sentry's Postgres database
+```
+$ docker run --rm -ti --name=pgcli \
+  -e PGPASSWORD=RucLUS8A \
+  --link=acme_sentry_db \
+  diyan/pgcli \
+  --host=acme_sentry_db \
+  --dbname=sentry \
+  --user=sentry
+```
+
 ### TODOs
+- Improve error handling, use errors.Wrap
+- Helper method to get projectID for current HTTP request that contains orgSlug, projectSlug
 - Test framework
 - Continuous testing
 - DB test fixtures
