@@ -1,5 +1,5 @@
-hash: 55b37b20217558c3f0332c303c7904b1309d997cea9670d89c93137603386511
-updated: 2017-01-19T21:18:50.027523014+02:00
+hash: e879203930a0ebf962b6b699f9a64e5f5be98e3a0173383a964ef1ac5d1ce101
+updated: 2017-01-23T18:01:08.305132429+02:00
 imports:
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
@@ -43,6 +43,12 @@ imports:
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/Sirupsen/logrus
   version: d26492970760ca5d33129d2d799e34be5c4782eb
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
+  - require
+  - suite
 - name: github.com/tylerb/graceful
   version: 0e9129e9c6d47da90dc0c188b26bd7bb1dab53cd
 - name: github.com/valyala/bytebufferpool
@@ -65,4 +71,12 @@ imports:
   version: d75a52659825e75fff6158388dddc6a5b04f9ba5
   subpackages:
   - unix
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib

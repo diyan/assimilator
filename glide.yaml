@@ -21,3 +21,5 @@ import:
 - package: github.com/pkg/errors
   version: v0.8.0
 - package: github.com/x-cray/logrus-prefixed-formatter
+- package: github.com/stretchr/testify/suite
+  version: v1.1.4
