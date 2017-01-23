@@ -26,6 +26,7 @@ get-go-tools:  ## Install Golang development tools
 	go get -u github.com/derekparker/delve/cmd/dlv
 	go get -u github.com/alecthomas/gometalinter
 	gometalinter --install
+	go get github.com/smartystreets/goconvey
 
 get-atom-plugins:  ## Install plugins for Atom editor
 	apm install go-plus hyperclick go-debug go-signature-statusbar
@@ -34,7 +35,7 @@ test-go:  ## Run Go tests
 	echo TODO
 
 test-watch-go:  ## Continuous testing for Go sources
-	echo TODO
+	goconvey -excludedDirs vendor,ui,volumes,templates
 
 test-js:  ## Run JavaScript tests
 	@echo "--> Building static assets"
