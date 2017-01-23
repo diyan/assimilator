@@ -21,27 +21,27 @@ const (
 
 // Group is an aggregated message which summarizes a set of Events.
 type Group struct {
-	ID        int       `db:"id"`
-	Logger    string    `db:"logger"`
-	Level     int       `db:"level"`
-	Message   string    `db:"message"`
-	Culprit   *string   `db:"view"`
-	Status    int       `db:"status"`
-	TimesSeen int       `db:"times_seen"`
-	LastSeen  time.Time `db:"last_seen"`
-	FirstSeen time.Time `db:"first_seen"`
+	ID        int       `db:"id" json:"id,string"`
+	Logger    string    `db:"logger" json:"logger"`
+	Level     int       `db:"level" json:"level"`
+	Message   string    `db:"message" json:"titile"`
+	Culprit   *string   `db:"view" json:"culprit"`
+	Status    int       `db:"status" json:"status"`
+	TimesSeen int       `db:"times_seen" json:"-"`
+	LastSeen  time.Time `db:"last_seen" json:"lastSeen"`
+	FirstSeen time.Time `db:"first_seen" json:"firstSeen"`
 	// Data is a GzippedDictField
-	Data           *string    `db:"data"`
-	Score          int        `db:"score"`
-	ProjectID      *int       `db:"project_id"`
-	TimeSpentTotal int        `db:"time_spent_total"`
-	TimeSpentCount int        `db:"time_spent_count"`
-	ResolvedAt     *time.Time `db:"resolved_at"`
-	ActiveAt       *time.Time `db:"active_at"`
-	IsPublic       *bool      `db:"is_public"`
-	Platform       *string    `db:"platform"`
-	NumComments    *int       `db:"num_comments"`
-	FirstReleaseID *int       `db:"first_release_id"`
+	Data           *string    `db:"data" json:"-"`
+	Score          int        `db:"score" json:"-"`
+	ProjectID      *int       `db:"project_id" json:"-"`
+	TimeSpentTotal int        `db:"time_spent_total" json:"-"`
+	TimeSpentCount int        `db:"time_spent_count" json:"-"`
+	ResolvedAt     *time.Time `db:"resolved_at" json:"-"`
+	ActiveAt       *time.Time `db:"active_at" json:"-"`
+	IsPublic       *bool      `db:"is_public" json:"isPublic"`
+	Platform       *string    `db:"platform" json:"-"`
+	NumComments    *int       `db:"num_comments" json:"numComments"`
+	FirstReleaseID *int       `db:"first_release_id" json:"-"`
 	// ShortID *int `db:"short_id"`
 }
 
