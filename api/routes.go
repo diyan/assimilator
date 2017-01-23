@@ -13,12 +13,13 @@ func RegisterRoutes(g *echo.Group) {
 	g.GET("/organizations/:organization_slug/", api.OrganizationDetailsGetEndpoint)
 
 	// Projects
+	g.GET("/projects/:organization_slug/:project_slug/environments/", api.ProjectEnvironmentsGetEndpoint)
 	g.GET("/projects/:organization_slug/:project_slug/issues/", api.ProjectGroupIndexGetEndpoint)
 	g.GET("/projects/:organization_slug/:project_slug/groups/", api.ProjectGroupIndexGetEndpoint)
+	g.GET("/projects/:organization_slug/:project_slug/searches/", api.ProjectSearchesGetEndpoint)
 
 	g.GET("/projects/:organization_slug/:project_slug/members/", api.ProjectMemberIndexGetEndpoint)
 	g.GET("/projects/:organization_slug/:project_slug/tags/", api.ProjectTagsGetEndpoint)
-
 	// Internal
 	g.GET("/internal/health/", api.SystemHealthGetEndpoint)
 }
