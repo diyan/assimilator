@@ -1,6 +1,8 @@
-hash: e879203930a0ebf962b6b699f9a64e5f5be98e3a0173383a964ef1ac5d1ce101
-updated: 2017-01-23T18:01:08.305132429+02:00
+hash: ddc1438978a95bc32c739c343626389561f9526e8f7dbdcd4d73996646d302f8
+updated: 2017-01-23T20:49:40.746362333+02:00
 imports:
+- name: github.com/bluele/factory-go
+  version: 037d52eaae310c951822d582dec6d0b42637fcd2
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
 - name: github.com/diyan/echox

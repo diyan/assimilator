@@ -23,3 +23,4 @@ import:
 - package: github.com/x-cray/logrus-prefixed-formatter
 - package: github.com/stretchr/testify/suite
   version: v1.1.4
+- package: github.com/bluele/factory-go
