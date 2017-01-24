@@ -8,7 +8,7 @@ $ sudo pacman -S git vim go go-tools glide
 $ vim ~/.zlogin
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
-$ mkdir ~/go/assimilator && cd $_
+$ mkdir -p $GOPATH/src/github.com/diyan && cd $_
 $ git clone git@github.com:diyan/assimilator.git
 $ make get-go-tools
 $ make get-go-deps
