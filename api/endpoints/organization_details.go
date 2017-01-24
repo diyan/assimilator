@@ -44,7 +44,7 @@ type Team struct {
 func OrganizationDetailsGetEndpoint(c echo.Context) error {
 	orgSlug := c.Param("organization_slug")
 	userID := 1 // TODO get ID from context.request.user.id
-	db, err := db.GetSession(c)
+	db, err := db.GetTx(c)
 	if err != nil {
 		return err
 	}

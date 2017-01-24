@@ -11,7 +11,7 @@ import (
 
 func ProjectEnvironmentsGetEndpoint(c echo.Context) error {
 	projectID := MustGetProjectID(c)
-	db, err := db.GetSession(c)
+	db, err := db.GetTx(c)
 	if err != nil {
 		return errors.Wrap(err, "can not get db session")
 	}

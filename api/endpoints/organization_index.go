@@ -11,7 +11,7 @@ import (
 
 func OrganizationIndexGetEndpoint(c echo.Context) error {
 	//memberOnly := c.Param("member")
-	db, err := db.GetSession(c)
+	db, err := db.GetTx(c)
 	if err != nil {
 		return err
 	}

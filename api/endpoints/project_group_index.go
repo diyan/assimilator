@@ -63,7 +63,7 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		return c.JSON(400, map[string]string{"detail": errInvalidStatsPeriod})
 	}
 	query := strings.TrimSpace(c.QueryParam("query"))
-	db, err := db.GetSession(c)
+	db, err := db.GetTx(c)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func buildQueryDto(c echo.Context, projectID int64) (QueryDto, error) {
 	return query, nil
 }
 
-func buildSelectBuilder(query QueryDto, db *dbr.Session) (*dbr.SelectBuilder, error) {
+func buildSelectBuilder(query QueryDto, db *dbr.Tx) (*dbr.SelectBuilder, error) {
 	sb := db.Select("gm.*").From("sentry_groupedmessage gm").Where("gm.project_id = ?", query.ProjectID)
 	if query.Query != "" {
 		// TODO(dcramer): if we want to continue to support search on SQL

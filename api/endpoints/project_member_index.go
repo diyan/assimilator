@@ -26,7 +26,7 @@ type UserOptions struct {
 
 func ProjectMemberIndexGetEndpoint(c echo.Context) error {
 	projectID := MustGetProjectID(c)
-	db, err := db.GetSession(c)
+	db, err := db.GetTx(c)
 	if err != nil {
 		return err
 	}

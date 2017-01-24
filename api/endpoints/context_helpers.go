@@ -21,7 +21,7 @@ func MustGetProjectID(c echo.Context) int64 {
 func GetProjectID(c echo.Context) (int64, error) {
 	orgSlug := c.Param("organization_slug")
 	projectSlug := c.Param("project_slug")
-	db, err := db.GetSession(c)
+	db, err := db.GetTx(c)
 	if err != nil {
 		return 0, err
 	}

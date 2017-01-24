@@ -6,7 +6,24 @@ import (
 	"github.com/pkg/errors"
 )
 
-func GetSession(c echo.Context) (*dbr.Session, error) {
+// GetTx returns DB transaction associated with current HTTP request
+func GetTx(c echo.Context) (*dbr.Tx, error) {
+	if tx, ok := c.Get("dbr.Tx").(*dbr.Tx); ok {
+		return tx, nil
+	}
+	return NewTx(c)
+}
+
+// NewTx starts new DB transactions and associate it with current HTTP request
+func NewTx(c echo.Context) (*dbr.Tx, error) {
+	if sess, ok := c.Get("dbr.Session").(*dbr.Session); ok {
+		tx, err := sess.Begin()
+		if err != nil {
+			return nil, errors.Wrap(err, "can not start db transaction")
+		}
+		c.Set("dbr.Tx", tx)
+		return tx, nil
+	}
 	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/sentry?sslmode=disable", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to init db connection")
@@ -17,5 +34,7 @@ func GetSession(c echo.Context) (*dbr.Session, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to ping db")
 	}
-	return conn.NewSession(nil), nil
+	sess := conn.NewSession(nil)
+	c.Set("dbr.Session", sess)
+	return NewTx(c)
 }
