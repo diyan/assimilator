@@ -42,8 +42,14 @@ func (t *testSuite) SetupTest() {
 	t.App = web.GetApp()
 	tx, err := db.GetTx(t.App.NewContext(nil, nil))
 	t.NoError(err)
-	// TODO How to share same *dbr.Session between testSuite and Echo's app instance
 	t.Tx = tx
+	// Mock *dbr.Tx in the test App instance
+	t.App.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("dbr.Tx", t.Tx)
+			return next(c)
+		}
+	})
 	t.Client = NewTestClient(t.Suite, t.App)
 }
 
@@ -91,7 +97,7 @@ func (c *TestClient) Delete(url string) *httptest.ResponseRecorder {
 // TODO If wrong name will be passed to SeqInt the test will be not visible for GoConvey!
 var TagKeyFactory = factory.NewFactory(
 	&models.TagKey{
-		ProjectID: 1,
+		ProjectID: 2,
 	},
 ).SeqInt("ID", func(n int) (interface{}, error) {
 	return n + 10, nil
@@ -127,6 +133,18 @@ func (t *testSuite) TestProjectTags_Get() {
 			"id": "5",
 			"key": "server_name",
 			"uniqueValues": 1,
+			"name": null
+		},
+		{
+			"id": "11",
+			"key": "key-1",
+			"uniqueValues": 0,
+			"name": null
+		},
+		{
+			"id": "12",
+			"key": "key-2",
+			"uniqueValues": 0,
 			"name": null
 		}]`,
 		rr.Body.String())
