@@ -1,5 +1,5 @@
 .PHONY: build-go watch-go get-go-deps get-js-deps get-go-tools get-atom-plugins
-.PHONY: test-js ling-go lint-js help
+.PHONY: test-js lint-go lint-js help
 .DEFAULT_GOAL := help
 
 build-go:  ## Build Golang project
@@ -52,5 +52,5 @@ lint-js:  ## Run static code analysis for JavaScript sources
 	cd ui && node_modules/.bin/eslint  --config .eslintrc --ext .jsx,.js {tests/js,app}
 	@echo
 
-help:  ## Show hel
+help:  ## Show help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
