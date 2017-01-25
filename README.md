@@ -36,9 +36,15 @@ $ docker run --rm -ti --name=pgcli \
   --user=sentry
 ```
 
+### Dump Sentry's Postgres database
+```
+$ docker exec -ti acme_sentry_db \
+  sh -c 'PGPASSWORD=RucLUS8A pg_dump --username=sentry --dbname=sentry'
+```
+
 ### TODOs
 - Improve error handling, use errors.Wrap
-- Helper method to get projectID for current HTTP request that contains orgSlug, projectSlug
+- Publish diyan/sentry:8.12.0 to GitHub and Docker Hub
 - Test framework
 - Continuous testing
 - DB test fixtures
