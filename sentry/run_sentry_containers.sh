@@ -7,7 +7,7 @@ IFS=$'\n\t'
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$DIR"
 
-VOLUMES_DIR="$DIR/../volumes"
+VOLUMES_DIR="$DIR/../.volumes"
 SENTRY_URL_PREFIX=http://localhost:9000
 
 # WARN Use carefully! Comment out code below to debug from scratch.
@@ -74,7 +74,7 @@ expect << END
         --link acme_sentry_redis \
         --restart=unless-stopped \
         --name acme_sentry_web \
-        slafs/sentry:8.0
+        diyan/sentry:8.12.0
     # sentryweb runs db migrations on start which takes time
     set timeout 60
     expect "Running service: 'http'"
@@ -97,10 +97,12 @@ expect << END
         --link acme_sentry_redis \
         --restart=unless-stopped \
         --name acme_sentry_worker \
-        slafs/sentry:8.0 \
-        celery worker -B --concurrency=4
+        diyan/sentry:8.12.0 \
+        run worker --concurrency=4
     expect "ready."
 END
+# TODO `sentry celery -B is dropped, consider use `celery run cron`
+# TODO `sentry start` is deprecated, use `sentry run web`
 echo INFO acme_sentry_worker is ready
 echo DONE all sentry containers are ready, try to login on http://localhost:9000 with admin / bHxTgk9K
 
