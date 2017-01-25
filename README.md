@@ -2,7 +2,8 @@
 WIP. An attempt to port minimum valuable subset of Sentry from Python to the Golang.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/diyan/assimilator/blob/master/LICENSE)
-[![TravisCI](https://img.shields.io/travis/diyan/assimilator/master.svg)](https://travis-ci.org/diyan/assimilator)
+[![Travis Build](https://travis-ci.org/diyan/assimilator.svg?branch=master)](https://travis-ci.org/diyan/assimilator)
+[![Go Report Card](https://goreportcard.com/badge/diyan/assimilator)](http://goreportcard.com/report/diyan/assimilator)
 
 ### Setup development enviroment on Arch Linux
 
