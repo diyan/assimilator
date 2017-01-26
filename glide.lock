@@ -1,5 +1,5 @@
-hash: b47f744f379414d3d6f9f5ed02e0705391a78d42b2e309505d22e77fb9fc08db
-updated: 2017-01-25T17:57:03.474438043+02:00
+hash: 91f51781e91f3250ef2d1ea5a684f5691758e920cc28704305379a9d8c690af3
+updated: 2017-01-26T12:31:28.936757386+02:00
 imports:
 - name: github.com/bluele/factory-go
   version: 037d52eaae310c951822d582dec6d0b42637fcd2
@@ -20,6 +20,8 @@ imports:
   version: b2f0ffcef2a64c0729d5818e103bc019caed7b22
   subpackages:
   - dialect
+- name: github.com/intelekshual/go-simpleflake
+  version: 7d205c7bab7dabd7b8c3e2639b719446cae82d2b
 - name: github.com/k0kubun/pp
   version: 36d5366f4ec038f9a76dd85c7b29074089bb9b9e
 - name: github.com/labstack/echo
@@ -39,6 +41,13 @@ imports:
   - oid
 - name: github.com/mattes/migrate
   version: ce1b59bb819416ca67422929b1cb48bb342720b6
+  subpackages:
+  - driver
+  - driver/postgres
+  - file
+  - migrate
+  - migrate/direction
+  - pipe
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty

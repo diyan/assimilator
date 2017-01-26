@@ -28,3 +28,4 @@ import:
 - package: github.com/bluele/factory-go
 - package: github.com/mattes/migrate
   version: v1.3.0
+- package: github.com/intelekshual/go-simpleflake

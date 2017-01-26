@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/k0kubun/pp"
+	simpleflake "github.com/intelekshual/go-simpleflake"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
@@ -50,21 +50,43 @@ func RecoverMiddleware() echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			defer func() {
 				if r := recover(); r != nil {
-					var err error
-					switch r := r.(type) {
-					case error:
-						err = r
-					default:
+					req := c.Request()
+					logEvent := logrus.Fields{
+						"event": "internal_error", // TOOD consider internalError naming
+						// TODO set request_id and other request-specific into in the separate middleware
+						"host":   req.Host,
+						"uri":    req.URL.String(),
+						"method": req.Method,
+						//"path":   path,
+						// TODO check X-Real-IP and X-Forwarded-For headers
+						"remote_ip": req.RemoteAddr,
+					}
+					eventID, err := simpleflake.New()
+					// TODO generate request_id in separate logging middleware
+					logEvent["request_id"] = eventID
+					logEvent["event_id"] = eventID
+					if err != nil {
+						logrus.Error(errors.Wrap(err, "failed to generate simpleflake ID"))
+					}
+					if _, ok := r.(stackTracer); ok {
+						// stackTracer interface means that error was handled gracefully
+						// TODO add more domain-specific error interface
+						logEvent["event"] = "app_error"
+						logEvent["error_msg"] = fmt.Sprintf("%v", r)
+						err = fmt.Errorf("%+v\n", r)
+					} else if e, ok := r.(error); ok {
+						err = e
+					} else {
 						err = fmt.Errorf("%v", r)
 					}
-					pp.Print(err.Error())
-					pp.Print(err)
+
 					//stack := make([]byte, config.StackSize)
 					//length := runtime.Stack(stack, !config.DisableStackAll)
 					//if !config.DisablePrintStack {
 					//	c.Logger().Printf("[%s] %s %s\n", color.Red("PANIC RECOVER"), err, stack[:length])
 					//}
 					//c.Error(err)
+					logrus.WithFields(logEvent).Error(err)
 				}
 			}()
 			return next(c)
