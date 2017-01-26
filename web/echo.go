@@ -52,7 +52,7 @@ func RecoverMiddleware() echo.MiddlewareFunc {
 				if r := recover(); r != nil {
 					req := c.Request()
 					logEvent := logrus.Fields{
-						"event": "internal_error", // TOOD consider internalError naming
+						"event": "internal_error", // TODO consider internalError naming
 						// TODO set request_id and other request-specific into in the separate middleware
 						"host":   req.Host,
 						"uri":    req.URL.String(),
