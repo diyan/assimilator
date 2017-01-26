@@ -49,4 +49,5 @@ $ docker exec -ti acme_sentry_db \
 - Continuous testing
 - DB test fixtures
 - Implement Prefix / SetPrefix in Echo/Logrus logger
+- Implement generic handler so "can not get project: query failed: dbr: not found", would be "can not get project. resource not found"
 - Hell of a lot things to do
