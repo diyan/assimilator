@@ -42,7 +42,7 @@ func getReactPageView(c echo.Context) error {
 	// restrict orgSlug to the regex [\w_-]+
 	//orgSlug := c.Param("organization-slug")
 	//log.Print(orgSlug, " is an organization-slug")
-	// TOOD implement generic ReactPageView
+	// TODO implement generic ReactPageView
 	return c.Render(http.StatusOK, "react.html", map[string]interface{}{
 		"request":        struct{ LANGUAGE_CODE string }{LANGUAGE_CODE: "en"},
 		"sentry_version": struct{ build string }{build: "8.12.0"},
