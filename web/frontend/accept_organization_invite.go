@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetAcceptOrganizationInviteView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getAcceptOrganizationInviteView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

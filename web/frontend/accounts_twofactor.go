@@ -4,35 +4,35 @@ import (
 	"github.com/labstack/echo"
 )
 
-func RecoveryCodeSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func recoveryCodeSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func RecoveryCodeSettingsPostView(c echo.Context) error {
+func recoveryCodeSettingsPostView(c echo.Context) error {
 
-	return RenderNotImplemented(c)
+	return renderNotImplemented(c)
 }
 
-func TOTPSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func tOTPSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func TOTPSettingsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func tOTPSettingsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func SmsSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func smsSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func SmsSettingsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func smsSettingsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func U2FSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func u2FSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func U2FSettingsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func u2FSettingsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

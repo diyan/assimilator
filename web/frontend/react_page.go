@@ -6,39 +6,39 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetOrganizationHomeView(c echo.Context) error {
-	return GetReactPageView(c)
+func getOrganizationHomeView(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetSentryAdminOverview(c echo.Context) error {
-	return GetReactPageView(c)
+func getSentryAdminOverview(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetSentryAPI(c echo.Context) error {
-	return GetReactPageView(c)
+func getSentryAPI(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetSentryOrganizationStatsView(c echo.Context) error {
-	return GetReactPageView(c)
+func getSentryOrganizationStatsView(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetSentryShortIDView(c echo.Context) error {
-	return GetReactPageView(c)
+func getSentryShortIDView(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetSentryGroupView(c echo.Context) error {
-	return GetReactPageView(c)
+func getSentryGroupView(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetSentryStream(c echo.Context) error {
-	return GetReactPageView(c)
+func getSentryStream(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetGenericReactPageView(c echo.Context) error {
-	return GetReactPageView(c)
+func getGenericReactPageView(c echo.Context) error {
+	return getReactPageView(c)
 }
 
-func GetReactPageView(c echo.Context) error {
+func getReactPageView(c echo.Context) error {
 	// restrict orgSlug to the regex [\w_-]+
 	//orgSlug := c.Param("organization-slug")
 	//log.Print(orgSlug, " is an organization-slug")

@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetRemoveOrganizationView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getRemoveOrganizationView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

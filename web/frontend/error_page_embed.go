@@ -4,10 +4,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-func ErrorPageEmbedGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func errorPageEmbedGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func ErrorPageEmbedPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func errorPageEmbedPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetProjectRuleEditView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getProjectRuleEditView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

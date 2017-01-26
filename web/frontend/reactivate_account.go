@@ -4,10 +4,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-func ReactivateAccountGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func reactivateAccountGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func ReactivateAccountPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func reactivateAccountPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

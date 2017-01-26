@@ -4,18 +4,18 @@ import (
 	"github.com/labstack/echo"
 )
 
-func AuthRegisterGetView(c echo.Context) error {
-	return AuthLoginGetView(c)
+func authRegisterGetView(c echo.Context) error {
+	return authLoginGetView(c)
 }
 
-func AuthRegisterPostView(c echo.Context) error {
-	return AuthLoginPostView(c)
+func authRegisterPostView(c echo.Context) error {
+	return authLoginPostView(c)
 }
 
-func AuthLoginGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func authLoginGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AuthLoginPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func authLoginPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

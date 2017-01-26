@@ -4,34 +4,34 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetStatusEnv(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getStatusEnv(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetStatusPackages(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getStatusPackages(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetStatusMail(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getStatusMail(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetStatusWarnings(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getStatusWarnings(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetCreateNewUser(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getCreateNewUser(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetEditUser(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getEditUser(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetRemoveUser(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getRemoveUser(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func GetConfigurePlugin(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getConfigurePlugin(c echo.Context) error {
+	return renderNotImplemented(c)
 }

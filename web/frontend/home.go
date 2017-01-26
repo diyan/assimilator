@@ -14,7 +14,7 @@ type Organization struct {
 	Slug string
 }
 
-func GetHomeView(c echo.Context) error {
+func getHomeView(c echo.Context) error {
 	return redirectToOrg(c)
 }
 
@@ -24,7 +24,7 @@ func redirectToOrg(c echo.Context) error {
 		return err
 	}
 	if err == nil {
-		orgURI := c.Echo().URI(GetOrganizationHomeView, org.Slug)
+		orgURI := c.Echo().URI(getOrganizationHomeView, org.Slug)
 		return c.Redirect(http.StatusFound, orgURI)
 	}
 	//} else if !features.Has("organizations:create") {

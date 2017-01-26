@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetOrganizationAuthSettingsView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getOrganizationAuthSettingsView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

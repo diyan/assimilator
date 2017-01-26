@@ -4,10 +4,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-func AccountSecurityGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountSecurityGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountSecurityPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountSecurityPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

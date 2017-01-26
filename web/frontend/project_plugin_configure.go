@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetProjectPluginConfigureView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getProjectPluginConfigureView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

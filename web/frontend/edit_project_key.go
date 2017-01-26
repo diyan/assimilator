@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetEditProjectKeyView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getEditProjectKeyView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

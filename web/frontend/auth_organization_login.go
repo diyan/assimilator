@@ -4,10 +4,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-func AuthOrganizationLoginGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func authOrganizationLoginGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AuthOrganizationLoginPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func authOrganizationLoginPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

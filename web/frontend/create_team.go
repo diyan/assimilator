@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetCreateTeamView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getCreateTeamView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

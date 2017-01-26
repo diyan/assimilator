@@ -4,14 +4,14 @@ import (
 	"github.com/labstack/echo"
 )
 
-func TwoFactorAuthGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func twoFactorAuthGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func TwoFactorAuthPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func twoFactorAuthPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func U2FAppID(c echo.Context) error {
-	return RenderNotImplemented(c)
+func u2FAppID(c echo.Context) error {
+	return renderNotImplemented(c)
 }

@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetProjectReleaseTrackingView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getProjectReleaseTrackingView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

@@ -4,86 +4,86 @@ import (
 	"github.com/labstack/echo"
 )
 
-func LoginRedirect(c echo.Context) error {
-	return RenderNotImplemented(c)
+func loginRedirect(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountStartConfirmEmail(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountStartConfirmEmail(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountConfirmEmail(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountConfirmEmail(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountRecoverGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountRecoverGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountRecoverPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountRecoverPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountRecoverConfirmGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountRecoverConfirmGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountRecoverConfirmPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountRecoverConfirmPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AccountSettingsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func accountSettingsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func TwoFactorSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func twoFactorSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func TwoFactorSettingsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func twoFactorSettingsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AvatarSettings(c echo.Context) error {
-	return RenderNotImplemented(c)
+func avatarSettings(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AppearanceSettingsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func appearanceSettingsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func AppearanceSettingsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func appearanceSettingsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func ListIdentities(c echo.Context) error {
-	return RenderNotImplemented(c)
+func listIdentities(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DisconnectIdentityGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func disconnectIdentityGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DisconnectIdentityPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func disconnectIdentityPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func ShowEmailsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func showEmailsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func ShowEmailsPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func showEmailsPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func EmailUnsubscribeProjectGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func emailUnsubscribeProjectGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func EmailUnsubscribeProjectPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func emailUnsubscribeProjectPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }

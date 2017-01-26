@@ -4,6 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetUserAvatarPhotoView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func getUserAvatarPhotoView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
