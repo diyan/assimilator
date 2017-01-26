@@ -9,9 +9,11 @@ import (
 
 	"github.com/bluele/factory-go/factory"
 	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/migrations"
 	"github.com/diyan/assimilator/models"
 	"github.com/diyan/assimilator/web"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -23,7 +25,7 @@ type testSuite struct {
 	suite.Suite
 	*require.Assertions
 	HttpRecorder *httptest.ResponseRecorder
-	Client       *TestClient
+	Client       *EchoTestClient
 	App          *echo.Echo
 	Tx           *dbr.Tx
 }
@@ -32,6 +34,36 @@ type testSuite struct {
 func (suite *testSuite) SetT(t *testing.T) {
 	suite.Suite.SetT(t)
 	suite.Assertions = require.New(t)
+}
+
+func (t *testSuite) SetupSuite() {
+	// TODO check what is faster - re-create db or drop all tables?
+	// select 'drop table "' || tablename || '" cascade;'
+	// from pg_tables where schemaname = 'sentry_ci';
+
+	// TODO remove duplicated code
+	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/postgres?sslmode=disable", nil)
+	t.NoError(errors.Wrap(err, "failed to init db connection"))
+	// dbr.Open calls sql.Open which returns err == nil even if there is no db connection,
+	//   so it is required to explicitly ping the database
+	err = conn.Ping()
+	t.NoError(errors.Wrap(err, "failed to ping db"))
+	sess := conn.NewSession(nil)
+	// Force drop db while others may be connected
+	_, err = sess.Exec(`
+		select pg_terminate_backend(pid) 
+		from pg_stat_activity 
+		where datname = 'sentry_ci';`)
+	t.NoError(err)
+	_, err = sess.Exec("drop database if exists sentry_ci;")
+	t.NoError(err)
+	_, err = sess.Exec("create database sentry_ci;")
+	t.NoError(err)
+	migrations.UpgradeDB()
+}
+
+func (t *testSuite) TearDownSuite() {
+	//fmt.Print("TearDownSuite")
 }
 
 // testify's suite.Suite calls following hooks on each test method execution:
@@ -50,7 +82,7 @@ func (t *testSuite) SetupTest() {
 			return next(c)
 		}
 	})
-	t.Client = NewTestClient(t.Suite, t.App)
+	t.Client = NewEchoTestClient(t.Suite, t.App)
 }
 
 func (t *testSuite) TearDownTest() {
@@ -58,39 +90,34 @@ func (t *testSuite) TearDownTest() {
 	t.NoError(err)
 }
 
-var _ suite.SetupTestSuite = &testSuite{}
-var _ suite.TearDownTestSuite = &testSuite{}
-
 // TODO Move test client into separate module
-type TestClient struct {
-	Server   *echo.Echo
+type EchoTestClient struct {
+	server   *echo.Echo
 	recorder *httptest.ResponseRecorder
 	suite    suite.Suite
 }
 
 // TODO keep the TestClient generic if possible
-func NewTestClient(suite suite.Suite, server *echo.Echo) *TestClient {
-	return &TestClient{
-		Server: server,
+func NewEchoTestClient(suite suite.Suite, server *echo.Echo) *EchoTestClient {
+	return &EchoTestClient{
+		server: server,
 		suite:  suite,
 	}
 }
 
-func (c *TestClient) Get(url string) *httptest.ResponseRecorder {
+func (c *EchoTestClient) Get(url string) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	req, err := http.NewRequest("GET", url, nil)
 	c.suite.NoError(err)
-	// TODO we should set correct Tx to the echo.Context before this call
-	c.Server.ServeHTTP(recorder, req)
+	c.server.ServeHTTP(recorder, req)
 	return recorder
 }
 
-func (c *TestClient) Delete(url string) *httptest.ResponseRecorder {
+func (c *EchoTestClient) Delete(url string) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	req, err := http.NewRequest("DELETE", url, nil)
 	c.suite.NoError(err)
-	// TODO we should set correct Tx to the echo.Context before this call
-	c.Server.ServeHTTP(recorder, req)
+	c.server.ServeHTTP(recorder, req)
 	return recorder
 }
 
@@ -109,6 +136,7 @@ func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
 
+// TODO setup project, organization, etc using text fixtures
 func (t *testSuite) TestProjectTags_Get() {
 	tagKey1 := TagKeyFactory.MustCreate()
 	tagKey2 := TagKeyFactory.MustCreate()
