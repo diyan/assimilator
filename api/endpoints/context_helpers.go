@@ -6,9 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+// MustGetProjectID is like GetProjectID but panics if `organization_slug`
+//  or `project_slug` was not passed in HTTP request
 // TODO context_helpers a bad name, later we need to split this module into the
 //  several modules with good names.
-
 func MustGetProjectID(c echo.Context) int64 {
 	projectID, err := GetProjectID(c)
 	if err != nil {
@@ -17,7 +18,9 @@ func MustGetProjectID(c echo.Context) int64 {
 	return projectID
 }
 
-// TODO add argument, so we can return only visible or all projects
+// GetProjectID returns projectID for current HTTP request
+// TODO add argument, so we can return all projects or
+//   projects that only visible to current user
 func GetProjectID(c echo.Context) (int64, error) {
 	orgSlug := c.Param("organization_slug")
 	projectSlug := c.Param("project_slug")
