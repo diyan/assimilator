@@ -29,5 +29,5 @@ func ProjectSearchesGetEndpoint(c echo.Context) error {
 }
 
 func ProjectSearchesPostEndpoint(c echo.Context) error {
-	return RenderNotImplemented(c)
+	return renderNotImplemented(c)
 }

@@ -82,12 +82,12 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 			// information about where that is.  Note that this can return
 			// results for another project.  The UI deals with this.
 			// TODO Get Group by Short ID
-			return RenderNotImplemented(c)
+			return renderNotImplemented(c)
 		}
 		if matchingGroupID != 0 {
 			//  TODO Get by Group ID
 			// response['X-Sentry-Direct-Hit'] = '1'
-			return RenderNotImplemented(c)
+			return renderNotImplemented(c)
 		}
 	}
 

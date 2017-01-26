@@ -6,36 +6,36 @@ import (
 	"github.com/labstack/echo"
 )
 
-func RenderNotImplemented(c echo.Context) error {
+func renderNotImplemented(c echo.Context) error {
 	return c.HTML(
 		http.StatusNotImplemented,
 		"We are sorry, this page was not yet ported from Sentry")
 }
 
-func StoreGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func storeGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func StorePostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func storePostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func CspReportGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func cspReportGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func CspReportPostView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func cspReportPostView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
 func GetRobotsTxt(c echo.Context) error {
-	return RenderNotImplemented(c)
+	return renderNotImplemented(c)
 }
 
 func GetCrossdomainXMLIndex(c echo.Context) error {
-	return RenderNotImplemented(c)
+	return renderNotImplemented(c)
 }
 
-func GetCrossdomainXml(c echo.Context) error {
-	return RenderNotImplemented(c)
+func GetCrossdomainXML(c echo.Context) error {
+	return renderNotImplemented(c)
 }

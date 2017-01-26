@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo"
 )
 
-// RegisterRoutes adds API routes to the Echo's route group
-func RegisterRoutes(g *echo.Group) {
+// RegisterAPIRoutes adds API routes to the Echo's route group
+func RegisterAPIRoutes(g *echo.Group) {
 	// Organizations
 	g.GET("/organizations/", api.OrganizationIndexGetEndpoint)
 	g.GET("/organizations/:organization_slug/", api.OrganizationDetailsGetEndpoint)

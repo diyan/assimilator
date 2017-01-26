@@ -44,23 +44,8 @@ store.Any("", api.AnyStoreView)
 // RegisterRoutes ..
 func RegisterRoutes(e *echo.Echo) {
 	// TODO call registerDebugViews only if getattr(settings, 'DEBUG_VIEWS', settings.DEBUG)
-	registerDebugViews(e)
-	// Store endpoints first since they are the most active
-	//e.GET("/api/store/", api.StoreGetView)
-	//e.POST("/api/store/", api.StorePostView)
-	var g *echo.Group
-	g = e.Group("/api/store/")
-	g.GET("", api.StoreGetView)
-	g.POST("", api.StorePostView)
-	// :project_id is [\w_-]+
-	g = e.Group("/api/:project_id/store/")
-	g.GET("", api.StoreGetView)
-	g.POST("", api.StorePostView)
-	// :project_id is \d+
-	g = e.Group("/api/:project_id/csp-report/")
-	// TODO is CspReportGetView needed?
-	g.GET("", api.CspReportGetView)
-	g.POST("", api.CspReportPostView)
+	g := e.Group("/debug")
+	debug.RegisterDebugViews(g)
 	// The static version is either a 10 digit timestamp, a sha1, or md5 hash
 	// :version \d{10}|[a-f0-9]{32,40}
 	// TODO Use general-purpose static middleware or custom implementation?
@@ -68,8 +53,11 @@ func RegisterRoutes(e *echo.Echo) {
 	//e.GET("/_static/:version/:module/*", frontend.GetStaticMedia)
 
 	// API
-	apiV0Router := e.Group("/api/0")
-	apiV0.RegisterRoutes(apiV0Router)
+	g = e.Group("/api")
+	api.RegisterAPIRoutes(g)
+	// API version 0
+	g = e.Group("/api/0")
+	apiV0.RegisterAPIRoutes(g)
 	e.POST("/api/hooks/mailgun/inbound/", frontend.MailgunInboundWebhookPostView)
 	e.POST("/api/hooks/release/:plugin_id/:project_id/:signature/", frontend.ReleaseWebhookPostView)
 	g = e.Group("/api/embed/error-page/")
@@ -278,7 +266,7 @@ func RegisterRoutes(e *echo.Echo) {
 	})
 	// crossdomain.xml
 	e.GET("/crossdomain.xml", api.GetCrossdomainXMLIndex)
-	e.GET("/api/:project_id/crossdomain.xml", api.GetCrossdomainXml)
+	e.GET("/api/:project_id/crossdomain.xml", api.GetCrossdomainXML)
 
 	// plugins
 	// TODO mount plugin handlers under /plugins/* prefix
@@ -307,32 +295,4 @@ func RegisterRoutes(e *echo.Echo) {
 	// Legacy
 	// TODO check original implementation
 	// url(r'/", react_page_view),
-}
-
-func registerDebugViews(e *echo.Echo) {
-	// TODO stubs were created only for GET verbs
-	e.GET("debug/mail/alert/", debug.DebugMailAlertGetView)
-	e.GET("debug/mail/note/", debug.DebugNoteEmailGetView)
-	e.GET("debug/mail/new-release/", debug.DebugNewReleaseEmailGetView)
-	e.GET("debug/mail/assigned/", debug.DebugAssignedEmailGetView)
-	e.GET("debug/mail/assigned/self/", debug.DebugSelfAssignedEmailGetView)
-	e.GET("debug/mail/digest/", debug.DebugMailDigestGetView)
-	e.GET("debug/mail/report/", debug.DebugMailReportGetView)
-	e.GET("debug/mail/regression/", debug.DebugRegressionEmailGetView)
-	e.GET("debug/mail/regression/release/", debug.DebugRegressionReleaseEmailGetView)
-	e.GET("debug/mail/resolved/", debug.DebugResolvedEmailGetView)
-	e.GET("debug/mail/resolved-in-release/", debug.DebugResolvedInReleaseEmailGetView)
-	e.GET("debug/mail/resolved-in-release/upcoming/", debug.DebugResolvedInReleaseUpcomingEmailGetView)
-	e.GET("debug/mail/request-access/", debug.DebugMailRequestAccess)
-	e.GET("debug/mail/access-approved/", debug.DebugMailAccessApproved)
-	e.GET("debug/mail/invitation/", debug.DebugMailAccessInvitation)
-	e.GET("debug/mail/confirm-email/", debug.DebugMailConfirmEmail)
-	e.GET("debug/mail/recover-account/", debug.DebugMailRecoverAccount)
-	e.GET("debug/mail/unassigned/", debug.DebugUnassignedEmailGetView)
-	e.GET("debug/mail/org-delete-confirm/", debug.DebugMailOrgDeleteConfirmGetView)
-	e.GET("debug/embed/error-page/", debug.DebugErrorPageEmbedGetView)
-	e.GET("debug/trigger-error/", debug.DebugTriggerErrorGetView)
-	e.GET("debug/auth-confirm-identity/", debug.DebugAuthConfirmIdentity)
-	e.GET("debug/auth-confirm-link/", debug.DebugAuthConfirmLink)
-	e.GET("debug/icons/", debug.IconsGetView)
 }

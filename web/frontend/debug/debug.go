@@ -6,104 +6,104 @@ import (
 	"github.com/labstack/echo"
 )
 
-func RenderNotImplemented(c echo.Context) error {
+func renderNotImplemented(c echo.Context) error {
 	return c.HTML(
 		http.StatusNotImplemented,
 		"We are sorry, this page was not yet ported from Sentry")
 }
 
-func DebugMailAlertGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailAlertGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugNoteEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugNoteEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugNewReleaseEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugNewReleaseEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugAssignedEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugAssignedEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugSelfAssignedEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugSelfAssignedEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailDigestGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailDigestGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailReportGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailReportGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugRegressionEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugRegressionEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugRegressionReleaseEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugRegressionReleaseEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugResolvedEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugResolvedEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugResolvedInReleaseEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugResolvedInReleaseEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugResolvedInReleaseUpcomingEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugResolvedInReleaseUpcomingEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailRequestAccess(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailRequestAccess(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailAccessApproved(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailAccessApproved(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailAccessInvitation(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailAccessInvitation(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailConfirmEmail(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailConfirmEmail(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailRecoverAccount(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailRecoverAccount(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugUnassignedEmailGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugUnassignedEmailGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugMailOrgDeleteConfirmGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugMailOrgDeleteConfirmGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugErrorPageEmbedGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugErrorPageEmbedGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugTriggerErrorGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugTriggerErrorGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugAuthConfirmIdentity(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugAuthConfirmIdentity(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func DebugAuthConfirmLink(c echo.Context) error {
-	return RenderNotImplemented(c)
+func debugAuthConfirmLink(c echo.Context) error {
+	return renderNotImplemented(c)
 }
 
-func IconsGetView(c echo.Context) error {
-	return RenderNotImplemented(c)
+func iconsGetView(c echo.Context) error {
+	return renderNotImplemented(c)
 }
