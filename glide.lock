@@ -1,8 +1,10 @@
-hash: ddc1438978a95bc32c739c343626389561f9526e8f7dbdcd4d73996646d302f8
-updated: 2017-01-23T20:49:40.746362333+02:00
+hash: b47f744f379414d3d6f9f5ed02e0705391a78d42b2e309505d22e77fb9fc08db
+updated: 2017-01-25T17:57:03.474438043+02:00
 imports:
 - name: github.com/bluele/factory-go
   version: 037d52eaae310c951822d582dec6d0b42637fcd2
+  subpackages:
+  - factory
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
 - name: github.com/diyan/echox
@@ -35,6 +37,8 @@ imports:
   version: 67c3f2a8884c9b1aac5503c8d42ae4f73a93511c
   subpackages:
   - oid
+- name: github.com/mattes/migrate
+  version: ce1b59bb819416ca67422929b1cb48bb342720b6
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty

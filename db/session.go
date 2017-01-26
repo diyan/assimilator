@@ -24,7 +24,7 @@ func NewTx(c echo.Context) (*dbr.Tx, error) {
 		c.Set("dbr.Tx", tx)
 		return tx, nil
 	}
-	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/sentry?sslmode=disable", nil)
+	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/sentry_ci?sslmode=disable", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to init db connection")
 	}

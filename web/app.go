@@ -12,11 +12,8 @@ import (
 	mwx "github.com/diyan/echox/middleware"
 	mw "github.com/labstack/echo/middleware"
 	logrusfmt "github.com/x-cray/logrus-prefixed-formatter"
-
-	_ "github.com/lib/pq"
 )
 
-// TODO keep main.go small, move everything to the web/server.go
 func init() {
 	template.RegisterTags()
 	template.RegisterFilters()
