@@ -57,6 +57,7 @@ func RecoverMiddleware() echo.MiddlewareFunc {
 					default:
 						err = fmt.Errorf("%v", r)
 					}
+					pp.Print(err.Error())
 					pp.Print(err)
 					//stack := make([]byte, config.StackSize)
 					//length := runtime.Stack(stack, !config.DisableStackAll)
