@@ -7,6 +7,9 @@ type Organization struct {
 	ID          int       `db:"id" json:"id,string"`
 	Name        string    `db:"name" json:"name"`
 	Slug        string    `db:"slug" json:"slug"`
+	Status      int       `db:"status"`
+	Flags       int       `db:"flags"`
+	DefaultRole string    `db:"default_role"`
 	DateCreated time.Time `db:"date_added" json:"dateCreated"`
 }
 
