@@ -6,14 +6,14 @@ import "time"
 // is the top level entry point for all data.
 type Project struct {
 	ID             int       `db:"id" json:"id,string"`
-	Slug           string    `db:"slug" json:"slug"`
-	Name           string    `db:"name" json:"name"`
-	Public         bool      `db:"public" json:"public"`
-	DateCreated    time.Time `db:"date_added" json:"dateCreated"`
-	Status         int       `db:"status" json:"-"`
-	OrganizationID int       `db:"organization_id" json:"-"`
 	TeamID         int       `db:"team_id" json:"-"`
+	OrganizationID int       `db:"organization_id" json:"-"`
+	Name           string    `db:"name" json:"name"`
+	Slug           string    `db:"slug" json:"slug"`
+	Public         bool      `db:"public" json:"public"`
+	Status         int       `db:"status" json:"-"`
 	FirstEvent     time.Time `db:"first_event" json:"firstEvent"`
+	DateCreated    time.Time `db:"date_added" json:"dateCreated"`
 }
 
 const (
