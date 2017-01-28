@@ -3,12 +3,14 @@ package api_test
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"net/http/httptest"
 	"testing"
 
 	"github.com/bluele/factory-go/factory"
 	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/db/store"
 	"github.com/diyan/assimilator/migrations"
 	"github.com/diyan/assimilator/models"
 	"github.com/diyan/assimilator/web"
@@ -121,13 +123,42 @@ func (c *EchoTestClient) Delete(url string) *httptest.ResponseRecorder {
 	return recorder
 }
 
+var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+var OrganizationFactory = factory.NewFactory(
+	// TODO Seems like we have to return a pointer. go-factory does not work with return by value
+	&models.Organization{
+		ID:          1,
+		Name:        "ACME-Team",
+		Slug:        "acme-team",
+		Status:      models.OrganizationStatusVisible,
+		Flags:       1, // What does this mean?
+		DefaultRole: "member",
+		DateCreated: time_of_2999_01_01__00_00_00,
+	},
+)
+
+var ProjectFactory = factory.NewFactory(
+	&models.Project{
+		ID:             1,
+		TeamID:         1,
+		OrganizationID: 1,
+		Name:           "ACME",
+		Slug:           "acme",
+		Public:         false,
+		Status:         models.ProjectStatusVisible,
+		FirstEvent:     time_of_2999_01_01__00_00_00,
+		DateCreated:    time_of_2999_01_01__00_00_00,
+	},
+)
+
 // TODO If wrong name will be passed to SeqInt the test will be not visible for GoConvey!
 var TagKeyFactory = factory.NewFactory(
 	&models.TagKey{
-		ProjectID: 2,
+		ProjectID: 1,
 	},
 ).SeqInt("ID", func(n int) (interface{}, error) {
-	return n + 10, nil
+	return n, nil
 }).SeqInt("Key", func(n int) (interface{}, error) {
 	return fmt.Sprintf("key-%d", n), nil
 })
@@ -138,39 +169,31 @@ func TestRunSuite(t *testing.T) {
 
 // TODO setup project, organization, etc using text fixtures
 func (t *testSuite) TestProjectTags_Get() {
-	tagKey1 := TagKeyFactory.MustCreate()
-	tagKey2 := TagKeyFactory.MustCreate()
-	rv, err := t.Tx.InsertInto("sentry_filterkey").
-		Columns("id", "project_id", "key", "values_seen", "label", "status").
-		Record(tagKey1).
-		Record(tagKey2).
-		Exec()
+	org := OrganizationFactory.MustCreate().(*models.Organization)
+	project := ProjectFactory.MustCreate().(*models.Project)
+	tagKey1 := TagKeyFactory.MustCreate().(*models.TagKey)
+	tagKey2 := TagKeyFactory.MustCreate().(*models.TagKey)
+	orgStore := store.NewOrganizationStore(t.Tx)
+	err := orgStore.SaveOrganization(*org)
 	t.NoError(err)
-	// TODO can we just ignore rv / sql.Result?
-	t.NotNil(rv)
+	projectStore := store.NewProjectStore(t.Tx)
+	err = projectStore.SaveProject(*project)
+	t.NoError(err)
+	err = projectStore.SaveTags(tagKey1, tagKey2)
+	t.NoError(err)
+
 	rr := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/")
 	t.Equal(200, rr.Code)
 	// TODO result below is from read db but we should use test db
+	// TODO Investigate why GoConvey crashing if t.JSONEq is false
 	t.JSONEq(`[{
-			"id": "4",
-			"key": "level",
-			"uniqueValues": 1,
-			"name": null
-		}, 
-		{
-			"id": "5",
-			"key": "server_name",
-			"uniqueValues": 1,
-			"name": null
-		},
-		{
-			"id": "11",
+			"id": "1",
 			"key": "key-1",
 			"uniqueValues": 0,
 			"name": null
 		},
 		{
-			"id": "12",
+			"id": "2",
 			"key": "key-2",
 			"uniqueValues": 0,
 			"name": null
