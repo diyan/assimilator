@@ -13,7 +13,7 @@ import (
 func MustGetProjectID(c echo.Context) int64 {
 	projectID, err := GetProjectID(c)
 	if err != nil {
-		panic(errors.Wrap(err, "can not get project"))
+		panic(err)
 	}
 	return projectID
 }
@@ -28,6 +28,7 @@ func GetProjectID(c echo.Context) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	// TODO validate that orgSlug is exists
 	projectID, err := db.SelectBySql(`
 		select p.id
 			from sentry_project p
@@ -35,7 +36,7 @@ func GetProjectID(c echo.Context) (int64, error) {
 		where o.slug = ? and p.slug = ?`,
 		orgSlug, projectSlug).
 		ReturnInt64()
-	return projectID, errors.Wrap(err, "query failed")
+	return projectID, errors.Wrap(err, "can not get project")
 	// TODO return ResourceDoesNotExist if record was not found
 	// TODO check project permissions -> self.check_object_permissions(request, project)
 }
