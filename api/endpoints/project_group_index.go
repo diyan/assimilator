@@ -55,7 +55,7 @@ type ProjectRef struct {
 }
 
 func ProjectGroupIndexGetEndpoint(c echo.Context) error {
-	projectID := MustGetProjectID(c)
+	projectID := GetProjectID(c)
 	statsPeriod := c.QueryParam("statsPeriod")
 	shortIDLookup, _ := strconv.ParseBool("shortIdLookup")
 	if !(statsPeriod == "" || statsPeriod == "24h" || statsPeriod == "14d") {

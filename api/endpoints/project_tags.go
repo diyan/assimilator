@@ -3,31 +3,16 @@ package api
 import (
 	"net/http"
 
-	"github.com/diyan/assimilator/db"
-	"github.com/diyan/assimilator/models"
-
+	"github.com/diyan/assimilator/db/store"
 	"github.com/labstack/echo"
 )
 
 func ProjectTagsGetEndpoint(c echo.Context) error {
-	projectID := MustGetProjectID(c)
-	db, err := db.GetTx(c)
+	projectID := GetProjectID(c)
+	projectStore := store.NewProjectStore(c)
+	tags, err := projectStore.GetTags(projectID)
 	if err != nil {
 		return err
-	}
-	tags := []*models.TagKey{}
-	_, err = db.SelectBySql(`
-		select fk.*
-			from sentry_filterkey fk
-		where fk.project_id = ? and fk.status = ?`,
-		projectID, models.TagKeyStatusVisible).
-		LoadStructs(&tags)
-	if err != nil {
-		return err
-	}
-	// TODO tag.Key must be processed -> TagKey.get_standardized_key(tag_key.key)
-	for _, tag := range tags {
-		tag.PostGet()
 	}
 	return c.JSON(http.StatusOK, tags)
 }

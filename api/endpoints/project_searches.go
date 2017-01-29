@@ -9,7 +9,7 @@ import (
 )
 
 func ProjectSearchesGetEndpoint(c echo.Context) error {
-	projectID := MustGetProjectID(c)
+	projectID := GetProjectID(c)
 	db, err := db.GetTx(c)
 	if err != nil {
 		return err
