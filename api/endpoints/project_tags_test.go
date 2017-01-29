@@ -207,7 +207,6 @@ func (t *testSuite) TestProjectTags_Get() {
 	project := ProjectFactory.MustCreate().(*models.Project)
 	tagKey1 := TagKeyFactory.MustCreate().(*models.TagKey)
 	tagKey2 := TagKeyFactory.MustCreate().(*models.TagKey)
-	// TODO Pitfall. t.RequestCtx is needed to call projectStore.SaveProject using the same transacton
 	t.Factory.SaveOrganization(*org)
 	t.Factory.SaveProject(*project)
 	t.Factory.SaveTags(tagKey1, tagKey2)
