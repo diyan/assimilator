@@ -29,6 +29,7 @@ type testSuite struct {
 	HttpRecorder *httptest.ResponseRecorder
 	Client       *EchoTestClient
 	App          *echo.Echo
+	RequestCtx   echo.Context
 	Tx           *dbr.Tx
 }
 
@@ -74,7 +75,9 @@ func (t *testSuite) TearDownSuite() {
 func (t *testSuite) SetupTest() {
 	//t.HttpRecorder = httptest.NewRecorder()
 	t.App = web.GetApp()
-	tx, err := db.GetTx(t.App.NewContext(nil, nil))
+	// TODO Pitfall. t.RequestCtx is needed to call projectStore.SaveProject using the same transacton
+	t.RequestCtx = t.App.NewContext(nil, nil)
+	tx, err := db.GetTx(t.RequestCtx)
 	t.NoError(err)
 	t.Tx = tx
 	// Mock *dbr.Tx in the test App instance
@@ -132,7 +135,7 @@ var OrganizationFactory = factory.NewFactory(
 		Name:        "ACME-Team",
 		Slug:        "acme-team",
 		Status:      models.OrganizationStatusVisible,
-		Flags:       1, // What does this mean?
+		Flags:       1, // TODO What does this mean? Introduce constants
 		DefaultRole: "member",
 		DateCreated: time_of_2999_01_01__00_00_00,
 	},
@@ -173,10 +176,11 @@ func (t *testSuite) TestProjectTags_Get() {
 	project := ProjectFactory.MustCreate().(*models.Project)
 	tagKey1 := TagKeyFactory.MustCreate().(*models.TagKey)
 	tagKey2 := TagKeyFactory.MustCreate().(*models.TagKey)
-	orgStore := store.NewOrganizationStore(t.Tx)
+	// TODO Pitfall. t.RequestCtx is needed to call projectStore.SaveProject using the same transacton
+	orgStore := store.NewOrganizationStore(t.RequestCtx)
 	err := orgStore.SaveOrganization(*org)
 	t.NoError(err)
-	projectStore := store.NewProjectStore(t.Tx)
+	projectStore := store.NewProjectStore(t.RequestCtx)
 	err = projectStore.SaveProject(*project)
 	t.NoError(err)
 	err = projectStore.SaveTags(tagKey1, tagKey2)
