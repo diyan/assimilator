@@ -1,21 +1,27 @@
 package store
 
 import (
+	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/models"
-	"github.com/gocraft/dbr"
+	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
+// TODO consider move store sources from ./db/store to ./store
 type OrganizationStore struct {
-	tx *dbr.Tx
+	c echo.Context
 }
 
-func NewOrganizationStore(tx *dbr.Tx) OrganizationStore {
-	return OrganizationStore{tx: tx}
+func NewOrganizationStore(c echo.Context) OrganizationStore {
+	return OrganizationStore{c: c}
 }
 
 func (s OrganizationStore) SaveOrganization(org models.Organization) error {
-	_, err := s.tx.InsertInto("sentry_organization").
+	db, err := db.GetTx(s.c)
+	if err != nil {
+		return errors.Wrapf(err, "failed to save organization")
+	}
+	_, err = db.InsertInto("sentry_organization").
 		Columns("id", "name", "slug", "status", "flags", "default_role", "date_added").
 		Record(org).
 		Exec()
