@@ -29,8 +29,7 @@ type testSuite struct {
 	HttpRecorder *httptest.ResponseRecorder
 	Client       *EchoTestClient
 	App          *echo.Echo
-	RequestCtx   echo.Context
-	Tx           *dbr.Tx
+	Factory      TestFactory
 }
 
 // SetT overrides assert.Assertions with require.Assertions.
@@ -75,24 +74,56 @@ func (t *testSuite) TearDownSuite() {
 func (t *testSuite) SetupTest() {
 	//t.HttpRecorder = httptest.NewRecorder()
 	t.App = web.GetApp()
-	// TODO Pitfall. t.RequestCtx is needed to call projectStore.SaveProject using the same transacton
-	t.RequestCtx = t.App.NewContext(nil, nil)
-	tx, err := db.GetTx(t.RequestCtx)
-	t.NoError(err)
-	t.Tx = tx
-	// Mock *dbr.Tx in the test App instance
-	t.App.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set("dbr.Tx", t.Tx)
-			return next(c)
-		}
-	})
+	t.Factory = NewTestFactory(t.Suite, t.App)
 	t.Client = NewEchoTestClient(t.Suite, t.App)
 }
 
 func (t *testSuite) TearDownTest() {
-	err := t.Tx.Rollback()
-	t.NoError(err)
+	t.Factory.Reset()
+}
+
+type TestFactory struct {
+	suite            suite.Suite
+	tx               *dbr.Tx
+	SaveOrganization func(org models.Organization)
+	SaveProject      func(project models.Project)
+	SaveTags         func(tags ...*models.TagKey)
+}
+
+func NewTestFactory(suite suite.Suite, server *echo.Echo) TestFactory {
+	noError := suite.Require().NoError
+	ctx := server.NewContext(nil, nil)
+	tx, err := db.GetTx(ctx)
+	noError(err)
+	tf := TestFactory{
+		suite: suite,
+		tx:    tx,
+	}
+	// TODO Tricky implementation. Mock *dbr.Tx in the test Echo instance
+	server.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("dbr.Tx", tx)
+			return next(c)
+		}
+	})
+
+	orgStore := store.NewOrganizationStore(ctx)
+	projectStore := store.NewProjectStore(ctx)
+	tf.SaveOrganization = func(org models.Organization) {
+		noError(orgStore.SaveOrganization(org))
+	}
+	tf.SaveProject = func(project models.Project) {
+		noError(projectStore.SaveProject(project))
+	}
+	tf.SaveTags = func(tags ...*models.TagKey) {
+		noError(projectStore.SaveTags(tags...))
+	}
+	return tf
+}
+
+func (tf TestFactory) Reset() {
+	err := tf.tx.Rollback()
+	tf.suite.Require().NoError(err)
 }
 
 // TODO Move test client into separate module
@@ -177,14 +208,9 @@ func (t *testSuite) TestProjectTags_Get() {
 	tagKey1 := TagKeyFactory.MustCreate().(*models.TagKey)
 	tagKey2 := TagKeyFactory.MustCreate().(*models.TagKey)
 	// TODO Pitfall. t.RequestCtx is needed to call projectStore.SaveProject using the same transacton
-	orgStore := store.NewOrganizationStore(t.RequestCtx)
-	err := orgStore.SaveOrganization(*org)
-	t.NoError(err)
-	projectStore := store.NewProjectStore(t.RequestCtx)
-	err = projectStore.SaveProject(*project)
-	t.NoError(err)
-	err = projectStore.SaveTags(tagKey1, tagKey2)
-	t.NoError(err)
+	t.Factory.SaveOrganization(*org)
+	t.Factory.SaveProject(*project)
+	t.Factory.SaveTags(tagKey1, tagKey2)
 
 	rr := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/")
 	t.Equal(200, rr.Code)
