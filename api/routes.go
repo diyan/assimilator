@@ -2,7 +2,7 @@ package api
 
 import (
 	api "github.com/diyan/assimilator/api/endpoints"
-
+	mw "github.com/diyan/assimilator/api/middleware"
 	"github.com/labstack/echo"
 )
 
@@ -13,13 +13,17 @@ func RegisterAPIRoutes(g *echo.Group) {
 	g.GET("/organizations/:organization_slug/", api.OrganizationDetailsGetEndpoint)
 
 	// Projects
-	g.GET("/projects/:organization_slug/:project_slug/environments/", api.ProjectEnvironmentsGetEndpoint)
-	g.GET("/projects/:organization_slug/:project_slug/issues/", api.ProjectGroupIndexGetEndpoint)
-	g.GET("/projects/:organization_slug/:project_slug/groups/", api.ProjectGroupIndexGetEndpoint)
-	g.GET("/projects/:organization_slug/:project_slug/searches/", api.ProjectSearchesGetEndpoint)
+	p := g.Group("/projects/:organization_slug/:project_slug")
+	//p.Use(mw.RequireUser)
+	p.Use(mw.RequireOrganization)
+	p.Use(mw.RequireProject)
+	p.GET("/environments/", api.ProjectEnvironmentsGetEndpoint)
+	p.GET("/issues/", api.ProjectGroupIndexGetEndpoint)
+	p.GET("/groups/", api.ProjectGroupIndexGetEndpoint)
+	p.GET("/searches/", api.ProjectSearchesGetEndpoint)
+	p.GET("/members/", api.ProjectMemberIndexGetEndpoint)
+	p.GET("/tags/", api.ProjectTagsGetEndpoint)
 
-	g.GET("/projects/:organization_slug/:project_slug/members/", api.ProjectMemberIndexGetEndpoint)
-	g.GET("/projects/:organization_slug/:project_slug/tags/", api.ProjectTagsGetEndpoint)
 	// Internal
 	g.GET("/internal/health/", api.SystemHealthGetEndpoint)
 }
