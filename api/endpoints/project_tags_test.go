@@ -98,9 +98,6 @@ func (t *testSuite) TestProjectTags_Get() {
 			"name": null
 		}]`,
 		rr.Body.String())
-
-	// TODO Can we pass t.Tx to the TagKeyFactory.MustCreateWithOption ?
-	// TODO Try to develop API like this - t.Factory.TagKey.MustCreate()
 }
 
 func (t *testSuite) TestProjectTags_Post() {
