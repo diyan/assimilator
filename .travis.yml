@@ -32,5 +32,6 @@ install:
   - make get-go-deps
 script:
   - make build-go
+  - make test-go
 #after_success:
 #  - coveralls
