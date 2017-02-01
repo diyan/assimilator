@@ -35,7 +35,8 @@ test-go:  ## Run Go tests
 	go test -cover $$(glide novendor | sort)
 
 test-watch-go:  ## Continuous testing for Go sources
-	goconvey -excludedDirs vendor,ui,volumes,templates
+	# goconvey -excludedDirs vendor,ui,.volumes,templates
+	ginkgo watch -r -notify
 
 test-js:  ## Run JavaScript tests
 	@echo "--> Building static assets"
