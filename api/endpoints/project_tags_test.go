@@ -65,8 +65,8 @@ func (t *testSuite) TearDownSuite() {
 // Question is why SetT func called twice?
 func (t *testSuite) SetupTest() {
 	t.App = web.GetApp()
-	t.Factory = factory.New(t.Suite, t.App)
-	t.Client = echotest.NewClient(t.Suite, t.App)
+	t.Factory = factory.New(t.T(), t.App)
+	t.Client = echotest.NewClient(t.T(), t.App)
 }
 
 func (t *testSuite) TearDownTest() {
@@ -76,7 +76,6 @@ func (t *testSuite) TearDownTest() {
 func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
-
 func (t *testSuite) TestProjectTags_Get() {
 	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
 	t.Factory.SaveProject(t.Factory.MakeProject())

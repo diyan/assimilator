@@ -3,31 +3,32 @@ package echotest
 import (
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
-	"github.com/labstack/echo"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/require"
 )
 
-// TODO Move test client into separate module
 type TestClient struct {
-	server   *echo.Echo
+	server   http.Handler
 	recorder *httptest.ResponseRecorder
-	suite    suite.Suite
+	t        *testing.T
 }
 
-// TODO keep the TestClient generic if possible
-// TODO Use *testing.T for better re-use
-func NewClient(suite suite.Suite, server *echo.Echo) *TestClient {
+func NewClient(t *testing.T, server http.Handler) *TestClient {
 	return &TestClient{
 		server: server,
-		suite:  suite,
+		t:      t,
 	}
+}
+
+func (c TestClient) noError(err error, msgAndArgs ...interface{}) {
+	require.NoError(c.t, err, msgAndArgs)
 }
 
 func (c *TestClient) Get(url string) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	req, err := http.NewRequest("GET", url, nil)
-	c.suite.NoError(err)
+	c.noError(err)
 	c.server.ServeHTTP(recorder, req)
 	return recorder
 }
@@ -35,7 +36,7 @@ func (c *TestClient) Get(url string) *httptest.ResponseRecorder {
 func (c *TestClient) Delete(url string) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	req, err := http.NewRequest("DELETE", url, nil)
-	c.suite.NoError(err)
+	c.noError(err)
 	c.server.ServeHTTP(recorder, req)
 	return recorder
 }
