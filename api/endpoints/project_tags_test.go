@@ -77,20 +77,13 @@ func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
 
-// TODO setup project, organization, etc using text fixtures
 func (t *testSuite) TestProjectTags_Get() {
 	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
 	t.Factory.SaveProject(t.Factory.MakeProject())
 	t.Factory.SaveTags(t.Factory.MakeTags()...)
-	// TODO move TestFactory to the factory.go
-	// TODO Group the API to improve code completion
-	// org := OrganizationFactory.MustCreate().(*models.Organization)
-	// t.Factory.Organization.MustCreate().(*models.Organization)
-	// Q: code below is easy to implement, but how to make it type safe?
 
 	rr := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/")
 	t.Equal(200, rr.Code)
-	// TODO result below is from read db but we should use test db
 	// TODO Investigate why GoConvey crashing if t.JSONEq is false
 	t.JSONEq(`[{
 			"id": "1",
