@@ -1,33 +1,27 @@
 package api_test
 
 import (
-	"net/http"
-	"time"
-
 	"net/http/httptest"
 	"testing"
 
-	"github.com/diyan/assimilator/db"
-	"github.com/diyan/assimilator/db/store"
 	"github.com/diyan/assimilator/migrations"
-	"github.com/diyan/assimilator/models"
+	"github.com/diyan/assimilator/testutil/echotest"
+	"github.com/diyan/assimilator/testutil/factory"
 	"github.com/diyan/assimilator/web"
+	"github.com/gocraft/dbr"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/gocraft/dbr"
 )
 
 type testSuite struct {
 	suite.Suite
 	*require.Assertions
 	HttpRecorder *httptest.ResponseRecorder
-	Client       *EchoTestClient
+	Client       *echotest.TestClient
 	App          *echo.Echo
-	Factory      TestFactory
+	Factory      factory.TestFactory
 }
 
 // SetT overrides assert.Assertions with require.Assertions.
@@ -70,129 +64,13 @@ func (t *testSuite) TearDownSuite() {
 // SetT, SetupTest, TearDownTest, SetT
 // Question is why SetT func called twice?
 func (t *testSuite) SetupTest() {
-	//t.HttpRecorder = httptest.NewRecorder()
 	t.App = web.GetApp()
-	t.Factory = NewTestFactory(t.Suite, t.App)
-	t.Client = NewEchoTestClient(t.Suite, t.App)
+	t.Factory = factory.New(t.Suite, t.App)
+	t.Client = echotest.NewClient(t.Suite, t.App)
 }
 
 func (t *testSuite) TearDownTest() {
 	t.Factory.Reset()
-}
-
-type TestFactory struct {
-	suite            suite.Suite
-	tx               *dbr.Tx
-	SaveOrganization func(org models.Organization)
-	SaveProject      func(project models.Project)
-	SaveTags         func(tags ...*models.TagKey)
-}
-
-func NewTestFactory(suite suite.Suite, server *echo.Echo) TestFactory {
-	noError := suite.Require().NoError
-	ctx := server.NewContext(nil, nil)
-	tx, err := db.GetTx(ctx)
-	noError(err)
-	tf := TestFactory{
-		suite: suite,
-		tx:    tx,
-	}
-	// TODO Tricky implementation. Mock *dbr.Tx in the test Echo instance
-	server.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set("dbr.Tx", tx)
-			return next(c)
-		}
-	})
-
-	orgStore := store.NewOrganizationStore(ctx)
-	projectStore := store.NewProjectStore(ctx)
-	tf.SaveOrganization = func(org models.Organization) {
-		noError(orgStore.SaveOrganization(org))
-	}
-	tf.SaveProject = func(project models.Project) {
-		noError(projectStore.SaveProject(project))
-	}
-	tf.SaveTags = func(tags ...*models.TagKey) {
-		noError(projectStore.SaveTags(tags...))
-	}
-	return tf
-}
-
-func (tf TestFactory) Reset() {
-	err := tf.tx.Rollback()
-	tf.suite.Require().NoError(err)
-}
-
-var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
-
-func (tf TestFactory) MakeTags() []*models.TagKey {
-	tag1 := models.TagKey{
-		ID:        1,
-		ProjectID: 1,
-		Key:       "server_name",
-	}
-	tag2 := tag1
-	tag2.ID = 2
-	tag2.Key = "level"
-	return []*models.TagKey{&tag1, &tag2}
-}
-
-func (tf TestFactory) MakeOrganization() models.Organization {
-	return models.Organization{
-		ID:          1,
-		Name:        "ACME-Team",
-		Slug:        "acme-team",
-		Status:      models.OrganizationStatusVisible,
-		Flags:       1, // TODO Introduce constants
-		DefaultRole: "member",
-		DateCreated: time_of_2999_01_01__00_00_00,
-	}
-}
-
-func (tf TestFactory) MakeProject() models.Project {
-	return models.Project{
-		ID:             1,
-		TeamID:         1,
-		OrganizationID: 1,
-		Name:           "ACME",
-		Slug:           "acme",
-		Public:         false,
-		Status:         models.ProjectStatusVisible,
-		FirstEvent:     time_of_2999_01_01__00_00_00,
-		DateCreated:    time_of_2999_01_01__00_00_00,
-	}
-}
-
-// TODO Move test client into separate module
-type EchoTestClient struct {
-	server   *echo.Echo
-	recorder *httptest.ResponseRecorder
-	suite    suite.Suite
-}
-
-// TODO keep the TestClient generic if possible
-func NewEchoTestClient(suite suite.Suite, server *echo.Echo) *EchoTestClient {
-	return &EchoTestClient{
-		server: server,
-		suite:  suite,
-	}
-}
-
-func (c *EchoTestClient) Get(url string) *httptest.ResponseRecorder {
-	recorder := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", url, nil)
-	c.suite.NoError(err)
-	c.server.ServeHTTP(recorder, req)
-	return recorder
-}
-
-func (c *EchoTestClient) Delete(url string) *httptest.ResponseRecorder {
-	recorder := httptest.NewRecorder()
-	req, err := http.NewRequest("DELETE", url, nil)
-	c.suite.NoError(err)
-	c.server.ServeHTTP(recorder, req)
-	return recorder
 }
 
 func TestRunSuite(t *testing.T) {
@@ -216,13 +94,13 @@ func (t *testSuite) TestProjectTags_Get() {
 	// TODO Investigate why GoConvey crashing if t.JSONEq is false
 	t.JSONEq(`[{
 			"id": "1",
-			"key": "key-1",
+			"key": "server_name",
 			"uniqueValues": 0,
 			"name": null
 		},
 		{
 			"id": "2",
-			"key": "key-2",
+			"key": "level",
 			"uniqueValues": 0,
 			"name": null
 		}]`,
