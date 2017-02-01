@@ -1,14 +1,12 @@
 package api_test
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bluele/factory-go/factory"
 	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/db/store"
 	"github.com/diyan/assimilator/migrations"
@@ -126,6 +124,46 @@ func (tf TestFactory) Reset() {
 	tf.suite.Require().NoError(err)
 }
 
+var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+func (tf TestFactory) MakeTags() []*models.TagKey {
+	tag1 := models.TagKey{
+		ID:        1,
+		ProjectID: 1,
+		Key:       "server_name",
+	}
+	tag2 := tag1
+	tag2.ID = 2
+	tag2.Key = "level"
+	return []*models.TagKey{&tag1, &tag2}
+}
+
+func (tf TestFactory) MakeOrganization() models.Organization {
+	return models.Organization{
+		ID:          1,
+		Name:        "ACME-Team",
+		Slug:        "acme-team",
+		Status:      models.OrganizationStatusVisible,
+		Flags:       1, // TODO Introduce constants
+		DefaultRole: "member",
+		DateCreated: time_of_2999_01_01__00_00_00,
+	}
+}
+
+func (tf TestFactory) MakeProject() models.Project {
+	return models.Project{
+		ID:             1,
+		TeamID:         1,
+		OrganizationID: 1,
+		Name:           "ACME",
+		Slug:           "acme",
+		Public:         false,
+		Status:         models.ProjectStatusVisible,
+		FirstEvent:     time_of_2999_01_01__00_00_00,
+		DateCreated:    time_of_2999_01_01__00_00_00,
+	}
+}
+
 // TODO Move test client into separate module
 type EchoTestClient struct {
 	server   *echo.Echo
@@ -157,59 +195,20 @@ func (c *EchoTestClient) Delete(url string) *httptest.ResponseRecorder {
 	return recorder
 }
 
-var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
-
-var OrganizationFactory = factory.NewFactory(
-	// TODO Seems like we have to return a pointer. go-factory does not work with return by value
-	&models.Organization{
-		ID:          1,
-		Name:        "ACME-Team",
-		Slug:        "acme-team",
-		Status:      models.OrganizationStatusVisible,
-		Flags:       1, // TODO What does this mean? Introduce constants
-		DefaultRole: "member",
-		DateCreated: time_of_2999_01_01__00_00_00,
-	},
-)
-
-var ProjectFactory = factory.NewFactory(
-	&models.Project{
-		ID:             1,
-		TeamID:         1,
-		OrganizationID: 1,
-		Name:           "ACME",
-		Slug:           "acme",
-		Public:         false,
-		Status:         models.ProjectStatusVisible,
-		FirstEvent:     time_of_2999_01_01__00_00_00,
-		DateCreated:    time_of_2999_01_01__00_00_00,
-	},
-)
-
-// TODO If wrong name will be passed to SeqInt the test will be not visible for GoConvey!
-var TagKeyFactory = factory.NewFactory(
-	&models.TagKey{
-		ProjectID: 1,
-	},
-).SeqInt("ID", func(n int) (interface{}, error) {
-	return n, nil
-}).SeqInt("Key", func(n int) (interface{}, error) {
-	return fmt.Sprintf("key-%d", n), nil
-})
-
 func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
 
 // TODO setup project, organization, etc using text fixtures
 func (t *testSuite) TestProjectTags_Get() {
-	org := OrganizationFactory.MustCreate().(*models.Organization)
-	project := ProjectFactory.MustCreate().(*models.Project)
-	tagKey1 := TagKeyFactory.MustCreate().(*models.TagKey)
-	tagKey2 := TagKeyFactory.MustCreate().(*models.TagKey)
-	t.Factory.SaveOrganization(*org)
-	t.Factory.SaveProject(*project)
-	t.Factory.SaveTags(tagKey1, tagKey2)
+	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
+	t.Factory.SaveProject(t.Factory.MakeProject())
+	t.Factory.SaveTags(t.Factory.MakeTags()...)
+	// TODO move TestFactory to the factory.go
+	// TODO Group the API to improve code completion
+	// org := OrganizationFactory.MustCreate().(*models.Organization)
+	// t.Factory.Organization.MustCreate().(*models.Organization)
+	// Q: code below is easy to implement, but how to make it type safe?
 
 	rr := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/")
 	t.Equal(200, rr.Code)
