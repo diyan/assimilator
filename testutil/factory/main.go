@@ -1,33 +1,40 @@
 package factory
 
 import (
+	"testing"
+
 	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/db/store"
 	"github.com/diyan/assimilator/models"
 
 	"github.com/gocraft/dbr"
 	"github.com/labstack/echo"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/require"
 )
 
 type TestFactory struct {
-	suite            suite.Suite
+	t                *testing.T
 	tx               *dbr.Tx
+	Reset            func()
 	SaveOrganization func(org models.Organization)
 	SaveProject      func(project models.Project)
 	SaveTags         func(tags ...*models.TagKey)
 }
 
-// TODO Use *testing.T for better re-use
-func New(suite suite.Suite, server *echo.Echo) TestFactory {
-	noError := suite.Require().NoError
+func New(t *testing.T, server *echo.Echo) TestFactory {
+	noError := require.New(t).NoError
 	ctx := server.NewContext(nil, nil)
 	tx, err := db.GetTx(ctx)
 	noError(err)
 	tf := TestFactory{
-		suite: suite,
-		tx:    tx,
+		t:  t,
+		tx: tx,
 	}
+	tf.Reset = func() {
+		err := tf.tx.Rollback()
+		noError(err)
+	}
+
 	// TODO Tricky implementation. Mock *dbr.Tx in the test Echo instance
 	server.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -48,9 +55,4 @@ func New(suite suite.Suite, server *echo.Echo) TestFactory {
 		noError(projectStore.SaveTags(tags...))
 	}
 	return tf
-}
-
-func (tf TestFactory) Reset() {
-	err := tf.tx.Rollback()
-	tf.suite.Require().NoError(err)
 }
