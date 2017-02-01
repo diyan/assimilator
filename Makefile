@@ -32,7 +32,7 @@ get-atom-plugins:  ## Install plugins for Atom editor
 	apm install go-plus hyperclick go-debug go-signature-statusbar
 
 test-go:  ## Run Go tests
-	echo TODO
+	go test -cover $$(glide novendor | sort)
 
 test-watch-go:  ## Continuous testing for Go sources
 	goconvey -excludedDirs vendor,ui,volumes,templates
