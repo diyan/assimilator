@@ -1,10 +1,10 @@
-hash: 91f51781e91f3250ef2d1ea5a684f5691758e920cc28704305379a9d8c690af3
-updated: 2017-01-26T12:31:28.936757386+02:00
+hash: b5295bcd7ef9caed0fe505b758f7a8a074ff67cc96196132418d92b5b8e3d3fe
+updated: 2017-02-01T17:39:19.196609095+02:00
 imports:
-- name: github.com/bluele/factory-go
-  version: 037d52eaae310c951822d582dec6d0b42637fcd2
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
-  - factory
+  - spew
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
 - name: github.com/diyan/echox
@@ -56,6 +56,10 @@ imports:
   version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
 - name: github.com/Sirupsen/logrus
   version: d26492970760ca5d33129d2d799e34be5c4782eb
 - name: github.com/stretchr/testify
@@ -86,12 +90,4 @@ imports:
   version: d75a52659825e75fff6158388dddc6a5b04f9ba5
   subpackages:
   - unix
-testImports:
-- name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
-  subpackages:
-  - spew
-- name: github.com/pmezard/go-difflib
-  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
-  subpackages:
-  - difflib
+testImports: []
