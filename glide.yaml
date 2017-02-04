@@ -28,3 +28,6 @@ import:
 - package: github.com/mattes/migrate
   version: v1.3.0
 - package: github.com/intelekshual/go-simpleflake
+- package: github.com/parnurzeal/gorequest
+  version: v0.2.14
+- package: github.com/moul/http2curl
