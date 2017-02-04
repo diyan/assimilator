@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/diyan/assimilator/migrations"
-	"github.com/diyan/assimilator/testutil/echotest"
 	"github.com/diyan/assimilator/testutil/factory"
+	"github.com/diyan/assimilator/testutil/testclient"
 	"github.com/diyan/assimilator/web"
 	"github.com/gocraft/dbr"
 	"github.com/labstack/echo"
+	"github.com/parnurzeal/gorequest"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -19,7 +20,7 @@ type testSuite struct {
 	suite.Suite
 	*require.Assertions
 	HttpRecorder *httptest.ResponseRecorder
-	Client       *echotest.TestClient
+	Client       *gorequest.SuperAgent
 	App          *echo.Echo
 	Factory      factory.TestFactory
 }
@@ -66,7 +67,7 @@ func (t *testSuite) TearDownSuite() {
 func (t *testSuite) SetupTest() {
 	t.App = web.GetApp()
 	t.Factory = factory.New(t.T(), t.App)
-	t.Client = echotest.NewClient(t.T(), t.App)
+	t.Client = testclient.New(t.T(), t.App)
 }
 
 func (t *testSuite) TearDownTest() {
@@ -76,14 +77,17 @@ func (t *testSuite) TearDownTest() {
 func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
+
 func (t *testSuite) TestProjectTags_Get() {
+	// TODO TestFactory does a side effect which is used by TestClient
+	//  make this code more explicit
 	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
 	t.Factory.SaveProject(t.Factory.MakeProject())
 	t.Factory.SaveTags(t.Factory.MakeTags()...)
 
-	rr := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/")
-	t.Equal(200, rr.Code)
-	// TODO Investigate why GoConvey crashing if t.JSONEq is false
+	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/").End()
+	t.Nil(errs)
+	t.Equal(200, res.StatusCode)
 	t.JSONEq(`[{
 			"id": "1",
 			"key": "server_name",
@@ -96,7 +100,7 @@ func (t *testSuite) TestProjectTags_Get() {
 			"uniqueValues": 0,
 			"name": null
 		}]`,
-		rr.Body.String())
+		bodyStr)
 }
 
 func (t *testSuite) TestProjectTags_Post() {
