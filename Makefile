@@ -26,7 +26,8 @@ get-go-tools:  ## Install Golang development tools
 	go get -u github.com/derekparker/delve/cmd/dlv
 	go get -u github.com/alecthomas/gometalinter
 	gometalinter --install
-	go get github.com/smartystreets/goconvey
+	#go get github.com/smartystreets/goconvey
+	go get github.com/onsi/ginkgo/ginkgo
 
 get-atom-plugins:  ## Install plugins for Atom editor
 	apm install go-plus hyperclick go-debug go-signature-statusbar
