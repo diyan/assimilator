@@ -28,12 +28,13 @@ get-go-tools:  ## Install Golang development tools
 	gometalinter --install
 	#go get github.com/smartystreets/goconvey
 	go get github.com/onsi/ginkgo/ginkgo
+	go get github.com/mattn/goveralls
 
 get-atom-plugins:  ## Install plugins for Atom editor
 	apm install go-plus hyperclick go-debug go-signature-statusbar
 
 test-go:  ## Run Go tests
-	go test -cover $$(glide novendor | sort)
+	ginkgo -r -cover
 
 test-watch-go:  ## Continuous testing for Go sources
 	# goconvey -excludedDirs vendor,ui,.volumes,templates
