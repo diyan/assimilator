@@ -1,6 +1,8 @@
 package factory
 
 import (
+	"context"
+	"net/http"
 	"testing"
 
 	"github.com/diyan/assimilator/db"
@@ -23,9 +25,11 @@ type TestFactory struct {
 
 func New(t *testing.T, server *echo.Echo) TestFactory {
 	noError := require.New(t).NoError
-	ctx := server.NewContext(nil, nil)
-	// TODO remove hack
-	ctx.Set("conf.Config", MakeAppConfig())
+	// TODO remove hack that builds *dbr.Tx
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+	c := context.WithValue(req.Context(), "conf.Config", MakeAppConfig())
+	req = req.WithContext(c)
+	ctx := server.NewContext(req, nil)
 	tx, err := db.GetTx(ctx)
 	noError(err)
 	tf := TestFactory{

@@ -27,7 +27,7 @@ func GetApp(config conf.Config) *echo.Echo {
 	// Register default error handler
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.Renderer = pongor.GetRenderer(pongor.PongorOption{Reload: true})
-	e.Use(conf.NewMiddleware(config))
+	e.Use(echo.WrapMiddleware(conf.NewMiddleware(config)))
 	// TODO ForceColors only if codegangsta/gin detected
 	logrus.SetFormatter(&logrusfmt.TextFormatter{ShortTimestamp: true, ForceColors: true})
 	// Register access log logger
