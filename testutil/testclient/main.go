@@ -25,10 +25,10 @@ type mockTransport struct {
 	handler http.Handler
 }
 
-func (t mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (mt mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	rr := httptest.NewRecorder()
 	//rr.Body = &bytes.Buffer{}
-	t.handler.ServeHTTP(rr, req)
+	mt.handler.ServeHTTP(rr, req)
 	return &http.Response{
 		StatusCode:    rr.Code,
 		Status:        http.StatusText(rr.Code),
