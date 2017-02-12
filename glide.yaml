@@ -36,5 +36,5 @@ import:
 - package: github.com/spf13/viper
 # Workaround to fix "Unable to checkout gopkg.in/yaml.v2" error
 - package: gopkg.in/yaml.v2
-  repo: git@github.com:go-yaml/yaml.git
-
+  version: v2
+  repo: https://github.com/go-yaml/yaml.git
