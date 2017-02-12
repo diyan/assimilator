@@ -3,10 +3,23 @@ package factory
 import (
 	"time"
 
+	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/models"
 )
 
 var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+// TODO Define naming for fixture-per-test and fixture-per-suite
+func MakeAppConfig() conf.Config {
+	return conf.Config{
+		Port:            3000,
+		DatabaseURL:     "postgres://sentry:RucLUS8A@localhost/sentry_ci?sslmode=disable",
+		InitialTeam:     "ACME-Team",
+		InitialProject:  "ACME",
+		InitialKey:      "763a78a695424ed687cf8b7dc26d3161:763a78a695424ed687cf8b7dc26d3161",
+		InitialPlatform: "python",
+	}
+}
 
 func (tf TestFactory) MakeTags() []*models.TagKey {
 	tag1 := models.TagKey{
