@@ -3,23 +3,13 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/migrations"
 	"github.com/diyan/assimilator/web"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-type AppConfig struct {
-	Port            int    `mapstructure:"port"`
-	DatabaseURL     string `mapstructure:"db_url"`
-	InitialTeam     string `mapstructure:"initial_team"`
-	InitialProject  string `mapstructure:"initial_project"`
-	InitialKey      string `mapstructure:"initial_key"`
-	InitialPlatform string `mapstructure:"initial_platform"`
-}
-
-var Config AppConfig
 
 func init() {
 	// TODO consider PersistentFlags instead of just Flags
@@ -50,18 +40,20 @@ var RootCmd = &cobra.Command{
         Put a multiline 
         rationale here`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := viper.Unmarshal(&Config); err != nil {
+		config := conf.Config{}
+		if err := viper.Unmarshal(&config); err != nil {
 			return errors.Wrap(err, "can not load configuration")
 		}
+
 		fmt.Println("Upgrading database schema, please wait...")
-		if err := migrations.UpgradeDB(Config.DatabaseURL); err != nil {
+		if err := migrations.UpgradeDB(config.DatabaseURL); err != nil {
 			return err
 		}
 		fmt.Print("Database is up to date. Starting web app...")
 		// TODO implement web.GetApp(), cron.GetApp(), smtp.GetApp() function
 		//   see https://docs.sentry.io/server/cli/run/
-		e := web.GetApp()
-		e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", Config.Port)))
+		e := web.GetApp(config)
+		e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 		return nil
 	},
 }

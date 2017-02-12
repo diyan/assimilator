@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/template"
 	"github.com/diyan/echox/log"
 	"github.com/echo-contrib/pongor"
@@ -19,13 +20,14 @@ func init() {
 	template.RegisterFilters()
 }
 
-func GetApp() *echo.Echo {
+func GetApp(config conf.Config) *echo.Echo {
 	e := echo.New()
 	e.Debug = true
 	e.Logger = log.Logrus()
 	// Register default error handler
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.Renderer = pongor.GetRenderer(pongor.PongorOption{Reload: true})
+	e.Use(conf.NewMiddleware(config))
 	// TODO ForceColors only if codegangsta/gin detected
 	logrus.SetFormatter(&logrusfmt.TextFormatter{ShortTimestamp: true, ForceColors: true})
 	// Register access log logger
