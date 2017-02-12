@@ -23,6 +23,8 @@ func FromEC(c echo.Context) Config {
 	panic(errors.New("failed to get app config, is conf.NewMiddleware(config) call missing?"))
 }
 
+// TODO Add func FromC(c context.Context) Config
+
 // NewMiddleware creates middleware that sets app config for each HTTP request
 func NewMiddleware(config Config) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {

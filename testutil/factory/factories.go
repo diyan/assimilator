@@ -13,7 +13,7 @@ var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, 
 func MakeAppConfig() conf.Config {
 	return conf.Config{
 		Port:            3000,
-		DatabaseURL:     "postgres://sentry:RucLUS8A@localhost/sentry_ci?sslmode=disable",
+		DatabaseURL:     "postgres://postgres@localhost/sentry_ci?sslmode=disable",
 		InitialTeam:     "ACME-Team",
 		InitialProject:  "ACME",
 		InitialKey:      "763a78a695424ed687cf8b7dc26d3161:763a78a695424ed687cf8b7dc26d3161",

@@ -37,7 +37,7 @@ func (t *testSuite) SetupSuite() {
 	// from pg_tables where schemaname = 'sentry_ci';
 
 	// TODO remove duplicated code
-	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/postgres?sslmode=disable", nil)
+	conn, err := dbr.Open("postgres", "postgres://postgres@localhost/postgres?sslmode=disable", nil)
 	t.NoError(errors.Wrap(err, "failed to init db connection"))
 	// dbr.Open calls sql.Open which returns err == nil even if there is no db connection,
 	//   so it is required to explicitly ping the database
