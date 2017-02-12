@@ -1,10 +1,8 @@
 package migrations
 
 import (
-
-	// Enable PostgreSQL driver for migration tool
 	"path/filepath"
-
+	// Enable PostgreSQL driver for migration tool
 	_ "github.com/mattes/migrate/driver/postgres"
 	"github.com/mattes/migrate/migrate"
 	"github.com/pkg/errors"
