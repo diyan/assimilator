@@ -54,7 +54,7 @@ func (t *testSuite) SetupSuite() {
 	t.NoError(err)
 	_, err = sess.Exec("create database sentry_ci;")
 	t.NoError(err)
-	migrations.UpgradeDB("postgres://sentry:RucLUS8A@localhost/sentry_ci?sslmode=disable")
+	t.NoError(migrations.UpgradeDB(factory.MakeAppConfig().DatabaseURL))
 }
 
 func (t *testSuite) TearDownSuite() {
@@ -65,7 +65,7 @@ func (t *testSuite) TearDownSuite() {
 // SetT, SetupTest, TearDownTest, SetT
 // Question is why SetT func called twice?
 func (t *testSuite) SetupTest() {
-	t.App = web.GetApp()
+	t.App = web.GetApp(factory.MakeAppConfig())
 	// TODO TestFactory does a side effect which is used by TestClient
 	//  make this code more explicit
 	t.Factory = factory.New(t.T(), t.App)

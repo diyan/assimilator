@@ -24,6 +24,8 @@ type TestFactory struct {
 func New(t *testing.T, server *echo.Echo) TestFactory {
 	noError := require.New(t).NoError
 	ctx := server.NewContext(nil, nil)
+	// TODO remove hack
+	ctx.Set("conf.Config", MakeAppConfig())
 	tx, err := db.GetTx(ctx)
 	noError(err)
 	tf := TestFactory{
