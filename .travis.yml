@@ -23,13 +23,17 @@ env:
   - GOOS=freebsd GOARCH=amd64
   - GOOS=freebsd GOARCH=386
   - GOOS=freebsd GOARCH=arm
+services:
+  - postgresql
 before_install:
   - if go version | grep --quiet go1.5; then export GO15VENDOREXPERIMENT=1; fi
   - go get github.com/Masterminds/glide
 install:
   - make get-go-deps
+before_script:
+  - psql --username=postgres -c 'create database sentry_ci;'
 script:
   - make build-go
-#  - make test-go
+  - make test-go
 #after_success:
 #  - coveralls
