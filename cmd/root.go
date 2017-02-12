@@ -14,7 +14,7 @@ import (
 func init() {
 	// TODO consider PersistentFlags instead of just Flags
 	RootCmd.Flags().IntP("port", "p", 3000, "Port to run the server on")
-	RootCmd.Flags().StringP("db-url", "d", "postgres://sentry:RucLUS8A@localhost/sentry?sslmode=disable", "Url to connect to PostgreSQL database")
+	RootCmd.Flags().StringP("db-url", "d", "postgres://postgres@localhost/sentry?sslmode=disable", "Url to connect to PostgreSQL database")
 	// TODO fix order displayed in cli help
 	RootCmd.Flags().String("initial-team", "ACME-Team", "Create an initial team inside Sentry DB with the given name")
 	RootCmd.Flags().String("initial-project", "ACME", "Create an initial project for the above team (owner for both is the created admin")
