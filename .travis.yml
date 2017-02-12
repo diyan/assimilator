@@ -28,6 +28,7 @@ services:
 before_install:
   - if go version | grep --quiet go1.5; then export GO15VENDOREXPERIMENT=1; fi
   - go get github.com/Masterminds/glide
+  - go get github.com/onsi/ginkgo/ginkgo
 install:
   - make get-go-deps
 script:
