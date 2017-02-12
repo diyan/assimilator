@@ -30,8 +30,6 @@ before_install:
   - go get github.com/Masterminds/glide
 install:
   - make get-go-deps
-before_script:
-  - psql --username=postgres -c 'create database sentry_ci;'
 script:
   - make build-go
   - make test-go
