@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/diyan/assimilator/conf"
 	"github.com/gocraft/dbr"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
@@ -24,7 +25,7 @@ func NewTx(c echo.Context) (*dbr.Tx, error) {
 		c.Set("dbr.Tx", tx)
 		return tx, nil
 	}
-	conn, err := dbr.Open("postgres", "postgres://sentry:RucLUS8A@localhost/sentry_ci?sslmode=disable", nil)
+	conn, err := dbr.Open("postgres", conf.FromEC(c).DatabaseURL, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to init db connection")
 	}
