@@ -3,3 +3,4 @@
 /.volumes
 /ui/node_modules
 /ui/dist
+*.coverprofile
