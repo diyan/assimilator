@@ -3,6 +3,7 @@ WIP. An attempt to port minimum valuable subset of Sentry from Python to the Gol
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/diyan/assimilator/blob/master/LICENSE)
 [![Travis Build](https://travis-ci.org/diyan/assimilator.svg?branch=master)](https://travis-ci.org/diyan/assimilator)
+[![Coverage](http://img.shields.io/coveralls/diyan/assimilator.svg)](https://coveralls.io/r/diyan/assimilator)
 [![Go Report Card](https://goreportcard.com/badge/diyan/assimilator)](http://goreportcard.com/report/diyan/assimilator)
 
 ### Setup development enviroment on Arch Linux
