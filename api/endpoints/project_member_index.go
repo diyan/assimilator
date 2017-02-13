@@ -5,6 +5,7 @@ import (
 
 	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/models"
+	"github.com/pkg/errors"
 
 	"github.com/labstack/echo"
 )
@@ -38,14 +39,18 @@ func ProjectMemberIndexGetEndpoint(c echo.Context) error {
 				join sentry_organizationmember om on u.id = om.user_id
 				join sentry_organization o on om.organization_id = o.id
 				join sentry_project p on o.id = p.organization_id
-		where p.project_id = ? and u.is_active = true`,
+		where p.id = ? and u.is_active = true`,
 		projectID).
 		LoadStructs(&users)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "can not read project members")
 	}
 	for _, user := range users {
 		user.PostGet()
+		// TODO add real implementation
+		user.Options.Language = "en"
+		user.Options.Timezone = "UTC"
+		user.Options.StacktraceOrder = "default"
 	}
 	// TODO fill user.AvatarURL, user.Options. Check UserSerializer(Serializer) impl
 	return c.JSON(http.StatusOK, users)
@@ -151,23 +156,4 @@ class UserSerializer(Serializer):
             } for i in attrs['identities']]
 
         return d
-*/
-
-/* EXPECTED RESPONSE
-curl -X GET http://localhost:9000/api/0/projects/acme/api/members/
-[
-    {
-        "username": "admin",
-        "name": "alexey.diyan@gmail.com",
-        "avatarUrl": "https://secure.gravatar.com/avatar/01bce7702975191fdc402565bd1045a8?s=32&d=mm",
-        "options": {
-            "timezone": "UTC",
-            "stacktraceOrder": "default",
-            "language": "en",
-            "clock24Hours": false
-        },
-        "id": "1",
-        "email": "alexey.diyan@gmail.com"
-    }
-]
 */
