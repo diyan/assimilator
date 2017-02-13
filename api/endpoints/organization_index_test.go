@@ -5,7 +5,6 @@ func (t *testSuite) TestOrganizationIndex_Get() {
 
 	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/organizations/").End()
 	t.Nil(errs)
-	t.Equal(200, res.StatusCode)
 	t.JSONEq(`[{
             "id": "1",
             "name": "ACME-Team",
@@ -13,6 +12,7 @@ func (t *testSuite) TestOrganizationIndex_Get() {
             "dateCreated": "2999-01-01T00:00:00Z"
         }]`,
 		bodyStr)
+	t.Equal(200, res.StatusCode)
 }
 
 func (t *testSuite) TestOrganizationIndex_Get_MemberOnly() {

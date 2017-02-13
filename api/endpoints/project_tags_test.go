@@ -87,7 +87,6 @@ func (t *testSuite) TestProjectTags_Get() {
 
 	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/").End()
 	t.Nil(errs)
-	t.Equal(200, res.StatusCode)
 	t.JSONEq(`[{
 			"id": "1",
 			"key": "server_name",
@@ -101,6 +100,7 @@ func (t *testSuite) TestProjectTags_Get() {
 			"name": null
 		}]`,
 		bodyStr)
+	t.Equal(200, res.StatusCode)
 }
 
 func (t *testSuite) TestProjectTags_Post() {
