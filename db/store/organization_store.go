@@ -17,7 +17,7 @@ func NewOrganizationStore(c echo.Context) OrganizationStore {
 }
 
 func (s OrganizationStore) SaveOrganization(org models.Organization) error {
-	db, err := db.GetTx(s.c)
+	db, err := db.FromE(s.c)
 	if err != nil {
 		return errors.Wrapf(err, "failed to save organization")
 	}

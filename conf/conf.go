@@ -15,8 +15,9 @@ type Config struct {
 	InitialPlatform string `mapstructure:"initial_platform"`
 }
 
-// FromEC returns app config associated with echo's Context
-func FromEC(c echo.Context) Config {
+
+// FromE returns app config associated with echo's Context
+func FromE(c echo.Context) Config {
 	if conf, ok := c.Get("conf.Config").(Config); ok {
 		return conf
 	}

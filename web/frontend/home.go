@@ -39,7 +39,7 @@ func getActiveOrganization(c echo.Context) (*models.Organization, error) {
 	orgSlug := c.Param("organization_slug")
 	userID := 1 // TODO get ID from context.request.user.id
 	onlyVisible := true
-	db, err := db.GetTx(c)
+	db, err := db.FromE(c)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not get db session")
 	}

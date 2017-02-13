@@ -16,7 +16,7 @@ func NewProjectStore(c echo.Context) ProjectStore {
 }
 
 func (s ProjectStore) GetProjectID(orgSlug, projectSlug string) (int64, error) {
-	db, err := db.GetTx(s.c)
+	db, err := db.FromE(s.c)
 	if err != nil {
 		return 0, errors.Wrapf(err, "can not get project")
 	}
@@ -34,7 +34,7 @@ func (s ProjectStore) GetProjectID(orgSlug, projectSlug string) (int64, error) {
 }
 
 func (s ProjectStore) GetEnvironments(projectID int64) ([]models.Environment, error) {
-	db, err := db.GetTx(s.c)
+	db, err := db.FromE(s.c)
 	if err != nil {
 		return nil, errors.Wrapf(err, "can not read project environments")
 	}
@@ -53,7 +53,7 @@ func (s ProjectStore) GetEnvironments(projectID int64) ([]models.Environment, er
 }
 
 func (s ProjectStore) GetTags(projectID int64) ([]*models.TagKey, error) {
-	db, err := db.GetTx(s.c)
+	db, err := db.FromE(s.c)
 	if err != nil {
 		return nil, errors.Wrapf(err, "can not read project tags")
 	}
@@ -75,7 +75,7 @@ func (s ProjectStore) GetTags(projectID int64) ([]*models.TagKey, error) {
 }
 
 func (s ProjectStore) SaveProject(project models.Project) error {
-	db, err := db.GetTx(s.c)
+	db, err := db.FromE(s.c)
 	if err != nil {
 		return errors.Wrapf(err, "failed to save project")
 	}
@@ -88,7 +88,7 @@ func (s ProjectStore) SaveProject(project models.Project) error {
 }
 
 func (s ProjectStore) SaveTags(tags ...*models.TagKey) error {
-	db, err := db.GetTx(s.c)
+	db, err := db.FromE(s.c)
 	if err != nil {
 		return errors.Wrapf(err, "failed to save project tags")
 	}

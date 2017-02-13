@@ -63,7 +63,7 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		return c.JSON(400, map[string]string{"detail": errInvalidStatsPeriod})
 	}
 	query := strings.TrimSpace(c.QueryParam("query"))
-	db, err := db.GetTx(c)
+	db, err := db.FromE(c)
 	if err != nil {
 		return err
 	}
