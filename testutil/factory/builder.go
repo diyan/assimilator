@@ -94,3 +94,22 @@ func (tf TestFactory) MakeProject() models.Project {
 		DateCreated:    time_of_2999_01_01__00_00_00,
 	}
 }
+
+func (tf TestFactory) MakeUser() models.User {
+	return models.User{
+		ID:                1,
+		Username:          "admin",
+		Name:              "",
+		Email:             "admin@example.com",
+		IsStaff:           true,
+		IsActive:          true,
+		IsSuperuser:       true,
+		IsManaged:         false,
+		IsPasswordExpired: false,
+		// TODO explain what is a plain-text equivalent
+		Password:           "pbkdf2_sha256$12000$GrqCKrh4gpuI$PLLnjVsHTgSDCcAv6ql0rJ3Z/5RE9oNoaHHc8D/WTtE=",
+		DateCreated:        time_of_2999_01_01__00_00_00,
+		LastLogin:          time_of_2999_01_01__00_00_00,
+		LastPasswordChange: time_of_2999_01_01__00_00_00,
+	}
+}
