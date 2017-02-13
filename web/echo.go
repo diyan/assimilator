@@ -41,7 +41,6 @@ func HTTPErrorHandler(err error, c echo.Context) {
 
 	//logrus.ErrorLevel()
 	//debug.PrintStack()
-	//pp.Print(err)
 	logrus.Error(err)
 }
 
