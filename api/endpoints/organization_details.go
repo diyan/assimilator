@@ -5,6 +5,7 @@ import (
 
 	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/models"
+	"github.com/pkg/errors"
 
 	"github.com/labstack/echo"
 )
@@ -48,7 +49,6 @@ func OrganizationDetailsGetEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
 	// TODO fill in pendingAccessRequest -> select count(*) from sentry_organizationaccessrequest ...
 	// TODO fill in org.features
 	// if env.request:
@@ -67,7 +67,7 @@ func OrganizationDetailsGetEndpoint(c echo.Context) error {
 		orgSlug, userID, models.OrganizationStatusVisible).
 		LoadStruct(&org)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "can not read organization")
 	}
 	quota := Quota{}
 	defaultProjectLimit := 100
@@ -80,11 +80,10 @@ func OrganizationDetailsGetEndpoint(c echo.Context) error {
 		defaultProjectLimit, orgSlug).
 		LoadStruct(&quota)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "can not read organization options")
 	}
 	// TODO fill in quota.maxRate -> 'maxRate': quotas.get_organization_quota(obj),
 	org.Quota = quota
-
 	teams := []Team{}
 	// TODO fill has_access field
 	_, err = db.SelectBySql(`
@@ -110,7 +109,7 @@ func OrganizationDetailsGetEndpoint(c echo.Context) error {
 			LoadStructs(&teams)
 	*/
 	if err != nil {
-		return err
+		return errors.Wrap(err, "can not read organization membership")
 	}
 	teamIDs := []int{}
 	for _, team := range teams {
@@ -120,7 +119,7 @@ func OrganizationDetailsGetEndpoint(c echo.Context) error {
 		// request.is_superuser()
 		teamIDs = append(teamIDs, team.ID)
 	}
-
+	// TODO check that teamIDs slice is not empty
 	// TODO fill project.features array
 	projects := []Project{}
 	_, err = db.SelectBySql(`
@@ -147,63 +146,3 @@ func OrganizationDetailsGetEndpoint(c echo.Context) error {
 	org.Access = []string{"org:write", "member:write", "project:read", "org:delete", "org:read", "event:read", "team:delete", "member:delete", "event:delete", "member:read", "project:write", "event:write", "project:delete", "team:read", "team:write"}
 	return c.JSON(http.StatusOK, org)
 }
-
-/* EXPECTED RESPONSE
-curl -X GET http://localhost:9001/api/0/organizations/acme
-{
-    "pendingAccessRequests": 0,
-    "slug": "acme",
-    "name": "ACME",
-    "quota": {
-        "projectLimit": 100,
-        "maxRate": 0
-    },
-    "dateCreated": "2016-11-10T11:27:51.509Z",
-    "access": [
-        "org:write",
-        "member:write",
-        "project:read",
-        "org:delete",
-        "org:read",
-        "event:read",
-        "team:delete",
-        "member:delete",
-        "event:delete",
-        "member:read",
-        "project:write",
-        "event:write",
-        "project:delete",
-        "team:read",
-        "team:write"
-    ],
-    "teams": [
-        {
-            "slug": "acme",
-            "name": "ACME",
-            "hasAccess": true,
-            "isPending": false,
-            "dateCreated": "2016-11-10T11:27:51.522Z",
-            "isMember": true,
-            "id": "2",
-            "projects": [
-                {
-                    "slug": "api",
-                    "name": "API",
-                    "isPublic": false,
-                    "dateCreated": "2016-11-10T11:27:52.646Z",
-                    "firstEvent": "2016-11-10T11:31:27Z",
-                    "id": "2",
-                    "features": [
-                        "quotas"
-                    ]
-                }
-            ]
-        }
-    ],
-    "id": "2",
-    "features": [
-        "sso",
-        "open-membership"
-    ]
-}
-*/
