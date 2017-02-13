@@ -19,11 +19,11 @@ func NewOrganizationStore(c echo.Context) OrganizationStore {
 func (s OrganizationStore) SaveOrganization(org models.Organization) error {
 	db, err := db.FromE(s.c)
 	if err != nil {
-		return errors.Wrapf(err, "failed to save organization")
+		return errors.Wrap(err, "failed to save organization")
 	}
 	_, err = db.InsertInto("sentry_organization").
 		Columns("id", "name", "slug", "status", "flags", "default_role", "date_added").
 		Record(org).
 		Exec()
-	return errors.Wrapf(err, "failed to save organization")
+	return errors.Wrap(err, "failed to save organization")
 }

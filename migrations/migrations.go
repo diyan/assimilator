@@ -20,7 +20,7 @@ func UpgradeDB(databaseURL string) error {
 	if !ok {
 		// TODO handle error, do not just return the first one
 		// pp.Print(allErrors)
-		return errors.Wrapf(allErrors[0], "failed to upgrade database schema")
+		return errors.Wrap(allErrors[0], "failed to upgrade database schema")
 	}
 	return nil
 }
