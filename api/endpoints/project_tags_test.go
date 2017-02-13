@@ -7,6 +7,7 @@ func (t *testSuite) TestProjectTags_Get() {
 
 	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/tags/").End()
 	t.Nil(errs)
+	// TODO in the response uniqueValues should be equal to 1
 	t.JSONEq(`[{
 			"id": "1",
 			"key": "server_name",
