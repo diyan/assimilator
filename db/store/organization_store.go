@@ -27,3 +27,16 @@ func (s OrganizationStore) SaveOrganization(org models.Organization) error {
 		Exec()
 	return errors.Wrap(err, "failed to save organization")
 }
+
+func (s OrganizationStore) SaveOrganizationMember(
+	orgMember models.OrganizationMember) error {
+	db, err := db.FromE(s.c)
+	if err != nil {
+		return errors.Wrap(err, "failed to save organization member")
+	}
+	_, err = db.InsertInto("sentry_organizationmember").
+		Columns("id", "organization_id", "user_id", "type", "date_added", "email", "has_global_access", "flags", "role", "token").
+		Record(orgMember).
+		Exec()
+	return errors.Wrap(err, "failed to save organization member")
+}
