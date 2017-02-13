@@ -7,9 +7,9 @@ type Team struct {
 	ID             int       `db:"id" json:"id,string"`
 	Slug           string    `db:"slug" json:"slug"`
 	Name           string    `db:"name" json:"name"`
-	DateCreated    time.Time `db:"date_added" json:"dateCreated"`
-	Status         int       `db:"status" json:"status"`
 	OrganizationID int       `db:"organization_id" json:"-"`
+	Status         int       `db:"status" json:"-"`
+	DateCreated    time.Time `db:"date_added" json:"dateCreated"`
 }
 
 const (
