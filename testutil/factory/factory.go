@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/diyan/assimilator/db"
-	"github.com/diyan/assimilator/db/store"
-	"github.com/diyan/assimilator/models"
 
 	"github.com/gocraft/dbr"
 	"github.com/labstack/echo"
@@ -39,21 +37,6 @@ func (tf TestFactory) noError(err error, msgAndArgs ...interface{}) {
 func (tf TestFactory) Reset() {
 	err := tf.tx.Rollback()
 	tf.noError(err)
-}
-
-func (tf TestFactory) SaveOrganization(org models.Organization) {
-	orgStore := store.NewOrganizationStore(tf.ctx)
-	tf.noError(orgStore.SaveOrganization(org))
-}
-
-func (tf TestFactory) SaveProject(project models.Project) {
-	projectStore := store.NewProjectStore(tf.ctx)
-	tf.noError(projectStore.SaveProject(project))
-}
-
-func (tf TestFactory) SaveTags(tags ...*models.TagKey) {
-	projectStore := store.NewProjectStore(tf.ctx)
-	tf.noError(projectStore.SaveTags(tags...))
 }
 
 // MockDB adds early middleware that mock DB transaction to the test Echo instance
