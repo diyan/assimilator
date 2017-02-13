@@ -29,13 +29,3 @@ func SystemHealthGetEndpoint(c echo.Context) error {
 
 }
 
-/* EXPECTED RESPONSE
-curl -X GET http://localhost:9001/api/0/internal/health/
-{
-    "healthy": {
-        "CeleryAppVersionCheck": true,
-        "CeleryAliveCheck": true
-    },
-    "problems": []
-}
-*/
