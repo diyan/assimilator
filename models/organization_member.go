@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/gocraft/dbr"
+)
 
 type OrganizationMemberTeam struct {
 	ID                   int  `db:"id" json:"id,string"`
@@ -14,16 +18,17 @@ type OrganizationMemberTeam struct {
 // and could be thought of as team owners (though their access level may not)
 // be set to ownership.
 type OrganizationMember struct {
-	ID              int       `db:"id" json:"id,string"`
-	OrganizationID  int       `db:"organization_id" json:"organizationId"`
-	UserID          int       `db:"user_id" json:"userId"`
-	Type            int       `db:"type" json:"type"`
-	DateCreated     time.Time `db:"date_added" json:"dateCreated"`
-	Email           string    `db:"email" json:"email"`
-	HasGlobalAccess bool      `db:"has_global_access" json:"hasGlobalAccess"`
-	Flags           int64     `db:"flags" json:"flags"`
-	Counter         int       `db:"counter" json:"counter"`
-	Role            string    `db:"role" json:"role"`
+	ID              int            `db:"id" json:"id,string"`
+	OrganizationID  int            `db:"organization_id" json:"organizationId"`
+	UserID          int            `db:"user_id" json:"userId"`
+	Type            int            `db:"type" json:"type"`
+	DateCreated     time.Time      `db:"date_added" json:"dateCreated"`
+	Email           dbr.NullString `db:"email" json:"email"`
+	HasGlobalAccess bool           `db:"has_global_access" json:"hasGlobalAccess"`
+	Flags           int64          `db:"flags" json:"flags"`
+	Counter         int            `db:"counter" json:"counter"`
+	Role            string         `db:"role" json:"role"`
+	Token           dbr.NullString `db:"token" json:"token"`
 }
 
 /*
@@ -62,24 +67,6 @@ class OrganizationMemberTeam(BaseModel):
             'email': self.organizationmember.get_email(),
             'is_active': self.is_active,
         }
-
-
-
-describe sentry_organizationmember
-+-------------------+--------------------------+-------------------------------------------------------------------------+
-| Column            | Type                     | Modifiers                                                               |
-|-------------------+--------------------------+-------------------------------------------------------------------------|
-| id                | integer                  |  not null default nextval('sentry_organizationmember_id_seq'::regclass) |
-| organization_id   | integer                  |  not null                                                               |
-| user_id           | integer                  |                                                                         |
-| type              | integer                  |  not null                                                               |
-| date_added        | timestamp with time zone |  not null                                                               |
-| email             | character varying(75)    |                                                                         |
-| has_global_access | boolean                  |  not null                                                               |
-| flags             | bigint                   |  not null                                                               |
-| counter           | integer                  |                                                                         |
-| role              | character varying(32)    |  not null                                                               |
-+-------------------+--------------------------+-------------------------------------------------------------------------+
 
 class OrganizationMember(Model):
     """
