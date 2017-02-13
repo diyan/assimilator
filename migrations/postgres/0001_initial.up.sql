@@ -88,3 +88,21 @@ create table sentry_organizationaccessrequest (
     team_id integer not null,
     member_id integer not null
 );
+
+
+create table auth_user (
+    id serial not null,
+    password character varying(128) not null,
+    last_login timestamp with time zone not null,
+    username character varying(128) not null,
+    first_name character varying(200) not null,
+    email character varying(75) not null,
+    is_staff boolean not null,
+    is_active boolean not null,
+    is_superuser boolean not null,
+    date_joined timestamp with time zone not null,
+    is_managed boolean not null,
+    is_password_expired boolean not null,
+    last_password_change timestamp with time zone,
+    session_nonce character varying(12)
+);
