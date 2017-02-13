@@ -10,7 +10,7 @@ type Project struct {
 	OrganizationID int       `db:"organization_id" json:"-"`
 	Name           string    `db:"name" json:"name"`
 	Slug           string    `db:"slug" json:"slug"`
-	Public         bool      `db:"public" json:"public"`
+	Public         bool      `db:"public" json:"isPublic"`
 	Status         int       `db:"status" json:"-"`
 	FirstEvent     time.Time `db:"first_event" json:"firstEvent"`
 	DateCreated    time.Time `db:"date_added" json:"dateCreated"`
