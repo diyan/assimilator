@@ -19,9 +19,8 @@ type TestFactory struct {
 }
 
 func New(t *testing.T, server *echo.Echo) TestFactory {
-	noError := require.New(t).NoError
 	tx, err := db.New(MakeAppConfig())
-	noError(err)
+	require.NoError(t, err)
 	MockDB(server, tx)
 	ctx := server.NewContext(nil, nil)
 	db.ToE(ctx, tx)
