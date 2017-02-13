@@ -24,21 +24,3 @@ func OrganizationIndexGetEndpoint(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, orgs)
 }
-
-/* EXPECTED RESPONSE
-curl -X GET http://localhost:9001/api/0/organizations                                                       ✹ ✭
-[
-  {
-    "id": "1",
-    "name": "Sentry",
-    "slug": "sentry",
-    "dateCreated": "2016-11-10T11:26:23.079809Z"
-  },
-  {
-    "id": "2",
-    "name": "ACME",
-    "slug": "acme",
-    "dateCreated": "2016-11-10T11:27:51.50939Z"
-  }
-]
-*/

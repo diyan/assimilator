@@ -104,5 +104,5 @@ func (t *testSuite) TestProjectTags_Get() {
 }
 
 func (t *testSuite) TestProjectTags_Post() {
-
+	t.T().Skip("Not yet implemented")
 }
