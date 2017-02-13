@@ -5,6 +5,7 @@ import (
 
 	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/models"
+	"github.com/gocraft/dbr"
 )
 
 var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -42,6 +43,41 @@ func (tf TestFactory) MakeOrganization() models.Organization {
 		Flags:       1, // TODO Introduce constants
 		DefaultRole: "member",
 		DateCreated: time_of_2999_01_01__00_00_00,
+	}
+}
+
+func (tf TestFactory) MakeOrganizationMember() models.OrganizationMember {
+	return models.OrganizationMember{
+		ID:              1,
+		OrganizationID:  1,
+		UserID:          1,
+		Type:            50, // TODO introduce constant
+		DateCreated:     time_of_2999_01_01__00_00_00,
+		Email:           dbr.NullString{},
+		HasGlobalAccess: true,
+		Flags:           0,
+		Role:            "owner",
+		Token:           dbr.NullString{},
+	}
+}
+
+func (tf TestFactory) MakeTeam() models.Team {
+	return models.Team{
+		ID:             1,
+		Slug:           "acme-team",
+		Name:           "ACME-Team",
+		OrganizationID: 1,
+		Status:         models.TeamStatusVisible,
+		DateCreated:    time_of_2999_01_01__00_00_00,
+	}
+}
+
+func (tf TestFactory) MakeTeamMember() models.OrganizationMemberTeam {
+	return models.OrganizationMemberTeam{
+		ID:                   1,
+		OrganizationMemberID: 1,
+		TeamID:               1,
+		IsActive:             true,
 	}
 }
 
