@@ -4,13 +4,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/parnurzeal/gorequest"
 )
 
-// TODO consider drop *testing.T parameter
-func New(t *testing.T, handler http.Handler) *gorequest.SuperAgent {
+func New(handler http.Handler) *gorequest.SuperAgent {
 	mockTransport := mockTransport{
 		handler: handler,
 	}

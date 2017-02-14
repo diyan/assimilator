@@ -69,7 +69,7 @@ func (t *testSuite) SetupTest() {
 	// TODO TestFactory does a side effect which is used by TestClient
 	//  make this code more explicit
 	t.Factory = factory.New(t.T(), t.App)
-	t.Client = testclient.New(t.T(), t.App)
+	t.Client = testclient.New(t.App)
 }
 
 func (t *testSuite) TearDownTest() {
