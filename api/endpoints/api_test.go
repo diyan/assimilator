@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"net/http/httptest"
 	"testing"
 
 	"github.com/diyan/assimilator/migrations"
@@ -18,10 +17,9 @@ import (
 
 type testSuite struct {
 	suite.Suite
-	HttpRecorder *httptest.ResponseRecorder
-	Client       *gorequest.SuperAgent
-	App          *echo.Echo
-	Factory      factory.TestFactory
+	Client  *gorequest.SuperAgent
+	App     *echo.Echo
+	Factory factory.TestFactory
 }
 
 func (t *testSuite) SetupSuite() {
