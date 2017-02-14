@@ -10,6 +10,7 @@ import (
 )
 
 func OrganizationIndexGetEndpoint(c echo.Context) error {
+	// TODO implement memberOnly flag
 	//memberOnly := c.Param("member")
 	db, err := db.FromE(c)
 	if err != nil {
