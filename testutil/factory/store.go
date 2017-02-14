@@ -30,6 +30,11 @@ func (tf TestFactory) SaveProject(project models.Project) {
 	tf.noError(projectStore.SaveProject(project))
 }
 
+func (tf TestFactory) SaveEnvironment(environment models.Environment) {
+	projectStore := store.NewProjectStore(tf.ctx)
+	tf.noError(projectStore.SaveEnvironment(environment))
+}
+
 func (tf TestFactory) SaveTags(tags ...*models.TagKey) {
 	projectStore := store.NewProjectStore(tf.ctx)
 	tf.noError(projectStore.SaveTags(tags...))

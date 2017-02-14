@@ -95,6 +95,15 @@ func (tf TestFactory) MakeProject() models.Project {
 	}
 }
 
+func (tf TestFactory) MakeEnvironment() models.Environment {
+	return models.Environment{
+		ID:          1,
+		ProjectID:   1,
+		Name:        "",
+		DateCreated: time_of_2999_01_01__00_00_00,
+	}
+}
+
 func (tf TestFactory) MakeUser() models.User {
 	return models.User{
 		ID:                1,

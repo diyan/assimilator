@@ -14,6 +14,15 @@ create table sentry_project (
 );
 
 
+create table sentry_environment (
+    id serial not null,
+    project_id integer not null,
+    name character varying(64) not null,
+    date_added timestamp with time zone not null,
+    constraint sentry_environment_project_id_check check ((project_id >= 0))
+);
+
+
 create table sentry_filterkey (
     id serial not null,
     project_id integer not null,

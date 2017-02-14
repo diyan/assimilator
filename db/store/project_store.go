@@ -87,6 +87,18 @@ func (s ProjectStore) SaveProject(project models.Project) error {
 	return errors.Wrap(err, "failed to save project")
 }
 
+func (s ProjectStore) SaveEnvironment(environment models.Environment) error {
+	db, err := db.FromE(s.c)
+	if err != nil {
+		return errors.Wrap(err, "failed to save project environment")
+	}
+	_, err = db.InsertInto("sentry_environment").
+		Columns("id", "project_id", "name", "date_added").
+		Record(environment).
+		Exec()
+	return errors.Wrap(err, "failed to save project environment")
+}
+
 func (s ProjectStore) SaveTags(tags ...*models.TagKey) error {
 	db, err := db.FromE(s.c)
 	if err != nil {
