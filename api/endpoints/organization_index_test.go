@@ -5,6 +5,7 @@ func (t *testSuite) TestOrganizationIndex_Get() {
 
 	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/organizations/").End()
 	t.Nil(errs)
+	// TODO `isEarlyAdopter: false` is expected in the response
 	t.JSONEq(`[{
             "id": "1",
             "name": "ACME-Team",
