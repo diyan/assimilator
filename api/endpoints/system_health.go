@@ -16,16 +16,18 @@ type SystemHealth struct {
 type SystemHealthStatus struct {
 	CeleryAppVersionCheck bool `json:"CeleryAppVersionCheck"`
 	CeleryAliveCheck      bool `json:"CeleryAliveCheck"`
+	WarningStatusCheck    bool `json:"WarningStatusCheck"`
 }
 
 // TODO replace stub with real implementation
 func SystemHealthGetEndpoint(c echo.Context) error {
 	health := SystemHealth{
 		Healthy: SystemHealthStatus{
-			CeleryAppVersionCheck: true, CeleryAliveCheck: true},
+			CeleryAppVersionCheck: true,
+			CeleryAliveCheck:      true,
+			WarningStatusCheck:    false},
 		Problems: []string{},
 	}
 	return c.JSON(http.StatusOK, health)
 
 }
-

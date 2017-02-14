@@ -5,6 +5,7 @@ func (t *testSuite) TestSystemHealth_Get() {
 	t.Nil(errs)
 	t.JSONEq(`{
             "healthy": {
+                "WarningStatusCheck": false,
                 "CeleryAppVersionCheck": true,
                 "CeleryAliveCheck": true
             },
