@@ -23,6 +23,16 @@ create table sentry_environment (
 );
 
 
+create table sentry_savedsearch (
+    id serial not null,
+    project_id integer not null,
+    name character varying(128) not null,
+    query text not null,
+    date_added timestamp with time zone not null,
+    is_default boolean not null
+);
+
+
 create table sentry_filterkey (
     id serial not null,
     project_id integer not null,

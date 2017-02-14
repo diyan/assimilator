@@ -40,6 +40,11 @@ func (tf TestFactory) SaveTags(tags ...*models.TagKey) {
 	tf.noError(projectStore.SaveTags(tags...))
 }
 
+func (tf TestFactory) SaveProjectSearches(searches ...models.SavedSearch) {
+	projectStore := store.NewProjectStore(tf.ctx)
+	tf.noError(projectStore.SaveSearches(searches...))
+}
+
 func (tf TestFactory) SaveUser(user models.User) {
 	store := store.NewUserStore(tf.ctx)
 	tf.noError(store.SaveUser(user))

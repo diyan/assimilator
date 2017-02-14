@@ -113,3 +113,17 @@ func (s ProjectStore) SaveTags(tags ...*models.TagKey) error {
 	_, err = query.Exec()
 	return errors.Wrap(err, "failed to save project tags")
 }
+
+func (s ProjectStore) SaveSearches(searches ...models.SavedSearch) error {
+	db, err := db.FromE(s.c)
+	if err != nil {
+		return errors.Wrap(err, "failed to save project searches")
+	}
+	query := db.InsertInto("sentry_savedsearch").
+		Columns("id", "project_id", "name", "query", "date_added", "is_default")
+	for _, search := range searches {
+		query = query.Record(search)
+	}
+	_, err = query.Exec()
+	return errors.Wrap(err, "failed to save project searches")
+}

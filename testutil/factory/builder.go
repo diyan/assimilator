@@ -34,6 +34,62 @@ func (tf TestFactory) MakeTags() []*models.TagKey {
 	return []*models.TagKey{&tag1, &tag2}
 }
 
+func (tf TestFactory) MakeProjectSearches() []models.SavedSearch {
+	return []models.SavedSearch{
+		models.SavedSearch{
+			ID:          1,
+			ProjectID:   1,
+			Name:        "Unresolved Issues",
+			Query:       "is:unresolved",
+			DateCreated: time_of_2999_01_01__00_00_00,
+			IsDefault:   true,
+		},
+		models.SavedSearch{
+			ID:          2,
+			ProjectID:   1,
+			Name:        "Needs Triage",
+			Query:       "is:unresolved is:unassigned",
+			DateCreated: time_of_2999_01_01__00_00_00,
+			IsDefault:   false,
+		},
+		models.SavedSearch{
+			ID:          3,
+			ProjectID:   1,
+			Name:        "Assigned To Me",
+			Query:       "is:unresolved assigned:me",
+			DateCreated: time_of_2999_01_01__00_00_00,
+			IsDefault:   false,
+		},
+		models.SavedSearch{
+			ID:          4,
+			ProjectID:   1,
+			Name:        "My Bookmarks",
+			Query:       "is:unresolved bookmarks:me",
+			DateCreated: time_of_2999_01_01__00_00_00,
+			IsDefault:   false,
+		},
+		models.SavedSearch{
+			ID:          5,
+			ProjectID:   1,
+			Name:        "New Today",
+			Query:       "is:unresolved age:-24h",
+			DateCreated: time_of_2999_01_01__00_00_00,
+			IsDefault:   false,
+		},
+	}
+}
+
+// SavedSearch is a model for saved search query.
+type SavedSearch struct {
+	ID          int       `db:"id" json:"id,string"`
+	ProjectID   string    `db:"project_id" json:"-"`
+	Name        string    `db:"name" json:"name"`
+	Query       string    `db:"query" json:"query"`
+	DateCreated time.Time `db:"date_added" json:"dateCreated"`
+	IsDefault   bool      `db:"is_default" json:"isDefault"`
+	// TODO JSON payload contains isUserDefault property
+}
+
 func (tf TestFactory) MakeOrganization() models.Organization {
 	return models.Organization{
 		ID:          1,
