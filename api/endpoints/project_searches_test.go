@@ -1,14 +1,22 @@
 package api_test
 
-func (t *testSuite) TestProjectSearches_Get() {
-	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
-	t.Factory.SaveProject(t.Factory.MakeProject())
-	t.Factory.SaveProjectSearches(t.Factory.MakeProjectSearches()...)
+import (
+	"testing"
 
-	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/searches/").End()
-	t.Nil(errs)
-	t.Equal(200, res.StatusCode)
-	t.JSONEq(`[
+	"github.com/stretchr/testify/assert"
+)
+
+func TestProjectSearches_Get(t *testing.T) {
+	client, factory := Setup(t)
+	defer TearDown(t)
+	factory.SaveOrganization(factory.MakeOrganization())
+	factory.SaveProject(factory.MakeProject())
+	factory.SaveProjectSearches(factory.MakeProjectSearches()...)
+
+	res, bodyStr, errs := client.Get("http://example.com/api/0/projects/acme-team/acme/searches/").End()
+	assert.Nil(t, errs)
+	assert.Equal(t, 200, res.StatusCode)
+	assert.JSONEq(t, `[
 		    {
 				"id": "3",
 				"name": "Assigned To Me",

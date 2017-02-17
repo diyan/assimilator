@@ -1,9 +1,18 @@
 package api_test
 
-func (t *testSuite) TestSystemHealth_Get() {
-	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/internal/health/").End()
-	t.Nil(errs)
-	t.JSONEq(`{
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestSystemHealth_Get(t *testing.T) {
+	client, _ := Setup(t)
+	defer TearDown(t)
+	res, bodyStr, errs := client.Get("http://example.com/api/0/internal/health/").End()
+	assert.Nil(t, errs)
+	assert.Equal(t, 200, res.StatusCode)
+	assert.JSONEq(t, `{
             "healthy": {
                 "WarningStatusCheck": false,
                 "CeleryAppVersionCheck": true,
@@ -12,5 +21,4 @@ func (t *testSuite) TestSystemHealth_Get() {
             "problems": []
         }`,
 		bodyStr)
-	t.Equal(200, res.StatusCode)
 }

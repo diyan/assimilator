@@ -1,16 +1,26 @@
 package api_test
 
-func (t *testSuite) TestOrganizationDetails_Get() {
-	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
-	t.Factory.SaveOrganizationMember(t.Factory.MakeOrganizationMember())
-	t.Factory.SaveTeam(t.Factory.MakeTeam())
-	t.Factory.SaveTeamMember(t.Factory.MakeTeamMember())
-	t.Factory.SaveProject(t.Factory.MakeProject())
+import (
+	"testing"
 
-	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/organizations/acme-team").End()
-	t.Nil(errs)
+	"github.com/stretchr/testify/assert"
+)
+
+func TestOrganizationDetails_Get(t *testing.T) {
+	client, factory := Setup(t)
+	defer TearDown(t)
+
+	factory.SaveOrganization(factory.MakeOrganization())
+	factory.SaveOrganizationMember(factory.MakeOrganizationMember())
+	factory.SaveTeam(factory.MakeTeam())
+	factory.SaveTeamMember(factory.MakeTeamMember())
+	factory.SaveProject(factory.MakeProject())
+
+	res, bodyStr, errs := client.Get("http://example.com/api/0/organizations/acme-team").End()
+	assert.Nil(t, errs)
+	assert.Equal(t, 200, res.StatusCode)
 	// TODO in response teams.1.project.1.features should be equal to ["quotas"]
-	t.JSONEq(`{
+	assert.JSONEq(t, `{
             "id": "1",        
             "slug": "acme-team",
             "name": "ACME-Team",
@@ -58,5 +68,4 @@ func (t *testSuite) TestOrganizationDetails_Get() {
             ]
         }`,
 		bodyStr)
-	t.Equal(200, res.StatusCode)
 }

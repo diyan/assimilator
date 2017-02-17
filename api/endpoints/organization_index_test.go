@@ -1,21 +1,29 @@
 package api_test
 
-func (t *testSuite) TestOrganizationIndex_Get() {
-	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
+import (
+	"testing"
 
-	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/organizations/").End()
-	t.Nil(errs)
+	"github.com/stretchr/testify/assert"
+)
+
+func TestOrganizationIndex_Get(t *testing.T) {
+	client, factory := Setup(t)
+	defer TearDown(t)
+	factory.SaveOrganization(factory.MakeOrganization())
+
+	res, bodyStr, errs := client.Get("http://example.com/api/0/organizations/").End()
+	assert.Nil(t, errs)
 	// TODO `isEarlyAdopter: false` is expected in the response
-	t.JSONEq(`[{
+	assert.JSONEq(t, `[{
             "id": "1",
             "name": "ACME-Team",
             "slug": "acme-team",
             "dateCreated": "2999-01-01T00:00:00Z"
         }]`,
 		bodyStr)
-	t.Equal(200, res.StatusCode)
+	assert.Equal(t, 200, res.StatusCode)
 }
 
-func (t *testSuite) TestOrganizationIndex_Get_MemberOnly() {
-	t.T().Skip("Not yet implemented")
+func TestOrganizationIndex_Get_MemberOnly(t *testing.T) {
+	t.Skip("Not yet implemented")
 }

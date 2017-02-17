@@ -1,15 +1,24 @@
 package api_test
 
-func (t *testSuite) TestProjectMemberIndex_Get() {
-	t.Factory.SaveOrganization(t.Factory.MakeOrganization())
-	t.Factory.SaveOrganizationMember(t.Factory.MakeOrganizationMember())
-	t.Factory.SaveProject(t.Factory.MakeProject())
-	t.Factory.SaveUser(t.Factory.MakeUser())
+import (
+	"testing"
 
-	res, bodyStr, errs := t.Client.Get("http://example.com/api/0/projects/acme-team/acme/members/").End()
-	t.Nil(errs)
+	"github.com/stretchr/testify/assert"
+)
+
+func TestProjectMemberIndex_Get(t *testing.T) {
+	client, factory := Setup(t)
+	defer TearDown(t)
+	factory.SaveOrganization(factory.MakeOrganization())
+	factory.SaveOrganizationMember(factory.MakeOrganizationMember())
+	factory.SaveProject(factory.MakeProject())
+	factory.SaveUser(factory.MakeUser())
+
+	res, bodyStr, errs := client.Get("http://example.com/api/0/projects/acme-team/acme/members/").End()
+	assert.Nil(t, errs)
+	assert.Equal(t, 200, res.StatusCode)
 	// TODO in the response avatarUrl should be not empty, for ex https://secure.gravatar.com/avatar/01bce7702975191fdc402565bd1045a8?s=32&d=mm
-	t.JSONEq(`[{
+	assert.JSONEq(t, `[{
             "id": "1",
             "username": "admin",
             "name": "admin@example.com",
@@ -23,5 +32,4 @@ func (t *testSuite) TestProjectMemberIndex_Get() {
             }
         }]`,
 		bodyStr)
-	t.Equal(200, res.StatusCode)
 }
