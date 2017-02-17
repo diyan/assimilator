@@ -1,5 +1,7 @@
 package api_test
 
-func (t *testSuite) TestProjectGroupIndex_Get() {
-	t.T().Skip("Not yet implemented")
+import "testing"
+
+func TestProjectGroupIndex_Get(t *testing.T) {
+	t.Skip("Not yet implemented")
 }
