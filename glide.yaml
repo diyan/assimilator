@@ -9,8 +9,9 @@ import:
 - package: github.com/echo-contrib/pongor
 - package: github.com/flosch/pongo2
   version: v3.0
+# gocraft/dbr v2.1 does not support *string, *int64; use master instead 
 - package: github.com/gocraft/dbr
-  version: v2.1
+  version: master
 - package: github.com/k0kubun/pp
   version: v2.2.0
 - package: github.com/labstack/echo
@@ -38,3 +39,4 @@ import:
 - package: gopkg.in/yaml.v2
   version: v2
   repo: https://github.com/go-yaml/yaml.git
+- package: github.com/AlekSi/pointer
