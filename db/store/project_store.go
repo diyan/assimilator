@@ -127,3 +127,20 @@ func (s ProjectStore) SaveSearches(searches ...models.SavedSearch) error {
 	_, err = query.Exec()
 	return errors.Wrap(err, "failed to save project searches")
 }
+
+func (s ProjectStore) SaveEventGroup(group models.Group) error {
+	db, err := db.FromE(s.c)
+	if err != nil {
+		return errors.Wrap(err, "failed to save groups of project issues")
+	}
+	_, err = db.InsertInto("sentry_groupedmessage").
+		Columns(
+			"id", "logger", "level", "message", "view", "status", "times_seen",
+			"last_seen", "first_seen", "data", "score", "project_id",
+			"time_spent_total", "time_spent_count", "resolved_at", "active_at",
+			"is_public", "platform", "num_comments", "first_release_id",
+			"short_id").
+		Record(group).
+		Exec()
+	return errors.Wrap(err, "failed to save groups of project issues")
+}
