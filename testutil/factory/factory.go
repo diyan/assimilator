@@ -31,7 +31,7 @@ func New(t *testing.T, server *echo.Echo) TestFactory {
 }
 
 func (tf TestFactory) noError(err error, msgAndArgs ...interface{}) {
-	require.New(tf.t).NoError(err, msgAndArgs)
+	require.New(tf.t).NoError(err, msgAndArgs...)
 }
 
 func (tf TestFactory) Reset() {
