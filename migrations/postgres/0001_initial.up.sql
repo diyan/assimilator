@@ -125,3 +125,34 @@ create table auth_user (
     last_password_change timestamp with time zone,
     session_nonce character varying(12)
 );
+
+
+
+create table sentry_groupedmessage (
+    id serial not null,
+    logger character varying(64) not null,
+    level integer not null,
+    message text not null,
+    view character varying(200),
+    status integer not null,
+    times_seen integer not null,
+    last_seen timestamp with time zone not null,
+    first_seen timestamp with time zone not null,
+    data text,
+    score integer not null,
+    project_id integer,
+    time_spent_total integer not null,
+    time_spent_count integer not null,
+    resolved_at timestamp with time zone,
+    active_at timestamp with time zone,
+    is_public boolean,
+    platform character varying(64),
+    num_comments integer,
+    first_release_id integer,
+    short_id integer,
+    constraint ck_num_comments_pstv_44851d4d5d739eab check ((num_comments >= 0)),
+    constraint sentry_groupedmessage_level_check check ((level >= 0)),
+    constraint sentry_groupedmessage_num_comments_check check ((num_comments >= 0)),
+    constraint sentry_groupedmessage_status_check check ((status >= 0)),
+    constraint sentry_groupedmessage_times_seen_check check ((times_seen >= 0))
+);
