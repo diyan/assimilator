@@ -6,43 +6,48 @@ import (
 )
 
 func (tf TestFactory) SaveOrganization(org models.Organization) {
-	orgStore := store.NewOrganizationStore(tf.ctx)
-	tf.noError(orgStore.SaveOrganization(org))
+	store := store.NewOrganizationStore(tf.ctx)
+	tf.noError(store.SaveOrganization(org))
 }
 
 func (tf TestFactory) SaveOrganizationMember(orgMember models.OrganizationMember) {
-	orgStore := store.NewOrganizationStore(tf.ctx)
-	tf.noError(orgStore.SaveOrganizationMember(orgMember))
+	store := store.NewOrganizationStore(tf.ctx)
+	tf.noError(store.SaveOrganizationMember(orgMember))
 }
 
 func (tf TestFactory) SaveTeam(team models.Team) {
-	teamStore := store.NewTeamStore(tf.ctx)
-	tf.noError(teamStore.SaveTeam(team))
+	store := store.NewTeamStore(tf.ctx)
+	tf.noError(store.SaveTeam(team))
 }
 
 func (tf TestFactory) SaveTeamMember(teamMember models.OrganizationMemberTeam) {
-	teamStore := store.NewTeamStore(tf.ctx)
-	tf.noError(teamStore.SaveMember(teamMember))
+	store := store.NewTeamStore(tf.ctx)
+	tf.noError(store.SaveMember(teamMember))
 }
 
 func (tf TestFactory) SaveProject(project models.Project) {
-	projectStore := store.NewProjectStore(tf.ctx)
-	tf.noError(projectStore.SaveProject(project))
+	store := store.NewProjectStore(tf.ctx)
+	tf.noError(store.SaveProject(project))
+}
+
+func (tf TestFactory) SaveEventGroup(group models.Group) {
+	store := store.NewProjectStore(tf.ctx)
+	tf.noError(store.SaveEventGroup(group))
 }
 
 func (tf TestFactory) SaveEnvironment(environment models.Environment) {
-	projectStore := store.NewProjectStore(tf.ctx)
-	tf.noError(projectStore.SaveEnvironment(environment))
+	store := store.NewProjectStore(tf.ctx)
+	tf.noError(store.SaveEnvironment(environment))
 }
 
 func (tf TestFactory) SaveTags(tags ...*models.TagKey) {
-	projectStore := store.NewProjectStore(tf.ctx)
-	tf.noError(projectStore.SaveTags(tags...))
+	store := store.NewProjectStore(tf.ctx)
+	tf.noError(store.SaveTags(tags...))
 }
 
 func (tf TestFactory) SaveProjectSearches(searches ...models.SavedSearch) {
-	projectStore := store.NewProjectStore(tf.ctx)
-	tf.noError(projectStore.SaveSearches(searches...))
+	store := store.NewProjectStore(tf.ctx)
+	tf.noError(store.SaveSearches(searches...))
 }
 
 func (tf TestFactory) SaveUser(user models.User) {
