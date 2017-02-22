@@ -33,16 +33,16 @@ type Group struct {
 	// Data is a GzippedDictField
 	Data           *string    `db:"data" json:"-"`
 	Score          int        `db:"score" json:"-"`
-	ProjectID      *int       `db:"project_id" json:"-"`
+	ProjectID      *int64     `db:"project_id" json:"-"`
 	TimeSpentTotal int        `db:"time_spent_total" json:"-"`
 	TimeSpentCount int        `db:"time_spent_count" json:"-"`
 	ResolvedAt     *time.Time `db:"resolved_at" json:"-"`
 	ActiveAt       *time.Time `db:"active_at" json:"-"`
 	IsPublic       *bool      `db:"is_public" json:"isPublic"`
 	Platform       *string    `db:"platform" json:"-"`
-	NumComments    *int       `db:"num_comments" json:"numComments"`
-	FirstReleaseID *int       `db:"first_release_id" json:"-"`
-	// ShortID *int `db:"short_id"`
+	NumComments    *int64     `db:"num_comments" json:"numComments"`
+	FirstReleaseID *int64     `db:"first_release_id" json:"-"`
+	ShortID        *int64     `db:"short_id"`
 }
 
 func init() {

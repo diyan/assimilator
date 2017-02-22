@@ -3,9 +3,9 @@ package factory
 import (
 	"time"
 
+	"github.com/AlekSi/pointer"
 	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/models"
-	"github.com/gocraft/dbr"
 )
 
 var time_of_2999_01_01__00_00_00 = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -109,11 +109,12 @@ func (tf TestFactory) MakeOrganizationMember() models.OrganizationMember {
 		UserID:          1,
 		Type:            50, // TODO introduce constant
 		DateCreated:     time_of_2999_01_01__00_00_00,
-		Email:           dbr.NullString{},
+		Email:           nil,
 		HasGlobalAccess: true,
 		Flags:           0,
+		Counter:         0,
 		Role:            "owner",
-		Token:           dbr.NullString{},
+		Token:           nil,
 	}
 }
 
@@ -157,6 +158,33 @@ func (tf TestFactory) MakeEnvironment() models.Environment {
 		ProjectID:   1,
 		Name:        "",
 		DateCreated: time_of_2999_01_01__00_00_00,
+	}
+}
+
+func (tf TestFactory) MakeEventGroup() models.Group {
+	return models.Group{
+		ID:        1,
+		ProjectID: pointer.ToInt64(1),
+		Logger:    "",
+		Level:     20, // TODO Add enums
+		Message:   "This is a test message generated using ``raven test`` __main__ in <module>",
+		Culprit:   pointer.ToString("__main__ in <module>"),
+		Status:    0, // TODO Add enums
+		TimesSeen: 1,
+		LastSeen:  time_of_2999_01_01__00_00_00,
+		FirstSeen: time_of_2999_01_01__00_00_00,
+		// TODO Data is most likely base64 -> gzip -> dict
+		Data:           pointer.ToString("eJwdykEOgjAUBND9P0V3sDKpQO0JvADErf2xY20CpOF/SLy9xWQ2M/PaWCyNzcyizw0v5AOxoXKlu+390PXeOUsyNvotqHtXbcSb91lr689ngXJk5doHamNxlWjW+eQ3ekyfLKaGjULULBDhBJOwYmNFNLvkNZkQNj6w/lEIVDyJXH6p7jGr"),
+		Score:          1485348661, // TODO what does this mean?
+		TimeSpentTotal: 0,
+		TimeSpentCount: 0,
+		ResolvedAt:     nil,
+		ActiveAt:       pointer.ToTime(time_of_2999_01_01__00_00_00),
+		IsPublic:       pointer.ToBool(false),
+		Platform:       pointer.ToString("python"),
+		NumComments:    pointer.ToInt64(0),
+		FirstReleaseID: nil,
+		ShortID:        pointer.ToInt64(1),
 	}
 }
 

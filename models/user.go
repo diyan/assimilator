@@ -18,7 +18,7 @@ type User struct {
 	Password           string    `db:"password" json:"-"`
 	LastLogin          time.Time `db:"last_login" json:"-"`
 	DateCreated        time.Time `db:"date_joined" json:"-"`
-	// TODO add session_nonce dbr.NullString
+	// TODO add session_nonce *string
 }
 
 func (user *User) PostGet() {

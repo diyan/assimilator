@@ -1,19 +1,15 @@
 package models
 
-import (
-	"strings"
-
-	"github.com/gocraft/dbr"
-)
+import "strings"
 
 // TagKey stores references to available filters keys.
 type TagKey struct {
-	ID           int            `db:"id" json:"id,string"`
-	ProjectID    int            `db:"project_id" json:"-"`
-	Key          string         `db:"key" json:"key"`
-	UniqueValues int            `db:"values_seen" json:"uniqueValues"`
-	Name         dbr.NullString `db:"label" json:"name"`
-	Status       int            `db:"status" json:"-"`
+	ID           int     `db:"id" json:"id,string"`
+	ProjectID    int     `db:"project_id" json:"-"`
+	Key          string  `db:"key" json:"key"`
+	UniqueValues int     `db:"values_seen" json:"uniqueValues"`
+	Name         *string `db:"label" json:"name"`
+	Status       int     `db:"status" json:"-"`
 }
 
 func (tag *TagKey) PostGet() {
@@ -29,14 +25,14 @@ func (tag *TagKey) PostGet() {
 		"server_name":     "Server",
 	}
 
-	if tag.Name.Valid {
+	if tag.Name != nil {
 		return
 	}
 	if label, ok := tagLabels[tag.Key]; ok {
-		tag.Name.String = label
+		tag.Name = &label
 	} else {
 		label = strings.Title(strings.Replace(tag.Key, "_", " ", -1))
-		tag.Name.String = label
+		tag.Name = &label
 	}
 }
 

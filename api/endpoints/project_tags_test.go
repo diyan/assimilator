@@ -20,13 +20,13 @@ func TestProjectTags_Get(t *testing.T) {
 			"id": "1",
 			"key": "server_name",
 			"uniqueValues": 0,
-			"name": null
+			"name": "Server"
 		},
 		{
 			"id": "2",
 			"key": "level",
 			"uniqueValues": 0,
-			"name": null
+			"name": "Level"
 		}]`,
 		bodyStr)
 }
