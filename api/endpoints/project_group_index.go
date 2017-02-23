@@ -1,63 +1,78 @@
 package api
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	base32num "github.com/Dancapistan/gobase32"
 	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/models"
-
+	"github.com/diyan/assimilator/tsdb"
+	"github.com/diyan/assimilator/web/frontend"
 	"github.com/gocraft/dbr"
 	"github.com/k0kubun/pp"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
 const errInvalidStatsPeriod = "Invalid stats_period. Valid choices are '', '24h', and '14d'"
 
-// Issue ...
-type Issue struct {
-	ID            string            `json:"id"`
-	FirstSeen     string            `json:"firstSeen"`
-	LastSeen      string            `json:"lastSeen"`
-	TimeSpent     *string           `json:"timeSpent"` // TODO check type
-	NumComments   int               `json:"numComments"`
-	UserCount     int               `json:"userCount"`
-	Stats         IssueStatistic    `json:"stats"`
-	Culprit       string            `json:"culprit"`
-	Title         string            `json:"title"`
-	AssignedTo    *string           `json:"assignedTo"` // TODO check type
-	Logger        *string           `json:"logger"`     // TODO check type
-	Annotations   []string          `json:"annotations"`
-	Status        string            `json:"status"`
-	IsPublic      bool              `json:"isPublic"`
-	HasSeen       bool              `json:"hasSeen"`
-	ShareID       string            `json:"shareId"`
-	Count         string            `json:"count"`
-	Permalink     string            `json:"permalink"`
-	Level         string            `json:"level"`
-	IsBookmarked  bool              `json:"isBookmarked"`
-	Project       ProjectRef        `json:"project"`
-	StatusDetails map[string]string `json:"statusDetails"` // TODO check type
+/*
+// OrganizationDetails ...
+type OrganizationDetails struct {
+	models.Organization
+	PendingAccessRequests int      `json:"pendingAccessRequests"`
+	Features              []string `json:"features"`
+	Quota                 Quota    `json:"quota"`
+	Access                []string `json:"access"`
+	Teams                 []Team   `json:"teams"`
+}
+*/
+
+// TODO check that TimeSpent is not missing
+type Group struct {
+	models.Group
+	ShortID             string            `json:"shortId"`
+	ShareID             string            `json:"shareId"`
+	Status              string            `json:"status"`
+	Logger              *string           `json:"logger"`
+	Level               string            `json:"level"`
+	Type                string            `json:"type"`
+	Annotations         []string          `json:"annotations"`
+	AssignedTo          *string           `json:"assignedTo"`
+	Count               int               `json:"count"`
+	UserCount           int               `json:"userCount"`
+	HasSeen             bool              `json:"hasSeen"`
+	Project             GroupProjectInfo  `json:"project"`
+	IsBookmarked        bool              `json:"isBookmarked"`
+	IsSubscribed        bool              `json:"isSubscribed"`
+	Permalink           string            `json:"permalink"`
+	Metadata            map[string]string `json:"metadata"`      // TODO check type
+	StatusDetails       map[string]string `json:"statusDetails"` // TODO check type
+	SubscriptionDetails *string           `json:"subscriptionDetails"`
+	Stats               GroupStatistic    `json:"stats"`
 }
 
-// IssueStatistic ...
-type IssueStatistic struct {
+// GroupStatistic ...
+type GroupStatistic struct {
 	For24h []string `json:"24h"`
 }
 
-// ProjectRef ...
-type ProjectRef struct {
+// GroupProjectInfo ...
+type GroupProjectInfo struct {
 	Name string `json:"name"`
 	Slug string `json:"slug"`
 }
 
 func ProjectGroupIndexGetEndpoint(c echo.Context) error {
-	projectID := GetProjectID(c)
+	orgSlug := c.Param("organization_slug")
+	project := GetProject(c)
 	statsPeriod := c.QueryParam("statsPeriod")
-	shortIDLookup, _ := strconv.ParseBool("shortIdLookup")
+	shortIDLookup, _ := strconv.ParseBool(c.QueryParam("shortIdLookup"))
+	// TODO return HTTP 400 if shortIdLookup has invalid format
 	if !(statsPeriod == "" || statsPeriod == "24h" || statsPeriod == "14d") {
 		// TODO introduce better error handling -> return err.InvalidStatsPeriod
 		return c.JSON(400, map[string]string{"detail": errInvalidStatsPeriod})
@@ -75,7 +90,7 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 				select em.group_id
 					from sentry_eventmapping em
 				where em.project_id = ? and em.event_id = ?`,
-				projectID, query).
+				project.ID, query).
 				ReturnInt64()
 		} else if shortIDLookup && models.LooksLikeShortID(query) {
 			// If the query looks like a short id, we want to provide some
@@ -91,17 +106,18 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		}
 	}
 
+	/* TODO is this obsolete code?
 	groups := []models.Group{}
 	_, err = db.SelectBySql(`
 		select gm.* from sentry_groupedmessage gm`).
 		LoadStructs(&groups)
 	if err != nil {
 		return err
-	}
+	}*/
 	// TODO Implement `func GetSearchBackend()` that returns SearchBackend interface
 	// NOTE Sentry v8.10 implements only single DjangoSearchBackend
 	// TODO CONTINUE !!!
-	queryDto, err := buildQueryDto(c, projectID)
+	queryDto, err := buildQueryDto(c, project.ID)
 	if err != nil {
 		// TODO If validation error return JSON -> Response({'detail': six.text_type(exc)}, status=400)
 		return err
@@ -110,14 +126,95 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	sql, args := sb.ToSql()
-	pp.Print(sql)
-	pp.Print(args)
-	issues := []models.Group{}
-	_, err = sb.LoadStructs(&issues)
+	//sql, args := sb.ToSql()
+	//pp.Print(sql)
+	//pp.Print(args)
+	groups := []*Group{}
+	_, err = sb.LoadStructs(&groups)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "can not read groups of project issues")
 	}
+	if statsPeriod != "" {
+		segments := int64(0)
+		interval := time.Duration(0)
+		// TODO add stats for the list of group/issue IDs
+		if statsPeriod == "14d" {
+			segments = 14
+			interval = time.Duration(24 * time.Hour)
+		} else if statsPeriod == "24h" {
+			segments = 24
+			interval = time.Duration(1 * time.Hour)
+		} else {
+			return errors.New(errInvalidStatsPeriod)
+		}
+		now := time.Now().UTC()
+		groupIDs := []int{}
+		for _, group := range groups {
+			if group.ProjectID != nil && *group.ProjectID == project.ID {
+				group.Project = GroupProjectInfo{
+					Name: project.Name,
+					Slug: project.Slug,
+				}
+			} else {
+				return errors.Errorf(
+					"Not implemented. Event group does not belong to the requested project. Group.ID=%d, Group.ProjectID=%d, Request.ProjectSlug=%s, Request.ProjectID=%d",
+					group.ID, *group.ProjectID, project.Slug, project.ID)
+			}
+			group.Logger = &group.Group.Logger
+			if *group.Logger == "" {
+				group.Logger = nil
+			}
+
+			statusCode := group.Group.Status
+			group.StatusDetails = map[string]string{}
+			//if attrs['ignore_duration']:
+			//	if attrs['ignore_duration'] < timezone.now() and status == GroupStatus.IGNORED:
+			//		status = GroupStatus.UNRESOLVED
+			//	else:
+			//		status_details['ignoreUntil'] = attrs['ignore_duration']
+			//elif status == GroupStatus.UNRESOLVED and obj.is_over_resolve_age():
+			//	status = GroupStatus.RESOLVED
+			//	status_details['autoResolved'] = True
+			if statusCode == models.GroupStatusResolved {
+				group.Status = "resolved"
+				//if attrs['pending_resolution']:
+				//    group.StatusDetails["inNextRelease"] = True
+			} else if statusCode == models.GroupStatusIgnored {
+				group.Status = "ignored"
+			} else if statusCode == models.GroupStatusPendingDeletion || statusCode == models.GroupStatusDeletionInProgress {
+				group.Status = "pending_deletion"
+			} else if statusCode == models.GroupStatusPendingMerge {
+				group.Status = "pending_merge"
+			} else {
+				group.Status = "unresolved"
+			}
+
+			if group.Group.ShortID != nil {
+				group.ShortID = fmt.Sprintf(
+					"%s-%s",
+					strings.ToUpper(project.Slug),
+					base32num.Encode(uint32(*group.Group.ShortID)))
+			}
+
+			group.Level = getLogLevelString(group.Group.Level)
+			group.Permalink = fmt.Sprintf("%s://%s%s",
+				c.Request().URL.Scheme,
+				c.Request().URL.Host,
+				c.Echo().URI(frontend.GetSentryGroupView, orgSlug, group.Project.Slug, group.ID))
+			groupIDs = append(groupIDs, group.ID)
+		}
+		start := now.Add(-time.Duration(((segments - 1) * interval.Nanoseconds())))
+		stats := tsdb.New().GetRange(tsdb.Group, groupIDs, start, now, int(interval.Seconds()))
+		pp.Print(stats)
+		/*
+		   for item in item_list:
+		       attrs[item].update({
+		           'stats': stats[item.id],
+		       })
+
+		*/
+	}
+
 	/*issues := []Issue{Issue{
 		TimeSpent:   nil,
 		LastSeen:    "2016-10-31T15:33:51Z",
@@ -147,11 +244,11 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		},
 		StatusDetails: map[string]string{},
 	}}*/
-	return c.JSON(http.StatusOK, issues)
+	return c.JSON(http.StatusOK, groups)
 }
 
 type QueryDto struct {
-	ProjectID         int64
+	ProjectID         int
 	Query             string // ?
 	Status            *int
 	Tags              string
@@ -183,7 +280,7 @@ var GroupStatusChoices = map[string]int{
 	"muted": models.GroupStatusIgnored,
 }
 
-func buildQueryDto(c echo.Context, projectID int64) (QueryDto, error) {
+func buildQueryDto(c echo.Context, projectID int) (QueryDto, error) {
 	// TODO Develop domain-specific context that embeds echo.Context
 	// TODO Do not ask for projectID, ask only assimilator.Context that includes this info
 	query := QueryDto{
@@ -303,37 +400,16 @@ func buildSelectBuilder(query QueryDto, db *dbr.Tx) (*dbr.SelectBuilder, error) 
 	return sb, nil
 }
 
-/* EXPECTED RESPONSE
-curl 'http://localhost:9000/api/0/projects/acme/api/issues/?limit=25&statsPeriod=24h&query=is%3Aunresolved+'
-[
-    {
-        "timeSpent": null,
-        "lastSeen": "2016-11-10T11:31:35Z",
-        "numComments": 0,
-        "userCount": 0,
-        "stats": {
-            "24h": []
-        },
-        "culprit": "/tmp/raven/bin/raven test http://571a1ad9bc9245329b22af2731db79d0:7910613d12ce478483eb9da048e45bed@localhost:9000/2",
-        "title": "This is a test message generated using ``raven test``",
-        "id": "1",
-        "assignedTo": null,
-        "logger": null,
-        "annotations": [],
-        "status": "unresolved",
-        "isPublic": false,
-        "hasSeen": false,
-        "shareId": "322e31",
-        "firstSeen": "2016-11-10T11:31:27Z",
-        "count": "3",
-        "permalink": "http://localhost:9000/acme/api/issues/1/",
-        "level": "info",
-        "isBookmarked": false,
-        "project": {
-            "name": "API",
-            "slug": "api"
-        },
-        "statusDetails": {}
-    }
-]
-*/
+func getLogLevelString(logLevelCode int) string {
+	logLevels := map[int]string{
+		10: "debug",
+		20: "info",
+		30: "warning",
+		40: "error",
+		50: "fatal",
+	}
+	if level, ok := logLevels[logLevelCode]; ok {
+		return level
+	}
+	return "unknown"
+}
