@@ -22,27 +22,27 @@ const (
 // Group is an aggregated message which summarizes a set of Events.
 type Group struct {
 	ID        int       `db:"id" json:"id,string"`
-	Logger    string    `db:"logger" json:"logger"`
-	Level     int       `db:"level" json:"level"`
-	Message   string    `db:"message" json:"titile"`
+	Logger    string    `db:"logger" json:"-"`
+	Level     int       `db:"level" json:"-"`
+	Message   string    `db:"message" json:"title"`
 	Culprit   *string   `db:"view" json:"culprit"`
-	Status    int       `db:"status" json:"status"`
+	Status    int       `db:"status" json:"-"`
 	TimesSeen int       `db:"times_seen" json:"-"`
 	LastSeen  time.Time `db:"last_seen" json:"lastSeen"`
 	FirstSeen time.Time `db:"first_seen" json:"firstSeen"`
 	// Data is a GzippedDictField
 	Data           *string    `db:"data" json:"-"`
 	Score          int        `db:"score" json:"-"`
-	ProjectID      *int64     `db:"project_id" json:"-"`
+	ProjectID      *int       `db:"project_id" json:"-"`
 	TimeSpentTotal int        `db:"time_spent_total" json:"-"`
 	TimeSpentCount int        `db:"time_spent_count" json:"-"`
 	ResolvedAt     *time.Time `db:"resolved_at" json:"-"`
 	ActiveAt       *time.Time `db:"active_at" json:"-"`
 	IsPublic       *bool      `db:"is_public" json:"isPublic"`
 	Platform       *string    `db:"platform" json:"-"`
-	NumComments    *int64     `db:"num_comments" json:"numComments"`
-	FirstReleaseID *int64     `db:"first_release_id" json:"-"`
-	ShortID        *int64     `db:"short_id"`
+	NumComments    *int       `db:"num_comments" json:"numComments"`
+	FirstReleaseID *int       `db:"first_release_id" json:"-"`
+	ShortID        *int       `db:"short_id" json:"-"`
 }
 
 func init() {

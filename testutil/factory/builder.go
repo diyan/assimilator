@@ -164,7 +164,7 @@ func (tf TestFactory) MakeEnvironment() models.Environment {
 func (tf TestFactory) MakeEventGroup() models.Group {
 	return models.Group{
 		ID:        1,
-		ProjectID: pointer.ToInt64(1),
+		ProjectID: pointer.ToInt(1),
 		Logger:    "",
 		Level:     20, // TODO Add enums
 		Message:   "This is a test message generated using ``raven test`` __main__ in <module>",
@@ -182,9 +182,9 @@ func (tf TestFactory) MakeEventGroup() models.Group {
 		ActiveAt:       pointer.ToTime(time_of_2999_01_01__00_00_00),
 		IsPublic:       pointer.ToBool(false),
 		Platform:       pointer.ToString("python"),
-		NumComments:    pointer.ToInt64(0),
+		NumComments:    pointer.ToInt(0),
 		FirstReleaseID: nil,
-		ShortID:        pointer.ToInt64(1),
+		ShortID:        pointer.ToInt(1),
 	}
 }
 
