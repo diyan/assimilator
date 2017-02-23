@@ -201,7 +201,7 @@ func RegisterFrontendRoutes(e *echo.Echo) {
 	// :short_id [\w_-]+
 	e.GET("/:organization_slug/issues/:short_id/", getSentryShortIDView)
 	// :group_id \d+
-	e.GET("/:organization_slug/:project_id/issues/:group_id/", getSentryGroupView)
+	e.GET("/:organization_slug/:project_id/issues/:group_id/", GetSentryGroupView)
 	e.GET("/:organization_slug/:project_id/", getSentryStream)
 
 	// :event_id_or_latest (\d+|latest)

@@ -26,7 +26,7 @@ func getSentryShortIDView(c echo.Context) error {
 	return getReactPageView(c)
 }
 
-func getSentryGroupView(c echo.Context) error {
+func GetSentryGroupView(c echo.Context) error {
 	return getReactPageView(c)
 }
 
