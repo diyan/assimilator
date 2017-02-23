@@ -40,3 +40,4 @@ import:
   version: v2
   repo: https://github.com/go-yaml/yaml.git
 - package: github.com/AlekSi/pointer
+- package: github.com/Dancapistan/gobase32

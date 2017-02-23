@@ -1,8 +1,10 @@
-hash: ee14b3af857a0b25463c3e46f96efcef5d56fb4710df5bcc51bc62c03860e293
-updated: 2017-02-22T17:19:33.740664906+02:00
+hash: fdffa9c134cb198dff80c732dddde70f78f65948caa857e5878c5ac62cbe0ea3
+updated: 2017-02-23T19:17:47.065609738+02:00
 imports:
 - name: github.com/AlekSi/pointer
   version: 08a25bac605b3fcb6cc27f3917b2c2c87451963d
+- name: github.com/Dancapistan/gobase32
+  version: 203acd9f6b689ed3fdb3f863c3b29435ee4e3d3a
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
@@ -98,7 +100,7 @@ imports:
 - name: github.com/spf13/cast
   version: f820543c3592e283e311a60d2a600a664e39f6f7
 - name: github.com/spf13/cobra
-  version: ee4055870c2d5f7ce112642377e32c9929c3bbaf
+  version: 92ea23a837e66f46ac9e7d04fa826602b7b0a42d
 - name: github.com/spf13/jwalterweatherman
   version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
 - name: github.com/spf13/pflag
@@ -135,7 +137,7 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 767daa157b4d460bba02409ff856ddeeb8e76ab7
+  version: 4687d739464a2d0af89a25be0318456e0776f3ef
   subpackages:
   - transform
   - unicode/norm
