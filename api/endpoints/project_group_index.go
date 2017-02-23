@@ -151,6 +151,9 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		groupIDs := []int{}
 		for _, group := range groups {
 			if group.ProjectID != nil && *group.ProjectID == project.ID {
+				// TODO extract into getShareId func/method
+				group.ShareID = fmt.Sprintf(
+					"%x", fmt.Sprintf("%d.%d", *group.ProjectID, group.ID))
 				group.Project = GroupProjectInfo{
 					Name: project.Name,
 					Slug: project.Slug,

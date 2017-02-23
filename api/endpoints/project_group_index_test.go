@@ -17,15 +17,12 @@ func TestProjectGroupIndex_Get(t *testing.T) {
 	assert.Nil(t, errs)
 	assert.Equal(t, 200, res.StatusCode)
 	assert.NotEmpty(t, bodyStr)
-	// TODO diff full response
-	// TODO shortId 1 -> "ACME-1"
-	// TODO add annotations, assignedTo, count, hasSeen, isBookmarked, isSubscribed,
-	//   metadata.title, stats.24h, shareId,
-	//   userCount, type
+	// TODO add annotations, assignedTo, count, hasSeen, isBookmarked,
+	//   isSubscribed, metadata.title, stats.24h, userCount, type
 	assert.JSONEq(t, `[
 	    {
 	        "id": "1",
-	        "shareId": "322e31",
+	        "shareId": "312e31",
 	        "shortId": "ACME-1",
 	        "count": "1",
 	        "userCount": 0,
