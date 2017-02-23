@@ -46,8 +46,6 @@ $ docker exec -ti acme_sentry_db \
 ### TODOs
 - Improve error handling, use errors.Wrap
 - Publish diyan/sentry:8.12.0 to GitHub and Docker Hub
-- Test framework
-- Continuous testing
 - DB test fixtures
 - Implement Prefix / SetPrefix in Echo/Logrus logger
 - Implement generic handler so "can not get project: query failed: dbr: not found", would be "can not get project. resource not found"
