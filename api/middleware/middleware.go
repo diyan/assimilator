@@ -24,11 +24,11 @@ func RequireProject(next echo.HandlerFunc) echo.HandlerFunc {
 			return errors.New("'project_slug' was not provided")
 		}
 		projectStore := store.NewProjectStore(c)
-		projectID, err := projectStore.GetProjectID(orgSlug, projectSlug)
+		project, err := projectStore.GetProject(orgSlug, projectSlug)
 		if err != nil {
 			return err
 		}
-		c.Set("projectID", projectID)
+		c.Set("project", project)
 		return next(c)
 		// TODO return ResourceDoesNotExist if record was not found
 		// TODO check project permissions -> self.check_object_permissions(request, project)

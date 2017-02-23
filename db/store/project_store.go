@@ -15,25 +15,26 @@ func NewProjectStore(c echo.Context) ProjectStore {
 	return ProjectStore{c: c}
 }
 
-func (s ProjectStore) GetProjectID(orgSlug, projectSlug string) (int64, error) {
+func (s ProjectStore) GetProject(orgSlug, projectSlug string) (models.Project, error) {
 	db, err := db.FromE(s.c)
+	project := models.Project{}
 	if err != nil {
-		return 0, errors.Wrap(err, "can not get project")
+		return project, errors.Wrap(err, "can not get project")
 	}
-	projectID, err := db.SelectBySql(`
-            select p.id
+	_, err = db.SelectBySql(`
+            select p.*
                 from sentry_project p
                     join sentry_organization o on p.organization_id = o.id
             where o.slug = ? and p.slug = ?`,
 		orgSlug, projectSlug).
-		ReturnInt64()
+		LoadStructs(&project)
 	if err != nil {
-		return 0, errors.Wrap(err, "can not get project")
+		return project, errors.Wrap(err, "can not get project")
 	}
-	return projectID, nil
+	return project, nil
 }
 
-func (s ProjectStore) GetEnvironments(projectID int64) ([]models.Environment, error) {
+func (s ProjectStore) GetEnvironments(projectID int) ([]models.Environment, error) {
 	db, err := db.FromE(s.c)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not read project environments")
@@ -52,7 +53,7 @@ func (s ProjectStore) GetEnvironments(projectID int64) ([]models.Environment, er
 	return environments, nil
 }
 
-func (s ProjectStore) GetTags(projectID int64) ([]*models.TagKey, error) {
+func (s ProjectStore) GetTags(projectID int) ([]*models.TagKey, error) {
 	db, err := db.FromE(s.c)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not read project tags")

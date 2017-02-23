@@ -8,9 +8,9 @@ import (
 )
 
 func ProjectEnvironmentsGetEndpoint(c echo.Context) error {
-	projectID := GetProjectID(c)
+	project := GetProject(c)
 	projectStore := store.NewProjectStore(c)
-	environments, err := projectStore.GetEnvironments(projectID)
+	environments, err := projectStore.GetEnvironments(project.ID)
 	if err != nil {
 		return err
 	}

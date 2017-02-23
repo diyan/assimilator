@@ -9,7 +9,7 @@ import (
 )
 
 func ProjectSearchesGetEndpoint(c echo.Context) error {
-	projectID := GetProjectID(c)
+	project := GetProject(c)
 	db, err := db.FromE(c)
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func ProjectSearchesGetEndpoint(c echo.Context) error {
 			from sentry_savedsearch ss
 		where ss.project_id = ?
         order by ss.name`,
-		projectID).
+		project.ID).
 		LoadStructs(&searches)
 	if err != nil {
 		return err

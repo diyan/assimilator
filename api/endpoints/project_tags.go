@@ -8,9 +8,9 @@ import (
 )
 
 func ProjectTagsGetEndpoint(c echo.Context) error {
-	projectID := GetProjectID(c)
+	project := GetProject(c)
 	projectStore := store.NewProjectStore(c)
-	tags, err := projectStore.GetTags(projectID)
+	tags, err := projectStore.GetTags(project.ID)
 	if err != nil {
 		return err
 	}

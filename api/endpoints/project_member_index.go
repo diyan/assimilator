@@ -26,7 +26,7 @@ type UserOptions struct {
 }
 
 func ProjectMemberIndexGetEndpoint(c echo.Context) error {
-	projectID := GetProjectID(c)
+	project := GetProject(c)
 	db, err := db.FromE(c)
 	if err != nil {
 		return err
@@ -38,9 +38,8 @@ func ProjectMemberIndexGetEndpoint(c echo.Context) error {
 			from auth_user u
 				join sentry_organizationmember om on u.id = om.user_id
 				join sentry_organization o on om.organization_id = o.id
-				join sentry_project p on o.id = p.organization_id
-		where p.id = ? and u.is_active = true`,
-		projectID).
+		where o.id = ? and u.is_active = true`,
+		project.OrganizationID).
 		LoadStructs(&users)
 	if err != nil {
 		return errors.Wrap(err, "can not read project members")

@@ -3,13 +3,14 @@ package api
 import (
 	"errors"
 
+	"github.com/diyan/assimilator/models"
 	"github.com/labstack/echo"
 )
 
-// GetProjectID returns projectID for current HTTP request
-func GetProjectID(c echo.Context) int64 {
-	if projectID, ok := c.Get("projectID").(int64); ok {
-		return projectID
+// GetProject returns project for current HTTP request
+func GetProject(c echo.Context) models.Project {
+	if project, ok := c.Get("project").(models.Project); ok {
+		return project
 	}
-	panic(errors.New("failed to get projectID, is mw.RequireProject call missing?"))
+	panic(errors.New("failed to get project, is mw.RequireProject call missing?"))
 }
