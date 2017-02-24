@@ -8,8 +8,7 @@ cache:
     - $HOME/.glide/cache
 go:
   - 1.5.x
-  - 1.6.x
-  - 1.7.x
+  - 1.8.x
   - master
 env:
   - GOOS=linux GOARCH=amd64
