@@ -224,36 +224,6 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 
 		*/
 	}
-
-	/*issues := []Issue{Issue{
-		TimeSpent:   nil,
-		LastSeen:    "2016-10-31T15:33:51Z",
-		NumComments: 0,
-		UserCount:   0,
-		Stats: IssueStatistic{
-			For24h: []string{},
-		},
-		Culprit:      "__main__ in <module>",
-		Title:        "This is a test message generated using ``raven test``",
-		ID:           "2",
-		AssignedTo:   nil,
-		Logger:       nil,
-		Annotations:  []string{},
-		Status:       "unresolved",
-		IsPublic:     false,
-		HasSeen:      true,
-		ShareID:      "322e32",
-		FirstSeen:    "2016-10-31T15:33:51Z",
-		Count:        "1",
-		Permalink:    "http://localhost:9000/acme/api/issues/2/",
-		Level:        "info",
-		IsBookmarked: false,
-		Project: ProjectRef{
-			Name: "API",
-			Slug: "api",
-		},
-		StatusDetails: map[string]string{},
-	}}*/
 	return c.JSON(http.StatusOK, groups)
 }
 
