@@ -204,6 +204,13 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 				c.Request().URL.Scheme,
 				c.Request().URL.Host,
 				c.Echo().URI(frontend.GetSentryGroupView, orgSlug, group.Project.Slug, group.ID))
+			// TODO implement correct behavior for annotations, metadata, type
+			group.Annotations = []string{}
+			group.Metadata = map[string]string{
+				"title": group.Message,
+			}
+			group.Type = "default"
+
 			groupIDs = append(groupIDs, group.ID)
 		}
 		start := now.Add(-time.Duration(((segments - 1) * interval.Nanoseconds())))
