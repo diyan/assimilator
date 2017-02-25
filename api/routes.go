@@ -24,6 +24,14 @@ func RegisterAPIRoutes(g *echo.Group) {
 	p.GET("/members/", api.ProjectMemberIndexGetEndpoint)
 	p.GET("/tags/", api.ProjectTagsGetEndpoint)
 
+	// Groups
+	g.GET("/issues/:issue_id/", api.GroupDetailsGetEndpoint)
+	// TODO implement GroupEventsGetEndpoint
+	//g.GET("/issues/:issue_id/events/", api.GroupEventsGetEndpoint)
+	g.GET("/issues/:issue_id/events/latest/", api.GroupEventsLatestGetEndpoint)
+	// ...
+	g.GET("/issues/:issue_id/environments/:environment/", api.GroupEnvironmentDetailsGetEndpoint)
+
 	// Internal
 	g.GET("/internal/health/", api.SystemHealthGetEndpoint)
 }
