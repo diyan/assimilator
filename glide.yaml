@@ -41,3 +41,4 @@ import:
   repo: https://github.com/go-yaml/yaml.git
 - package: github.com/AlekSi/pointer
 - package: github.com/Dancapistan/gobase32
+- package: github.com/hydrogen18/stalecucumber

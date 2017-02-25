@@ -1,5 +1,5 @@
-hash: fdffa9c134cb198dff80c732dddde70f78f65948caa857e5878c5ac62cbe0ea3
-updated: 2017-02-23T19:17:47.065609738+02:00
+hash: 20e5d646a82e3fb81ccaba9110c1b1e2277f805df590bda89beccfae61f3fca2
+updated: 2017-02-24T18:20:41.307125643+02:00
 imports:
 - name: github.com/AlekSi/pointer
   version: 08a25bac605b3fcb6cc27f3917b2c2c87451963d
@@ -37,6 +37,8 @@ imports:
   - json/parser
   - json/scanner
   - json/token
+- name: github.com/hydrogen18/stalecucumber
+  version: 0a94983f3e27967c69ba6bb92f9d5f0a68a97bc0
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/intelekshual/go-simpleflake
@@ -127,13 +129,13 @@ imports:
   - acme
   - acme/autocert
 - name: golang.org/x/net
-  version: 6b27048ae5e6ad1ef927e72e437531493de612fe
+  version: dd2d9a67c97da0afa00d5726e28086007a0acce5
   subpackages:
   - context
   - context/ctxhttp
   - publicsuffix
 - name: golang.org/x/sys
-  version: 075e574b89e4c2d22f2286a7e2b919519c6f3547
+  version: e4594059fe4cde2daf423055a596c2cd1e6c9adf
   subpackages:
   - unix
 - name: golang.org/x/text
