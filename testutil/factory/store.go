@@ -30,11 +30,6 @@ func (tf TestFactory) SaveProject(project models.Project) {
 	tf.noError(store.SaveProject(project))
 }
 
-func (tf TestFactory) SaveEventGroup(group models.Group) {
-	store := store.NewProjectStore(tf.ctx)
-	tf.noError(store.SaveEventGroup(group))
-}
-
 func (tf TestFactory) SaveEnvironment(environment models.Environment) {
 	store := store.NewProjectStore(tf.ctx)
 	tf.noError(store.SaveEnvironment(environment))
@@ -48,6 +43,21 @@ func (tf TestFactory) SaveTags(tags ...*models.TagKey) {
 func (tf TestFactory) SaveProjectSearches(searches ...models.SavedSearch) {
 	store := store.NewProjectStore(tf.ctx)
 	tf.noError(store.SaveSearches(searches...))
+}
+
+func (tf TestFactory) SaveEventGroup(group models.Group) {
+	store := store.NewProjectStore(tf.ctx)
+	tf.noError(store.SaveEventGroup(group))
+}
+
+func (tf TestFactory) SaveEvent(event models.Event) {
+	store := store.NewEventStore(tf.ctx)
+	tf.noError(store.SaveEvent(event))
+}
+
+func (tf TestFactory) SaveEventNodeBlob(nodeBlob models.NodeBlob) {
+	store := store.NewEventStore(tf.ctx)
+	tf.noError(store.SaveNodeBlob(nodeBlob))
 }
 
 func (tf TestFactory) SaveUser(user models.User) {
