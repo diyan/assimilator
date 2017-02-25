@@ -28,6 +28,7 @@ func (s ProjectStore) GetProject(orgSlug, projectSlug string) (models.Project, e
             where o.slug = ? and p.slug = ?`,
 		orgSlug, projectSlug).
 		LoadStructs(&project)
+	// TODO err will still be equal to nil if project not found
 	if err != nil {
 		return project, errors.Wrap(err, "can not get project")
 	}
