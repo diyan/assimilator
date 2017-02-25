@@ -156,3 +156,23 @@ create table sentry_groupedmessage (
     constraint sentry_groupedmessage_status_check check ((status >= 0)),
     constraint sentry_groupedmessage_times_seen_check check ((times_seen >= 0))
 );
+
+
+create table sentry_message (
+    id serial not null,
+    message text not null,
+    datetime timestamp with time zone not null,
+    data text,
+    group_id integer,
+    message_id character varying(32),
+    project_id integer,
+    time_spent integer,
+    platform character varying(64)
+);
+
+
+create table nodestore_node (
+    id character varying(40) not null,
+    data text not null,
+    "timestamp" timestamp with time zone not null
+);
