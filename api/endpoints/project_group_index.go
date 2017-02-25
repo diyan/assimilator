@@ -214,8 +214,8 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 			groupIDs = append(groupIDs, group.ID)
 		}
 		start := now.Add(-time.Duration(((segments - 1) * interval.Nanoseconds())))
-		stats := tsdb.New().GetRange(tsdb.Group, groupIDs, start, now, int(interval.Seconds()))
-		pp.Print(stats)
+		tsdb.New().GetRange(tsdb.Group, groupIDs, start, now, int(interval.Seconds()))
+		//pp.Print(stats)
 		/*
 		   for item in item_list:
 		       attrs[item].update({
