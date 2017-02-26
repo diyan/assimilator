@@ -21,7 +21,6 @@ func TestGroupEventsLatests_Get(t *testing.T) {
 	assert.Equal(t, 200, res.StatusCode)
 	assert.NotEmpty(t, bodyStr)
 	fmt.Print(bodyStr)
-	return
 	assert.JSONEq(t, `{
             "id": "1",
             "groupID": "1",
@@ -104,7 +103,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                             "'formatted'": null
                                         }
                                     },
-                                    "self": "<raven.base.Client object at 0x7f866fab1190>"
+                                    "self": "<raven.base.Client object at 0x7f0274921190>"
                                 },
                                 "symbol": null,
                                 "module": "raven.base",
@@ -138,7 +137,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                 "vars": {
                                     "event_type": "'raven.events.Message'",
                                     "tags": null,
-                                    "self": "<raven.base.Client object at 0x7f866fab1190>",
+                                    "self": "<raven.base.Client object at 0x7f0274921190>",
                                     "extra": {
                                         "'loadavg'": [ 0.04, 0.32, 0.5 ],
                                         "'user'": "'root'"
@@ -184,7 +183,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                 "colNo": null,
                                 "vars": {
                                     "message": "'This is a test message generated using raven test'",
-                                    "self": "<raven.base.Client object at 0x7f866fab1190>",
+                                    "self": "<raven.base.Client object at 0x7f0274921190>",
                                     "kwargs": {
                                         "'extra'": {
                                             "'loadavg'": [ 0.04, 0.32, 0.5 ],
@@ -227,7 +226,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                 "colNo": null,
                                 "vars": {
                                     "k": "[Filtered]",
-                                    "client": "<raven.base.Client object at 0x7f866fab1190>",
+                                    "client": "<raven.base.Client object at 0x7f0274921190>",
                                     "data": null,
                                     "options": {
                                         "'tags'": null,
@@ -265,15 +264,15 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                 "function": "main",
                                 "colNo": null,
                                 "vars": {
-                                    "parser": "<optparse.OptionParser instance at 0x7f8669182560>",
+                                    "parser": "<optparse.OptionParser instance at 0x7f026dff2560>",
                                     "args": [
                                         "'test'",
                                         "'http://763a78a695424ed687cf8b7dc26d3161:[Filtered]@localhost:9000/2'"
                                     ],
                                     "dsn": "'http://763a78a695424ed687cf8b7dc26d3161:[Filtered]@localhost:9000/2'",
-                                    "client": "<raven.base.Client object at 0x7f866fab1190>",
-                                    "root": "<logging.Logger object at 0x7f86691557d0>",
-                                    "opts": "<Values at 0x7f8668f19320: {'data': None, 'tags': None}>"
+                                    "client": "<raven.base.Client object at 0x7f0274921190>",
+                                    "root": "<logging.Logger object at 0x7f026dfc57d0>",
+                                    "opts": "<Values at 0x7f026dd89320: {'data': None, 'tags': None}>"
                                 },
                                 "symbol": null,
                                 "module": "raven.scripts.runner",
@@ -311,7 +310,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     "sys": "<module 'sys' (built-in)>",
                                     "re": "<module 're' from '/usr/local/lib/python2.7/re.pyc'>",
                                     "__name__": "'__main__'",
-                                    "main": "<function main from raven.scripts.runner at 0x7f8668f25aa0>",
+                                    "main": "<function main from raven.scripts.runner at 0x7f026dd95aa0>",
                                     "__doc__": null
                                 },
                                 "symbol": null,
