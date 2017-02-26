@@ -8,9 +8,31 @@ import (
 
 // RegisterAPIRoutes adds API routes to the Echo's route group
 func RegisterAPIRoutes(g *echo.Group) {
+	// API tokens
+	// TODO implement /api-tokens/
+
+	// Auth
+	// TODO implement /auth/
+
+	// Broadcasts
+	g.GET("/broadcasts/", api.BroadcastIndexGetEndpoint)
+	g.GET("/broadcasts/", api.BroadcastIndexPutEndpoint)
+
+	// Users
+	// TODO implement
+	// /users/
+	// /users/:user_id/
+	// /users/:user_id/avatar/
+	// /users/:user_id/authenticators/:auth_id/
+	// /users/:user_id/identities/:identity_id/
+	// /users/:user_id/organizations/
+
 	// Organizations
 	g.GET("/organizations/", api.OrganizationIndexGetEndpoint)
 	g.GET("/organizations/:organization_slug/", api.OrganizationDetailsGetEndpoint)
+
+	// Teams
+	// TODO implement
 
 	// Projects
 	p := g.Group("/projects/:organization_slug/:project_slug")
@@ -31,6 +53,8 @@ func RegisterAPIRoutes(g *echo.Group) {
 	g.GET("/issues/:issue_id/events/latest/", api.GroupEventsLatestGetEndpoint)
 	// ...
 	g.GET("/issues/:issue_id/environments/:environment/", api.GroupEnvironmentDetailsGetEndpoint)
+
+	// Events
 
 	// Internal
 	g.GET("/internal/health/", api.SystemHealthGetEndpoint)
