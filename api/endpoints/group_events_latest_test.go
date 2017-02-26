@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,8 @@ func TestGroupEventsLatests_Get(t *testing.T) {
 	assert.Nil(t, errs)
 	assert.Equal(t, 200, res.StatusCode)
 	assert.NotEmpty(t, bodyStr)
-	fmt.Print(bodyStr)
+	// TODO dateReceived 2017-02-24T09:25:39Z -> 2999-01-01T00:00:00Z
+	// TODO eventID dcf8c1d1cd284d3fbfeffb43ddb7c0f7 or 8b76c9e141134b38a1e5f67d8709618d -> 44444444333322221111000000000000
 	assert.JSONEq(t, `{
             "id": "1",
             "groupID": "1",
@@ -42,13 +42,13 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                 { "key": "level", "value": "info" }
             ],
             "dateCreated": "2999-01-01T00:00:00Z",
-            "dateReceived": "2999-01-01T00:00:00Z",
+            "dateReceived": "2017-02-24T09:25:39Z",
             "user": null,
             "entries": [
                 {
                     "type": "message",
                     "data": {
-                        "message": "This is a test message generated using `+"``raven test``"+` __main__ in <module>"
+                        "message": "This is a test message generated using `+"``raven test``"+`"
                     }
                 },
                 {
@@ -56,65 +56,20 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                     "data": {
                         "frames": [
                             {
-                                "instructionOffset": null,
-                                "function": "build_msg",
                                 "colNo": null,
-                                "vars": {
-                                    "public_key": null,
-                                    "v": {
-                                        "'message'": "u'This is a test message generated using raven test'",
-                                        "'params'": [],
-                                        "'formatted'": null
-                                    },
-                                    "event_type": "'raven.events.Message'",
-                                    "culprit": null,
-                                    "tags": null,
-                                    "event_id": "'dcf8c1d1cd284d3fbfeffb43ddb7c0f7'",
-                                    "k": "'sentry.interfaces.Message'",
-                                    "extra": {
-                                        "'loadavg'": [ 0.04, 0.32, 0.5 ],
-                                        "'user'": "'root'"
-                                    },
-                                    "frames": "<generator object iter_stack_frames at 0x7f8668f1cb40>",
-                                    "stack": true,
-                                    "time_spent": null,
-                                    "fingerprint": null,
-                                    "handler": "<raven.events.Message object at 0x7f8668f45dd0>",
-                                    "result": {
-                                        "'sentry.interfaces.Message'": {
-                                            "'message'": "u'This is a test message generated using raven test'",
-                                            "'params'": [],
-                                            "'formatted'": null
-                                        },
-                                        "'message'": "u'This is a test message generated using raven test'"
-                                    },
-                                    "kwargs": {
-                                        "'message'": "'This is a test message generated using raven test'",
-                                        "'level'": 20
-                                    },
-                                    "date": null,
-                                    "data": {
-                                        "'extra'": {},
-                                        "'message'": "u'This is a test message generated using raven test'",
-                                        "'tags'": {},
-                                        "'sentry.interfaces.Message'": {
-                                            "'message'": "u'This is a test message generated using raven test'",
-                                            "'params'": [],
-                                            "'formatted'": null
-                                        }
-                                    },
-                                    "self": "<raven.base.Client object at 0x7f0274921190>"
-                                },
-                                "symbol": null,
-                                "module": "raven.base",
-                                "lineNo": 391,
-                                "errors": null,
-                                "package": null,
-                                "absPath": "/usr/local/lib/python2.7/site-packages/raven/base.py",
-                                "inApp": false,
+                                "lineNo": 391,                                
+                                "instructionOffset": null,
                                 "instructionAddr": null,
-                                "filename": "raven/base.py",
+                                "symbol": null,
+                                "symbolAddr": null,
+                                "absPath": "/usr/local/lib/python2.7/site-packages/raven/base.py",                                
+                                "module": "raven.base",
+                                "package": null,
                                 "platform": null,
+                                "errors": null,
+                                "inApp": false,
+                                "filename": "raven/base.py",
+                                "function": "build_msg",
                                 "context": [
                                     [ 386, "                frames = stack" ],
                                     [ 387, "" ],
@@ -128,40 +83,68 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     [ 395, "            })" ],
                                     [ 396, "" ]
                                 ],
-                                "symbolAddr": null
-                            },
-                            {
-                                "instructionOffset": null,
-                                "function": "capture",
-                                "colNo": null,
                                 "vars": {
+                                    "public_key": null,
+                                    "v": {
+                                        "'message'": "u'This is a test message generated using `+"``raven test``"+`'",
+                                        "'params'": [],
+                                        "'formatted'": null
+                                    },
                                     "event_type": "'raven.events.Message'",
+                                    "culprit": null,
                                     "tags": null,
-                                    "self": "<raven.base.Client object at 0x7f0274921190>",
+                                    "event_id": "'8b76c9e141134b38a1e5f67d8709618d'",
+                                    "k": "'sentry.interfaces.Message'",
                                     "extra": {
-                                        "'loadavg'": [ 0.04, 0.32, 0.5 ],
+                                        "'loadavg'": [ 0.11, 0.28, 0.38 ],
                                         "'user'": "'root'"
                                     },
+                                    "frames": "<generator object iter_stack_frames at 0x7f026dd8cb40>",
+                                    "stack": true,
                                     "time_spent": null,
+                                    "fingerprint": null,
+                                    "handler": "<raven.events.Message object at 0x7f026ddb5dd0>",
+                                    "result": {
+                                        "'sentry.interfaces.Message'": {
+                                            "'message'": "u'This is a test message generated using `+"``raven test``"+`'",
+                                            "'params'": [],
+                                            "'formatted'": null
+                                        },
+                                        "'message'": "u'This is a test message generated using `+"``raven test``"+`'"
+                                    },
                                     "kwargs": {
-                                        "'message'": "'This is a test message generated using raven test'",
+                                        "'message'": "'This is a test message generated using `+"``raven test``"+`'",
                                         "'level'": 20
                                     },
                                     "date": null,
-                                    "exc_info": null,
-                                    "data": null,
-                                    "stack": true
-                                },
-                                "symbol": null,
-                                "module": "raven.base",
+                                    "data": {
+                                        "'extra'": {},
+                                        "'message'": "u'This is a test message generated using `+"``raven test``"+`'",
+                                        "'tags'": {},
+                                        "'sentry.interfaces.Message'": {
+                                            "'message'": "u'This is a test message generated using `+"``raven test``"+`'",
+                                            "'params'": [],
+                                            "'formatted'": null
+                                        }
+                                    },
+                                    "self": "<raven.base.Client object at 0x7f0274921190>"
+                                }
+                            },
+                            {                                                                
+                                "colNo": null,
                                 "lineNo": 608,
-                                "errors": null,
-                                "package": null,
-                                "absPath": "/usr/local/lib/python2.7/site-packages/raven/base.py",
-                                "inApp": false,
+                                "instructionOffset": null,
                                 "instructionAddr": null,
-                                "filename": "raven/base.py",
+                                "symbol": null,
+                                "symbolAddr": null,
+                                "absPath": "/usr/local/lib/python2.7/site-packages/raven/base.py",
+                                "module": "raven.base",
+                                "package": null,
                                 "platform": null,
+                                "errors": null,
+                                "inApp": false,
+                                "filename": "raven/base.py",
+                                "function": "capture",
                                 "context": [
                                     [ 603, "                return" ],
                                     [ 604, "            self.record_exception_seen(exc_info)" ],
@@ -175,39 +158,43 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     [ 612, "        return data['event_id']" ],
                                     [ 613, "" ]
                                 ],
-                                "symbolAddr": null
+                                "vars": {
+                                    "event_type": "'raven.events.Message'",
+                                    "tags": null,
+                                    "self": "<raven.base.Client object at 0x7f0274921190>",
+                                    "extra": {
+                                        "'loadavg'": [ 0.11, 0.28, 0.38 ],
+                                        "'user'": "'root'"
+                                    },
+                                    "time_spent": null,
+                                    "kwargs": {
+                                        "'message'": "'This is a test message generated using `+"``raven test``"+`'",
+                                        "'level'": 20
+                                    },
+                                    "date": null,
+                                    "exc_info": null,
+                                    "data": null,
+                                    "stack": true
+                                }
                             },
                             {
-                                "instructionOffset": null,
-                                "function": "captureMessage",
                                 "colNo": null,
-                                "vars": {
-                                    "message": "'This is a test message generated using raven test'",
-                                    "self": "<raven.base.Client object at 0x7f0274921190>",
-                                    "kwargs": {
-                                        "'extra'": {
-                                            "'loadavg'": [ 0.04, 0.32, 0.5 ],
-                                            "'user'": "'root'"
-                                        },
-                                        "'stack'": true,
-                                        "'data'": null,
-                                        "'level'": 20,
-                                        "'tags'": null
-                                    }
-                                },
-                                "symbol": null,
-                                "module": "raven.base",
                                 "lineNo": 759,
-                                "errors": null,
-                                "package": null,
-                                "absPath": "/usr/local/lib/python2.7/site-packages/raven/base.py",
-                                "inApp": false,
+                                "instructionOffset": null,
                                 "instructionAddr": null,
-                                "filename": "raven/base.py",
+                                "symbol": null,
+                                "symbolAddr": null,
+                                "absPath": "/usr/local/lib/python2.7/site-packages/raven/base.py",
+                                "module": "raven.base",
+                                "package": null,
                                 "platform": null,
+                                "errors": null,
+                                "inApp": false,
+                                "filename": "raven/base.py",
+                                "function": "captureMessage",
                                 "context": [
                                     [ 754, "        \"\"\"" ],
-                                    [ 755, "        Creates an event from 'message'." ],
+                                    [ 755, "        Creates an event from `+"``message``"+`." ],
                                     [ 756, "" ],
                                     [ 757, "        >>> client.captureMessage('My event just happened!')" ],
                                     [ 758, "        \"\"\"" ],
@@ -218,32 +205,36 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     [ 763, "        Creates an event from an exception." ],
                                     [ 764, "" ]
                                 ],
-                                "symbolAddr": null
+                                "vars": {
+                                    "message": "'This is a test message generated using `+"``raven test``"+`'",
+                                    "self": "<raven.base.Client object at 0x7f0274921190>",
+                                    "kwargs": {
+                                        "'extra'": {
+                                            "'loadavg'": [ 0.11, 0.28, 0.38 ],
+                                            "'user'": "'root'"
+                                        },
+                                        "'stack'": true,
+                                        "'data'": null,
+                                        "'level'": 20,
+                                        "'tags'": null
+                                    }
+                                }
                             },
                             {
-                                "instructionOffset": null,
-                                "function": "send_test_message",
                                 "colNo": null,
-                                "vars": {
-                                    "k": "[Filtered]",
-                                    "client": "<raven.base.Client object at 0x7f0274921190>",
-                                    "data": null,
-                                    "options": {
-                                        "'tags'": null,
-                                        "'data'": null
-                                    },
-                                    "remote_config": "<raven.conf.remote.RemoteConfig object at 0x7f8668f26150>"
-                                },
-                                "symbol": null,
-                                "module": "raven.scripts.runner",
                                 "lineNo": 81,
-                                "errors": null,
-                                "package": null,
+                                "instructionOffset": null,
+                                "instructionAddr": null,                               
+                                "symbol": null,
+                                "symbolAddr": null,
                                 "absPath": "/usr/local/lib/python2.7/site-packages/raven/scripts/runner.py",
-                                "inApp": false,
-                                "instructionAddr": null,
-                                "filename": "raven/scripts/runner.py",
+                                "module": "raven.scripts.runner",
+                                "package": null,
                                 "platform": null,
+                                "errors": null,
+                                "inApp": false,
+                                "filename": "raven/scripts/runner.py",
+                                "function": "send_test_message",
                                 "context": [
                                     [ 76, "        level=logging.INFO," ],
                                     [ 77, "        stack=True," ],
@@ -257,33 +248,32 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     [ 85, "    sys.stdout.write('Event ID was %r\\n' % (ident,))" ],
                                     [ 86, "" ]
                                 ],
-                                "symbolAddr": null
+                                "vars": {
+                                    "k": "[Filtered]",
+                                    "client": "<raven.base.Client object at 0x7f0274921190>",
+                                    "data": null,
+                                    "options": {
+                                        "'tags'": null,
+                                        "'data'": null
+                                    },
+                                    "remote_config": "<raven.conf.remote.RemoteConfig object at 0x7f026dd96150>"
+                                }
                             },
                             {
-                                "instructionOffset": null,
-                                "function": "main",
                                 "colNo": null,
-                                "vars": {
-                                    "parser": "<optparse.OptionParser instance at 0x7f026dff2560>",
-                                    "args": [
-                                        "'test'",
-                                        "'http://763a78a695424ed687cf8b7dc26d3161:[Filtered]@localhost:9000/2'"
-                                    ],
-                                    "dsn": "'http://763a78a695424ed687cf8b7dc26d3161:[Filtered]@localhost:9000/2'",
-                                    "client": "<raven.base.Client object at 0x7f0274921190>",
-                                    "root": "<logging.Logger object at 0x7f026dfc57d0>",
-                                    "opts": "<Values at 0x7f026dd89320: {'data': None, 'tags': None}>"
-                                },
-                                "symbol": null,
-                                "module": "raven.scripts.runner",
                                 "lineNo": 113,
-                                "errors": null,
-                                "package": null,
+                                "instructionOffset": null,
+                                "instructionAddr": null,                                
+                                "symbol": null,
+                                "symbolAddr": null,
                                 "absPath": "/usr/local/lib/python2.7/site-packages/raven/scripts/runner.py",
-                                "inApp": false,
-                                "instructionAddr": null,
-                                "filename": "raven/scripts/runner.py",
+                                "module": "raven.scripts.runner",
+                                "package": null,
                                 "platform": null,
+                                "errors": null,
+                                "inApp": false,
+                                "filename": "raven/scripts/runner.py",
+                                "function": "main",
                                 "context": [
                                     [ 108, "    print(\" \", dsn)" ],
                                     [ 109, "    print()" ],
@@ -297,12 +287,41 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     [ 117, "    if client.state.did_fail():" ],
                                     [ 118, "        sys.stdout.write('error!\\n')" ]
                                 ],
-                                "symbolAddr": null
+                                "vars": {
+                                    "parser": "<optparse.OptionParser instance at 0x7f026dff2560>",
+                                    "args": [
+                                        "'test'",
+                                        "'http://763a78a695424ed687cf8b7dc26d3161:[Filtered]@localhost:9000/2'"
+                                    ],
+                                    "dsn": "'http://763a78a695424ed687cf8b7dc26d3161:[Filtered]@localhost:9000/2'",
+                                    "client": "<raven.base.Client object at 0x7f0274921190>",
+                                    "root": "<logging.Logger object at 0x7f026dfc57d0>",
+                                    "opts": "<Values at 0x7f026dd89320: {'data': None, 'tags': None}>"
+                                }
                             },
                             {
-                                "instructionOffset": null,
-                                "function": "<module>",
                                 "colNo": null,
+                                "lineNo": 11,
+                                "instructionOffset": null,
+                                "instructionAddr": null,
+                                "symbol": null,
+                                "symbolAddr": null,
+                                "absPath": "/usr/local/bin/raven",
+                                "module": "__main__",
+                                "package": null,
+                                "platform": null,
+                                "errors": null,
+                                "inApp": false,
+                                "filename": "bin/raven",
+                                "function": "<module>",
+                                "context": [
+                                    [ 6, "" ],
+                                    [ 7, "from raven.scripts.runner import main" ],
+                                    [ 8, "" ],
+                                    [ 9, "if __name__ == '__main__':" ],
+                                    [ 10, "    sys.argv[0] = re.sub(r'(-script\\.pyw?|\\.exe)?$', '', sys.argv[0])" ],
+                                    [ 11, "    sys.exit(main())" ]
+                                ],
                                 "vars": {
                                     "__builtins__": "<module '__builtin__' (built-in)>",
                                     "__file__": "'/usr/local/bin/raven'",
@@ -312,26 +331,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
                                     "__name__": "'__main__'",
                                     "main": "<function main from raven.scripts.runner at 0x7f026dd95aa0>",
                                     "__doc__": null
-                                },
-                                "symbol": null,
-                                "module": "__main__",
-                                "lineNo": 11,
-                                "errors": null,
-                                "package": null,
-                                "absPath": "/usr/local/bin/raven",
-                                "inApp": false,
-                                "instructionAddr": null,
-                                "filename": "bin/raven",
-                                "platform": null,
-                                "context": [
-                                    [ 6, "" ],
-                                    [ 7, "from raven.scripts.runner import main" ],
-                                    [ 8, "" ],
-                                    [ 9, "if __name__ == '__main__':" ],
-                                    [ 10, "    sys.argv[0] = re.sub(r'(-script\\.pyw?|\\.exe)?$', '', sys.argv[0])" ],
-                                    [ 11, "    sys.exit(main())" ]
-                                ],
-                                "symbolAddr": null
+                                }
                             }
                         ],
                         "framesOmitted": null,

@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/AlekSi/pointer"
 	"github.com/diyan/assimilator/db/store"
@@ -41,9 +42,10 @@ type EventDetails struct {
 	Errors       []interface{}          `json:"errors"`
 	Tags         []TagInfo              `json:"tags"`
 	SDK          SDKInfo                `json:"sdk"`
-	ReceivedTime int                    `json:"received"`
+	ReceivedTime time.Time              `json:"dateReceived"` // TODO check
 	Packages     map[string]string      `json:"packages"`
-	Extra        map[string]interface{} `json:"extra"`
+	Context      map[string]interface{} `json:"context"`
+	Contexts     map[string]string      `json:"contexts"` //  TODO check
 	// TODO double type info
 	Fingerprint []string `json:"fingerprint"`
 	// TODO check type info
@@ -101,7 +103,7 @@ type Frame struct {
 	Filename           string                 `json:"filename"`
 	Function           string                 `json:"function"`
 	Context            FrameContext           `json:"context"`
-	Variables          map[string]interface{} `json:"-"`
+	Variables          map[string]interface{} `json:"vars"`
 }
 
 type FrameContext []FrameContextLine
@@ -174,7 +176,7 @@ func toStringSlice(value interface{}) (rv []string) {
 
 func toStringStringMap(value interface{}) (rv map[string]string) {
 	if mapValue, ok := value.(map[interface{}]interface{}); ok {
-		rv := map[string]string{}
+		rv = map[string]string{}
 		for key, value := range mapValue {
 			rv[toString(key)] = toString(value)
 		}
@@ -245,13 +247,14 @@ func toEventDetails(nodeBlob interface{}) (rv *EventDetails, err error) {
 		ClientIP: toString(sdkMap["client_ip"]),
 	}
 	// TODO check `received` type, why it's float?
-	rv.ReceivedTime = int(nodeMap["received"].(float64))
+	rv.ReceivedTime = time.Unix(int64(nodeMap["received"].(float64)), 0).UTC()
 	rv.Packages = toStringStringMap(nodeMap["modules"])
 	rv.Metadata = toStringStringMap(nodeMap["metadata"])
-	rv.Extra = map[string]interface{}{}
+	rv.Context = map[string]interface{}{}
+	rv.Contexts = map[string]string{}
 	// TODO should use fillTypedVars method for `extra`?
 	for key, value := range nodeMap["extra"].(map[interface{}]interface{}) {
-		rv.Extra[toString(key)] = value
+		rv.Context[toString(key)] = value
 	}
 	rv.Fingerprint = toStringSlice(nodeMap["fingerprint"])
 
@@ -301,21 +304,23 @@ func toEventDetails(nodeBlob interface{}) (rv *EventDetails, err error) {
 }
 
 func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]interface{}) error {
-	for nameInterface, value := range sourceMap {
-		name := nameInterface.(string)
-		switch typedValue := value.(type) {
+	for nameBlob, valueBlob := range sourceMap {
+		name := nameBlob.(string)
+		switch value := valueBlob.(type) {
 		case map[interface{}]interface{}:
 			nestedMap := map[string]interface{}{}
 			destMap[name] = nestedMap
-			return fillTypedVars(typedValue, nestedMap)
+			if err := fillTypedVars(value, nestedMap); err != nil {
+				return err
+			}
 		case pickle.PickleNone:
 			destMap[name] = nil
 		case int64:
-			destMap[name] = int(typedValue)
+			destMap[name] = int(value)
 		case []interface{}, string, bool:
-			destMap[name] = typedValue
+			destMap[name] = value
 		default:
-			return errors.Errorf("unexpected type %T", typedValue)
+			return errors.Errorf("unexpected type %T", value)
 		}
 	}
 	return nil
