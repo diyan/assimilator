@@ -26,7 +26,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
             "groupID": "1",
             "release": null,
             "platform": "python",
-            "message": "This is a test message generated using raven test",
+            "message": "This is a test message generated using `+"``raven test``"+`",
             "eventID": "dcf8c1d1cd284d3fbfeffb43ddb7c0f7",
             "userReport": null,
             "nextEventID": null,

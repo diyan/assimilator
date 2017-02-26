@@ -16,10 +16,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type nodeInfo struct {
-	NodeID string // base64 encoded UUID
-}
-
 type Event struct {
 	models.Event
 	EventDetails
@@ -33,33 +29,25 @@ type Event struct {
 //  context, contexts
 
 type EventDetails struct {
-	Ref        int         `json:"-"`
-	RefVersion int         `json:"-"`
-	Version    string      `json:"-"`
-	Type       string      `json:"type"`
-	Message    MessageInfo `json:"-"`
-	// TODO check type info
-	Errors       []interface{}          `json:"errors"`
+	Ref          int                    `json:"-"`
+	RefVersion   int                    `json:"-"`
+	Version      string                 `json:"-"`
+	Release      *string                `json:"release"`
+	Type         string                 `json:"type"`
+	Size         int                    `json:"size"`
+	Message      string                 `json:"message"`
+	Errors       []interface{}          `json:"errors"` // TODO type?
 	Tags         []TagInfo              `json:"tags"`
 	SDK          SDKInfo                `json:"sdk"`
 	ReceivedTime time.Time              `json:"dateReceived"` // TODO check
 	Packages     map[string]string      `json:"packages"`
 	Context      map[string]interface{} `json:"context"`
 	Contexts     map[string]string      `json:"contexts"` //  TODO check
-	// TODO double type info
-	Fingerprint []string `json:"fingerprint"`
-	// TODO check type info
-	Metadata map[string]string `json:"metadata"`
-	//Stacktrace Stacktrace        `json:"sentry.interfaces.Stacktrace"`
-	Entries []interface{} `json:"entries"`
-
-	// TODO check type info for user, userReport
-	User       *string `json:"user"`
-	UserReport *string `json:"userReport"`
-}
-
-type MessageInfo struct {
-	Message string `json:"message"`
+	Fingerprint  []string               `json:"-"`        // TODO type?
+	Metadata     map[string]string      `json:"metadata"` // TODO type?
+	Entries      []interface{}          `json:"entries"`
+	User         *string                `json:"user"`       // TODO type?
+	UserReport   *string                `json:"userReport"` // TODO type?
 }
 
 type TagInfo struct {
@@ -225,12 +213,11 @@ func toEventDetails(nodeBlob interface{}) (rv *EventDetails, err error) {
 	rv.RefVersion = toInt(nodeMap["_ref_version"])
 	rv.Version = toString(nodeMap["version"])
 	rv.Type = toString(nodeMap["type"])
-	rv.Message = MessageInfo{
-		Message: toString(nodeMap["sentry.interfaces.Message"].(map[interface{}]interface{})["message"]),
-	}
+	rv.Size = 6597 // TODO remove hardcode
+	rv.Message = toString(nodeMap["sentry.interfaces.Message"].(map[interface{}]interface{})["message"])
 	rv.Entries = append(rv.Entries, map[string]interface{}{
 		"type": "message",
-		"data": rv.Message,
+		"data": map[string]string{"message": rv.Message},
 	})
 	rv.Errors = nodeMap["errors"].([]interface{})
 	for _, tagBlob := range nodeMap["tags"].([]interface{}) {
@@ -245,6 +232,10 @@ func toEventDetails(nodeBlob interface{}) (rv *EventDetails, err error) {
 		Name:     toString(sdkMap["name"]),
 		Version:  toString(sdkMap["version"]),
 		ClientIP: toString(sdkMap["client_ip"]),
+		Upstream: UpstreamInfo{
+			Name: toString(sdkMap["name"]),                 // TODO check code
+			URL:  "https://docs.sentry.io/clients/python/", // TODO remove harcode
+		},
 	}
 	// TODO check `received` type, why it's float?
 	rv.ReceivedTime = time.Unix(int64(nodeMap["received"].(float64)), 0).UTC()
@@ -256,7 +247,8 @@ func toEventDetails(nodeBlob interface{}) (rv *EventDetails, err error) {
 	for key, value := range nodeMap["extra"].(map[interface{}]interface{}) {
 		rv.Context[toString(key)] = value
 	}
-	rv.Fingerprint = toStringSlice(nodeMap["fingerprint"])
+	// TODO check implementation
+	//rv.Fingerprint = toStringSlice(nodeMap["fingerprint"])
 
 	stacktrace := Stacktrace{}
 	stacktraceMap := nodeMap["sentry.interfaces.Stacktrace"].(map[interface{}]interface{})
