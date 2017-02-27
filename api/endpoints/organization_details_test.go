@@ -3,12 +3,13 @@ package api_test
 import (
 	"testing"
 
+	"github.com/diyan/assimilator/testutil/fixture"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestOrganizationDetails_Get(t *testing.T) {
-	client, factory := Setup(t)
-	defer TearDown(t)
+	client, factory := fixture.Setup(t)
+	defer fixture.TearDown(t)
 
 	factory.SaveUser(factory.MakeUser())
 	factory.SaveOrganization(factory.MakeOrganization())

@@ -12,14 +12,6 @@ func renderNotImplemented(c echo.Context) error {
 		"We are sorry, this page was not yet ported from Sentry")
 }
 
-func storeGetView(c echo.Context) error {
-	return renderNotImplemented(c)
-}
-
-func storePostView(c echo.Context) error {
-	return renderNotImplemented(c)
-}
-
 func cspReportGetView(c echo.Context) error {
 	return renderNotImplemented(c)
 }
