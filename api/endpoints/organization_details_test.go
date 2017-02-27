@@ -10,6 +10,7 @@ func TestOrganizationDetails_Get(t *testing.T) {
 	client, factory := Setup(t)
 	defer TearDown(t)
 
+	factory.SaveUser(factory.MakeUser())
 	factory.SaveOrganization(factory.MakeOrganization())
 	factory.SaveOrganizationMember(factory.MakeOrganizationMember())
 	factory.SaveTeam(factory.MakeTeam())

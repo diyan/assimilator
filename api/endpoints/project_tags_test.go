@@ -9,7 +9,9 @@ import (
 func TestProjectTags_Get(t *testing.T) {
 	client, factory := Setup(t)
 	defer TearDown(t)
+
 	factory.SaveOrganization(factory.MakeOrganization())
+	factory.SaveTeam(factory.MakeTeam())
 	factory.SaveProject(factory.MakeProject())
 	factory.SaveTags(factory.MakeTags()...)
 

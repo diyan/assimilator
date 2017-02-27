@@ -9,10 +9,12 @@ import (
 func TestProjectMemberIndex_Get(t *testing.T) {
 	client, factory := Setup(t)
 	defer TearDown(t)
+
 	factory.SaveOrganization(factory.MakeOrganization())
-	factory.SaveOrganizationMember(factory.MakeOrganizationMember())
-	factory.SaveProject(factory.MakeProject())
 	factory.SaveUser(factory.MakeUser())
+	factory.SaveOrganizationMember(factory.MakeOrganizationMember())
+	factory.SaveTeam(factory.MakeTeam())
+	factory.SaveProject(factory.MakeProject())
 
 	res, bodyStr, errs := client.Get("http://example.com/api/0/projects/acme-team/acme/members/").End()
 	assert.Nil(t, errs)
