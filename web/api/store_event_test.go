@@ -229,7 +229,7 @@ func TestStoreEvent_Post(t *testing.T) {
 		bodyStr)
 }
 
-func TestStoreEvent_Post_MinimalBody(t *testing.T) {
+func TestStoreEvent_Post_InvalidBody(t *testing.T) {
 	client, factory := fixture.Setup(t)
 	defer fixture.TearDown(t)
 
@@ -238,12 +238,25 @@ func TestStoreEvent_Post_MinimalBody(t *testing.T) {
 	factory.SaveProject(factory.MakeProject())
 
 	res, bodyStr, errs := client.Post("http://example.com/api/1/store/").
-		Send(`{"event_id":"44444444333322221111000000000000"}`).
+		Send(`{
+			"unexpectedObject": {
+				"array": ["hello", 123.123, true, null],
+				"string": "hello",
+				"number": 123.123,
+				"boolean": true,
+				"null": null
+			},
+			"unexpectedArray": ["hello", 123.123, true, null],
+			"unexpectedString": "hello",
+			"unexpectedNumber": 123.123,
+			"unexpectedBoolean": true,
+			"unexpectedNull": null
+		}`).
 		End()
 	assert.Nil(t, errs)
 	assert.Equal(t, 200, res.StatusCode)
 	assert.NotEmpty(t, bodyStr)
-	assert.JSONEq(t,
-		`{"id": "44444444333322221111000000000000"}`,
-		bodyStr)
+	//assert.JSONEq(t,
+	//	`{"id": "44444444333322221111000000000000"}`,
+	//	bodyStr)
 }

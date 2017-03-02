@@ -16,7 +16,7 @@ func TestGroupEventsLatests_Get(t *testing.T) {
 	factory.SaveProject(factory.MakeProject())
 	factory.SaveEventGroup(factory.MakeEventGroup())
 	factory.SaveEvent(factory.MakeEvent())
-	factory.SaveEventNodeBlob(factory.MakeEventNodeBlobV2())
+	factory.SaveEventNodeBlob(factory.MakeEventNodeBlob())
 
 	res, bodyStr, errs := client.Get("http://example.com/api/0/issues/1/events/latest/").End()
 	assert.Nil(t, errs)
