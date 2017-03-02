@@ -42,3 +42,7 @@ import:
 - package: github.com/AlekSi/pointer
 - package: github.com/Dancapistan/gobase32
 - package: github.com/hydrogen18/stalecucumber
+- package: github.com/asaskevich/govalidator
+  version: v5
+- package: github.com/satori/go.uuid
+  version: v1.1.0
