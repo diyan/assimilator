@@ -30,5 +30,5 @@ const (
 type EventError struct {
 	Type  EventErrorType
 	Name  string
-	Value string
+	Value interface{}
 }
