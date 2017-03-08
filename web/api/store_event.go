@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"time"
 
+	"github.com/AlekSi/pointer"
 	log "github.com/Sirupsen/logrus"
+	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/models"
 	"github.com/k0kubun/pp"
 	"github.com/labstack/echo"
@@ -44,59 +45,8 @@ var validPlatforms = map[string]bool{
 }
 
 type EventDetails struct {
-	EventID     string
-	ProjectID   int
-	Logger      string
-	Platform    string
-	Culprit     string
-	Release     string
-	Timestamp   time.Time
-	Fingerprint []string
-	Modules     map[string]interface{} // TODO ensure type is not map[string]string
-	Tags        []TagKeyValue
-	Extra       map[string]interface{} // TODO ensure type is not map[string]string
-	Errors      []models.EventError
-
-	// Built-in interfaces, sorted by name
-	AppleCrashReport interface{}
-	Breadcrumbs      interface{}
-	Contexts         interface{}
-	CSP              interface{}
-	DebugMeta        interface{}
-	Device           interface{}
-	Exception        interface{}
-	LogEntry         interface{}
-	Query            interface{}
-	Repos            interface{}
-	Request          interface{}
-	SDK              interface{}
-	Stacktrace       interface{}
-	Template         interface{}
-	Threads          interface{}
-	User             interface{}
-}
-
-// TODO consider move to the interfaces package
-type TagKeyValue struct {
-	Key, Value string
-}
-
-// TODO move to the interfaces package
-type RequestInfo struct {
-	Headers map[string]string `json:"headers"`
-	URL     string            `json:"url"`
-}
-
-type ExceptionInfo struct {
-}
-
-type BreadcrumbInfo struct {
-}
-
-type UserInfo struct {
-	ID        int    `json:"id"`
-	Email     string `json:"email"`
-	IPAddress string `json:"ip_address"`
+	models.EventDetails
+	interfaces.EventInterfaces
 }
 
 func anyTypeToString(v interface{}) string {
@@ -163,9 +113,12 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 	}
 
 	event.Logger = anyTypeToString(rawEvent["logger"]) // TODO check code
-	event.Release = anyTypeToString(rawEvent["release"])
+	event.Release = pointer.ToString(anyTypeToString(rawEvent["release"]))
 
-	if !validPlatforms[anyTypeToString(rawEvent["platform"])] {
+	rawPlatform := anyTypeToString(rawEvent["platform"])
+	if validPlatforms[rawPlatform] {
+		event.Platform = rawPlatform
+	} else {
 		event.Platform = "other"
 	}
 
@@ -235,7 +188,8 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 
 	if rawExtra, ok := rawEvent["extra"]; ok {
 		if extra, ok := rawExtra.(map[string]interface{}); ok {
-			event.Extra = extra
+			// TODO HTTP POST uses `extra` name but HTTP GET uses `context` name
+			event.Context = extra
 		} else {
 			log.WithFields(log.Fields{
 				"extra": extra,
@@ -252,11 +206,21 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 	// Valid tags are both {"tagKey": "tagValue"} and [["tagKey", "tagValue"]]
 	if rawTags, ok := rawEvent["tags"]; ok {
 		if tagsMap, ok := rawTags.(map[string]interface{}); ok {
-			// TODO process tags as map
-			pp.Print(tagsMap)
+			for k, v := range tagsMap {
+				// TODO check length of tag key and tag value
+				event.Tags = append(event.Tags, models.TagKeyValue{
+					Key: anyTypeToString(k), Value: anyTypeToString(v),
+				})
+			}
 		} else if tagsSlice, ok := rawTags.([]interface{}); ok {
-			// TODO process tags as slice
-			pp.Print(tagsSlice)
+			for _, tagBlob := range tagsSlice {
+				// TODO safe type assertion
+				tag := tagBlob.([]interface{})
+				// TODO check length of tag key and tag value
+				event.Tags = append(event.Tags, models.TagKeyValue{
+					Key: anyTypeToString(tag[0]), Value: anyTypeToString(tag[1]),
+				})
+			}
 		} else {
 			log.WithFields(log.Fields{
 				"tags": rawTags,
@@ -270,6 +234,8 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 		}
 	}
 
+	// TODO handle error
+	event.EventInterfaces.UnmarshalAPI(rawEvent)
 	pp.Print(event)
 	return nil
 }
