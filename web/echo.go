@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"runtime"
 
 	"github.com/Sirupsen/logrus"
 	simpleflake "github.com/intelekshual/go-simpleflake"
@@ -74,16 +75,15 @@ func RecoverMiddleware() echo.MiddlewareFunc {
 						logEvent["error_msg"] = fmt.Sprintf("%v", r)
 						err = fmt.Errorf("%+v\n", r)
 					} else if e, ok := r.(error); ok {
-						err = e
+						logEvent["event"] = "internal_error"
+						stack := make([]byte, 1<<20)
+						stackLen := runtime.Stack(stack, false)
+						err = fmt.Errorf("%+v\n%s", e, stack[:stackLen])
 					} else {
+						logEvent["event"] = "internal_error"
 						err = fmt.Errorf("%v", r)
 					}
 
-					//stack := make([]byte, config.StackSize)
-					//length := runtime.Stack(stack, !config.DisableStackAll)
-					//if !config.DisablePrintStack {
-					//	c.Logger().Printf("[%s] %s %s\n", color.Red("PANIC RECOVER"), err, stack[:length])
-					//}
 					//c.Error(err)
 					logrus.WithFields(logEvent).Error(err)
 				}
