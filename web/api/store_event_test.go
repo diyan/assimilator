@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStoreEvent_Post(t *testing.T) {
+func TestStoreEvent_Post_RavenJSPayload(t *testing.T) {
 	client, factory := fixture.Setup(t)
 	defer fixture.TearDown(t)
 
@@ -219,6 +219,319 @@ func TestStoreEvent_Post(t *testing.T) {
 					}
 				}
 			]}
+		}`).
+		End()
+	assert.Nil(t, errs)
+	assert.Equal(t, 200, res.StatusCode)
+	assert.NotEmpty(t, bodyStr)
+	assert.JSONEq(t,
+		`{"id": "44444444333322221111000000000000"}`,
+		bodyStr)
+}
+
+func TestStoreEvent_Post_RavenPythonPayload(t *testing.T) {
+	client, factory := fixture.Setup(t)
+	defer fixture.TearDown(t)
+
+	factory.SaveOrganization(factory.MakeOrganization())
+	factory.SaveTeam(factory.MakeTeam())
+	factory.SaveProject(factory.MakeProject())
+
+	res, bodyStr, errs := client.Post("http://example.com/api/1/store/").
+		Send(`{
+			"project": "1",			
+			"event_id": "44444444333322221111000000000000",
+			"platform": "python",
+			"level": 20,
+			"server_name": "falcon",
+			"timestamp": "2017-03-11T09:58:41Z",
+			"time_spent": null,			
+			"message": "This is a test message generated using ` + "``raven test``" + `'",
+			"sentry.interfaces.Message": {
+				"message": "This is a test message generated using ` + "``raven test``" + `'",
+				"params": [],
+				"formatted": null
+			},
+			"repos": {},
+			"tags": {},
+			"modules": {
+				"python": "2.7.13",
+				"raven": "6.0.0"
+			},
+			"sdk": {
+				"version": "6.0.0",
+				"name": "raven-python"
+			},
+			"stacktrace": {
+				"frames": [
+					{
+						"function": "build_msg",
+						"abs_path": "/tmp/env2/lib/python2.7/site-packages/raven/base.py",
+						"pre_context": [
+							"                frames = stack",
+							"",
+							"            stack_info = get_stack_info(",
+							"                frames,",
+							"                transformer=self.transform,"
+						],
+						"post_context": [
+							"            )",
+							"            data.update({",
+							"                'stacktrace': stack_info,",
+							"            })",
+							""
+						],
+						"vars": {
+							"public_key": null,
+							"v": {
+								"'message'": "u'This is a test message generated using ` + "``raven test``" + `'",
+								"'params'": [],
+								"'formatted'": null
+							},
+							"event_type": "'raven.events.Message'",
+							"culprit": null,
+							"tags": null,
+							"event_id": "'894e39cfdb3e4b8895a6e90cae206782'",
+							"k": "'sentry.interfaces.Message'",
+							"extra": {
+								"'loadavg'": [
+									0.24,
+									0.57,
+									0.49
+								],
+								"'user'": "'alexey'"
+							},
+							"frames": "<generator object iter_stack_frames at 0x7fe197ad4f50>",
+							"stack": true,
+							"time_spent": null,
+							"fingerprint": null,
+							"handler": "<raven.events.Message object at 0x7fe1977d8d90>",
+							"result": {
+								"'sentry.interfaces.Message'": {
+									"'message'": "u'This is a test message generated using ` + "``raven test``" + `'",
+									"'params'": [],
+									"'formatted'": null
+								},
+								"'message'": "u'This is a test message generated using ` + "``raven test``" + `'"
+							},
+							"kwargs": {
+								"'message'": "'This is a test message generated using ` + "``raven test``" + `'",
+								"'level'": 20
+							},
+							"date": null,
+							"data": {
+								"'extra'": {},
+								"'message'": "u'This is a test message generated using ` + "``raven test``" + `'",
+								"'tags'": {},
+								"'sentry.interfaces.Message'": {
+									"'message'": "u'This is a test message generated using ` + "``raven test``" + `'",
+									"'params'": [],
+									"'formatted'": null
+								}
+							},
+							"self": "<raven.base.Client object at 0x7fe197a45b10>"
+						},
+						"module": "raven.base",
+						"filename": "raven/base.py",
+						"lineno": 406,
+						"in_app": false,
+						"context_line": "                capture_locals=self.capture_locals,"
+					},
+					{
+						"function": "capture",
+						"abs_path": "/tmp/env2/lib/python2.7/site-packages/raven/base.py",
+						"pre_context": [
+							"                return",
+							"            self.record_exception_seen(exc_info)",
+							"",
+							"        data = self.build_msg(",
+							"            event_type, data, date, time_spent, extra, stack, tags=tags,"
+						],
+						"post_context": [
+							"",
+							"        self.send(**data)",
+							"",
+							"        self._local_state.last_event_id = data['event_id']",
+							""
+						],
+						"vars": {
+							"event_type": "'raven.events.Message'",
+							"tags": null,
+							"self": "<raven.base.Client object at 0x7fe197a45b10>",
+							"extra": {
+								"'loadavg'": [
+									0.24,
+									0.57,
+									0.49
+								],
+								"'user'": "'alexey'"
+							},
+							"time_spent": null,
+							"kwargs": {
+								"'message'": "'This is a test message generated using ` + "``raven test``" + `'",
+								"'level'": 20
+							},
+							"date": null,
+							"exc_info": null,
+							"data": null,
+							"stack": true
+						},
+						"module": "raven.base",
+						"filename": "raven/base.py",
+						"lineno": 624,
+						"in_app": false,
+						"context_line": "            **kwargs)"
+					},
+					{
+						"function": "captureMessage",
+						"abs_path": "/tmp/env2/lib/python2.7/site-packages/raven/base.py",
+						"pre_context": [
+							"        \"\"\"",
+							"        Creates an event from` + "``message``" + `.",
+							"",
+							"        >>> client.captureMessage('My event just happened!')",
+							"        \"\"\""
+						],
+						"post_context": [
+							"",
+							"    def captureException(self, exc_info=None, **kwargs):",
+							"        \"\"\"",
+							"        Creates an event from an exception.",
+							""
+						],
+						"vars": {
+							"message": "'This is a test message generated using ` + "``raven test``" + `'",
+							"self": "<raven.base.Client object at 0x7fe197a45b10>",
+							"kwargs": {
+								"'extra'": {
+									"'loadavg'": [
+										0.24,
+										0.57,
+										0.49
+									],
+									"'user'": "'alexey'"
+								},
+								"'stack'": true,
+								"'data'": null,
+								"'level'": 20,
+								"'tags'": null
+							}
+						},
+						"module": "raven.base",
+						"filename": "raven/base.py",
+						"lineno": 778,
+						"in_app": false,
+						"context_line": "        return self.capture('raven.events.Message', message=message, **kwargs)"
+					},
+					{
+						"function": "send_test_message",
+						"abs_path": "/tmp/env2/lib/python2.7/site-packages/raven/scripts/runner.py",
+						"pre_context": [
+							"        level=logging.INFO,",
+							"        stack=True,",
+							"        tags=options.get('tags', {}),",
+							"        extra={",
+							"            'user': get_uid(),"
+						],
+						"post_context": [
+							"        },",
+							"    )",
+							"",
+							"    sys.stdout.write('Event ID was %r\\n' % (ident,))",
+							""
+						],
+						"vars": {
+							"k": "'secret_key'",
+							"client": "<raven.base.Client object at 0x7fe197a45b10>",
+							"data": null,
+							"options": {
+								"'tags'": null,
+								"'data'": null
+							},
+							"remote_config": "<raven.conf.remote.RemoteConfig object at 0x7fe197a4c110>"
+						},
+						"module": "raven.scripts.runner",
+						"filename": "raven/scripts/runner.py",
+						"lineno": 81,
+						"in_app": false,
+						"context_line": "            'loadavg': get_loadavg(),"
+					},
+					{
+						"function": "main",
+						"abs_path": "/tmp/env2/lib/python2.7/site-packages/raven/scripts/runner.py",
+						"pre_context": [
+							"    print(\" \", dsn)",
+							"    print()",
+							"",
+							"    client = Client(dsn, include_paths=['raven'])",
+							""
+						],
+						"post_context": [
+							"",
+							"    # TODO(dcramer): correctly support async models",
+							"    time.sleep(3)",
+							"    if client.state.did_fail():",
+							"        sys.stdout.write('error!\\n')"
+						],
+						"vars": {
+							"parser": "<optparse.OptionParser instance at 0x7fe197a19c68>",
+							"args": [
+								"'test'",
+								"'http://111:111@localhost:3000/1'"
+							],
+							"dsn": "'http://111:111@localhost:3000/1'",
+							"client": "<raven.base.Client object at 0x7fe197a45b10>",
+							"root": "<logging.Logger object at 0x7fe197accdd0>",
+							"opts": "<Values at 0x7fe197a19128: {'data': None, 'tags': None}>"
+						},
+						"module": "raven.scripts.runner",
+						"filename": "raven/scripts/runner.py",
+						"lineno": 113,
+						"in_app": false,
+						"context_line": "    send_test_message(client, opts.__dict__)"
+					},
+					{
+						"function": "<module>",
+						"abs_path": "/tmp/env2/bin/raven",
+						"pre_context": [
+							"",
+							"from raven.scripts.runner import main",
+							"",
+							"if __name__ == '__main__':",
+							"    sys.argv[0] = re.sub(r'(-script\\.pyw?|\\.exe)?$', '', sys.argv[0])"
+						],
+						"post_context": [],
+						"vars": {
+							"__builtins__": "<module '__builtin__' (built-in)>",
+							"__file__": "'/tmp/env2/bin/raven'",
+							"__package__": null,
+							"sys": "<module 'sys' (built-in)>",
+							"re": "<module 're' from '/tmp/env2/lib/python2.7/re.pyc'>",
+							"__name__": "'__main__'",
+							"main": "<function main from raven.scripts.runner at 0x7fe197ab8230>",
+							"__doc__": null
+						},
+						"module": "__main__",
+						"filename": "bin/raven",
+						"lineno": 11,
+						"in_app": false,
+						"context_line": "    sys.exit(main())"
+					}
+				]
+			},
+			"extra": {
+				"sys.argv": [
+					"'/tmp/env2/bin/raven'",
+					"'test'",
+					"'http://111:111@localhost:3000/1'"
+				],
+				"loadavg": [
+					0.24,
+					0.57,
+					0.49
+				],
+				"user": "'alexey'"
+			}
 		}`).
 		End()
 	assert.Nil(t, errs)
