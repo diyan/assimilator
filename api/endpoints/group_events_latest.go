@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
-	"encoding/json"
 	"net/http"
-	"time"
 
-	"github.com/AlekSi/pointer"
 	"github.com/diyan/assimilator/db/store"
+	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/models"
 	pickle "github.com/hydrogen18/stalecucumber"
 	"github.com/labstack/echo"
@@ -18,304 +16,10 @@ import (
 
 type Event struct {
 	models.Event
-	EventDetails
-	// TOOD add Message string `json:"message"` that will return MessageInfo.Message
+	models.EventDetails
+	interfaces.EventInterfaces
 	PreviousEventID *string `json:"previousEventID"`
 	NextEventID     *string `json:"nextEventID"`
-}
-
-// TODO add fields release, message (getter of MessageInfo.Message),
-//  size, dateReceived, entries (type message and type stacktrace),
-//  context, contexts
-
-type EventDetails struct {
-	Ref          int                    `json:"-"`
-	RefVersion   int                    `json:"-"`
-	Version      string                 `json:"-"`
-	Release      *string                `json:"release"`
-	Type         string                 `json:"type"`
-	Size         int                    `json:"size"`
-	Message      string                 `json:"message"`
-	Errors       []interface{}          `json:"errors"` // TODO type?
-	Tags         []TagInfo              `json:"tags"`
-	SDK          SDKInfo                `json:"sdk"`
-	ReceivedTime time.Time              `json:"dateReceived"` // TODO check
-	Packages     map[string]string      `json:"packages"`
-	Context      map[string]interface{} `json:"context"`
-	Contexts     map[string]string      `json:"contexts"` //  TODO check
-	Fingerprint  []string               `json:"-"`        // TODO type?
-	Metadata     map[string]string      `json:"metadata"` // TODO type?
-	Entries      []interface{}          `json:"entries"`
-	User         *string                `json:"user"`       // TODO type?
-	UserReport   *string                `json:"userReport"` // TODO type?
-}
-
-type TagInfo struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type SDKInfo struct {
-	Name     string       `json:"name"`
-	Version  string       `json:"version"`
-	ClientIP string       `json:"clientIP"`
-	Upstream UpstreamInfo `json:"upstream,omitempty"`
-}
-
-type UpstreamInfo struct {
-	Name    string `json:"name"`
-	URL     string `json:"url"`
-	IsNewer bool   `json:"isNewer"`
-}
-
-type Stacktrace struct {
-	HasSystemFrames bool `json:"hasSystemFrames"`
-	// TODO check type
-	FramesOmitted *bool   `json:"framesOmitted"`
-	Frames        []Frame `json:"frames"`
-}
-
-type Frame struct {
-	ColumnNumber       *int                   `json:"colNo"`
-	LineNumber         int                    `json:"lineNo"`
-	InstructionOffset  *int                   `json:"instructionOffset"` // TODO type?
-	InstructionAddress *string                `json:"instructionAddr"`   // TODO type?
-	Symbol             *string                `json:"symbol"`            // TODO type?
-	SymbolAddress      *string                `json:"symbolAddr"`        // TODO type?
-	AbsolutePath       string                 `json:"absPath"`
-	Module             string                 `json:"module"`
-	Package            *string                `json:"package"`
-	Platform           *string                `json:"platform"` // TODO type?
-	Errors             *string                `json:"errors"`   // TODO type?
-	InApp              bool                   `json:"inApp"`
-	Filename           string                 `json:"filename"`
-	Function           string                 `json:"function"`
-	Context            FrameContext           `json:"context"`
-	Variables          map[string]interface{} `json:"vars"`
-}
-
-type FrameContext []FrameContextLine
-
-type FrameContextLine struct {
-	LineNumber int
-	Line       string
-}
-
-func (contextLine FrameContextLine) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]interface{}{contextLine.LineNumber, contextLine.Line})
-}
-
-func toBool(value interface{}) bool {
-	switch typedValue := value.(type) {
-	case bool:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected bool type %T", typedValue))
-	}
-}
-
-func toInt(value interface{}) int {
-	switch typedValue := value.(type) {
-	case int64:
-		return int(typedValue)
-	case int:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected int type %T", typedValue))
-	}
-}
-
-func toIntPtr(value interface{}) *int {
-	_, isPickleNone := value.(pickle.PickleNone)
-	if value == nil || isPickleNone {
-		return nil
-	}
-	return pointer.ToInt(toInt(value))
-}
-
-func toString(value interface{}) string {
-	switch typedValue := value.(type) {
-	case string:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected string type %T", typedValue))
-	}
-}
-
-func toStringPtr(value interface{}) *string {
-	_, isPickleNone := value.(pickle.PickleNone)
-	if value == nil || isPickleNone {
-		return nil
-	}
-	return pointer.ToString(toString(value))
-}
-
-func toStringSlice(value interface{}) (rv []string) {
-	if sliceValue, ok := value.([]interface{}); ok {
-		for _, item := range sliceValue {
-			rv = append(rv, toString(item))
-		}
-	}
-	return
-}
-
-func toStringStringMap(value interface{}) (rv map[string]string) {
-	if mapValue, ok := value.(map[interface{}]interface{}); ok {
-		rv = map[string]string{}
-		for key, value := range mapValue {
-			rv[toString(key)] = toString(value)
-		}
-	}
-	return
-}
-
-func getFrameContext(
-	lineNumber int, contextLine string, preContext, postContext []string,
-	filename, module string) FrameContext {
-	if lineNumber == 0 {
-		return nil
-	}
-	if contextLine == "" && !(preContext != nil || postContext != nil) {
-		return nil
-	}
-	context := FrameContext{}
-	startLineNumber := lineNumber - len(preContext)
-	atLineNumber := startLineNumber
-	for _, line := range preContext {
-		context = append(context, FrameContextLine{LineNumber: atLineNumber, Line: line})
-		atLineNumber++
-	}
-	if startLineNumber < 0 {
-		startLineNumber = 0
-	}
-	context = append(context, FrameContextLine{LineNumber: atLineNumber, Line: contextLine})
-	atLineNumber++
-	for _, line := range postContext {
-		context = append(context, FrameContextLine{LineNumber: atLineNumber, Line: line})
-		atLineNumber++
-	}
-	return context
-}
-
-func toEventDetails(nodeBlob interface{}) (rv *EventDetails, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			rv = nil
-			err = errors.Wrapf(r.(error), "can not convert node blob to event details")
-		}
-	}()
-	rv = &EventDetails{}
-	nodeMap := nodeBlob.(map[interface{}]interface{})
-	rv.Ref = toInt(nodeMap["_ref"])
-	rv.RefVersion = toInt(nodeMap["_ref_version"])
-	rv.Version = toString(nodeMap["version"])
-	rv.Type = toString(nodeMap["type"])
-	rv.Size = 6597 // TODO remove hardcode
-	rv.Message = toString(nodeMap["sentry.interfaces.Message"].(map[interface{}]interface{})["message"])
-	rv.Entries = append(rv.Entries, map[string]interface{}{
-		"type": "message",
-		"data": map[string]string{"message": rv.Message},
-	})
-	rv.Errors = nodeMap["errors"].([]interface{})
-	for _, tagBlob := range nodeMap["tags"].([]interface{}) {
-		tagSlice := tagBlob.([]interface{})
-		rv.Tags = append(rv.Tags, TagInfo{
-			Key:   tagSlice[0].(string),
-			Value: tagSlice[1].(string),
-		})
-	}
-	sdkMap := nodeMap["sdk"].(map[interface{}]interface{})
-	rv.SDK = SDKInfo{
-		Name:     toString(sdkMap["name"]),
-		Version:  toString(sdkMap["version"]),
-		ClientIP: toString(sdkMap["client_ip"]),
-		Upstream: UpstreamInfo{
-			Name: toString(sdkMap["name"]),                 // TODO check code
-			URL:  "https://docs.sentry.io/clients/python/", // TODO remove harcode
-		},
-	}
-	// TODO check `received` type, why it's float?
-	rv.ReceivedTime = time.Unix(int64(nodeMap["received"].(float64)), 0).UTC()
-	rv.Packages = toStringStringMap(nodeMap["modules"])
-	rv.Metadata = toStringStringMap(nodeMap["metadata"])
-	rv.Context = map[string]interface{}{}
-	rv.Contexts = map[string]string{}
-	// TODO should use fillTypedVars method for `extra`?
-	for key, value := range nodeMap["extra"].(map[interface{}]interface{}) {
-		rv.Context[toString(key)] = value
-	}
-	// TODO check implementation
-	//rv.Fingerprint = toStringSlice(nodeMap["fingerprint"])
-
-	stacktrace := Stacktrace{}
-	stacktraceMap := nodeMap["sentry.interfaces.Stacktrace"].(map[interface{}]interface{})
-	stacktrace.HasSystemFrames = toBool(stacktraceMap["has_system_frames"])
-	stacktrace.FramesOmitted = nil
-	for _, frameBlob := range stacktraceMap["frames"].([]interface{}) {
-		frameMap := frameBlob.(map[interface{}]interface{})
-		frame := Frame{
-			Filename:     toString(frameMap["filename"]),
-			AbsolutePath: toString(frameMap["abs_path"]),
-			Module:       toString(frameMap["module"]),
-			Package:      toStringPtr(frameMap["package"]),
-			Platform:     toStringPtr(frameMap["platform"]),
-			//InstructionAddress: padHexAddr(frameMap["instruction_addr"], padAddr)
-			//SymbolAddress: padHexAddr(frameMap["symbol_addr"], padAddr)
-			Function:     toString(frameMap["function"]),
-			Symbol:       toStringPtr(frameMap["symbol"]),
-			LineNumber:   toInt(frameMap["lineno"]),
-			ColumnNumber: toIntPtr(frameMap["colno"]),
-			InApp:        toBool(frameMap["in_app"]),
-			Variables:    map[string]interface{}{},
-		}
-		frame.Context = getFrameContext(
-			frame.LineNumber,
-			toString(frameMap["context_line"]),
-			toStringSlice(frameMap["pre_context"]),
-			toStringSlice(frameMap["post_context"]),
-			frame.Filename,
-			frame.Module,
-		)
-
-		err := fillTypedVars(frameMap["vars"].(map[interface{}]interface{}), frame.Variables)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to decode frame variables")
-		}
-
-		stacktrace.Frames = append(stacktrace.Frames, frame)
-	}
-
-	rv.Entries = append(rv.Entries, map[string]interface{}{
-		"type": "stacktrace",
-		"data": stacktrace,
-	})
-	return
-}
-
-func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]interface{}) error {
-	for nameBlob, valueBlob := range sourceMap {
-		name := nameBlob.(string)
-		switch value := valueBlob.(type) {
-		case map[interface{}]interface{}:
-			nestedMap := map[string]interface{}{}
-			destMap[name] = nestedMap
-			if err := fillTypedVars(value, nestedMap); err != nil {
-				return err
-			}
-		case pickle.PickleNone:
-			destMap[name] = nil
-		case int64:
-			destMap[name] = int(value)
-		case []interface{}, string, bool:
-			destMap[name] = value
-		default:
-			return errors.Errorf("unexpected type %T", value)
-		}
-	}
-	return nil
 }
 
 func unpickleZippedBase64String(blob string) (interface{}, error) {
@@ -371,11 +75,16 @@ func GroupEventsLatestGetEndpoint(c echo.Context) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to decode event's blob")
 		}
-		eventDetails, err := toEventDetails(nodeBlob)
-		if err != nil {
+		apiEvent := Event{Event: event}
+		// TODO we can hide UnmarshalRecord method inside eventStore
+		//   but we need this convention for interfaces
+		if err := apiEvent.EventDetails.UnmarshalRecord(nodeBlob); err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, Event{Event: event, EventDetails: *eventDetails})
+		if err := apiEvent.EventInterfaces.UnmarshalRecord(nodeBlob); err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, apiEvent)
 	}
 	return c.NoContent(http.StatusOK)
 }
