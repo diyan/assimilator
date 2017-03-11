@@ -243,6 +243,23 @@ func toStringMap(value interface{}) (rv map[string]interface{}) {
 	return
 }
 
-func (stacktrace *Stacktrace) UnmarshalAPI(rawEvent map[string]interface{}) error {
+// NOTE We are expecting here rawStacktrace instead of rawEvent
+func (stacktrace *Stacktrace) UnmarshalAPI(rawStacktrace map[string]interface{}) error {
+	rawFrames, ok := rawStacktrace["frames"].([]interface{})
+	if !ok {
+		return nil
+	}
+	for _, rawFrame := range rawFrames {
+		frameMap := rawFrame.(map[string]interface{})
+		frame := Frame{
+			Filename:     frameMap["filename"].(string),
+			Function:     frameMap["function"].(string),
+			LineNumber:   int(frameMap["lineno"].(float64)),
+			ColumnNumber: pointer.ToInt(int(frameMap["colno"].(float64))),
+			InApp:        frameMap["in_app"].(bool),
+		}
+		stacktrace.Frames = append(stacktrace.Frames, frame)
+	}
+
 	return nil
 }
