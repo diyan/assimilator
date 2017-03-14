@@ -1,5 +1,5 @@
-hash: ef655c440be24a5c06d0344241d73152026cf556cc547f1984d5f1ac96486d6b
-updated: 2017-03-12T20:26:43.263959852+02:00
+hash: fbba472dc2f5eb0e4cbee9193af14a40991285ee31207f95b2754fb2e1d49eb3
+updated: 2017-03-14T20:32:50.304297925+02:00
 imports:
 - name: github.com/AlekSi/pointer
   version: 08a25bac605b3fcb6cc27f3917b2c2c87451963d
@@ -23,7 +23,7 @@ imports:
 - name: github.com/echo-contrib/pongor
   version: 40d20fccf83835a3f872e5dfbe4f20ac62352375
 - name: github.com/flosch/pongo2
-  version: 5e81b817a0c48c1c57cdf1a9056cf76bdee02ca9
+  version: 1d0f0d3af150c4a65dfd424d742f7374819e7d29
 - name: github.com/fsnotify/fsnotify
   version: 7d7316ed6e1ed2de075aab8dfc76de5d158d66e1
 - name: github.com/GeertJohan/go.rice
@@ -51,8 +51,12 @@ imports:
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/intelekshual/go-simpleflake
   version: 7d205c7bab7dabd7b8c3e2639b719446cae82d2b
+- name: github.com/juju/errors
+  version: 6f54ff6318409d31ff16261533ce2c8381a4fd5d
 - name: github.com/k0kubun/pp
   version: 36d5366f4ec038f9a76dd85c7b29074089bb9b9e
+- name: github.com/kardianos/osext
+  version: 9d302b58e975387d0b4d9be876622c86cefe64be
 - name: github.com/labstack/echo
   version: 8d504c1b699c757b267255c53b3e5219f9974abc
   subpackages:
@@ -65,7 +69,7 @@ imports:
   - log
   - random
 - name: github.com/lib/pq
-  version: e4af84aab01e159ca479940dbde304519e8e8811
+  version: 472a0745531a17dbac346e828b4c60e73ddff30c
   subpackages:
   - oid
 - name: github.com/magiconair/properties
@@ -75,12 +79,9 @@ imports:
   subpackages:
   - database
   - database/postgres
-  - migrate
-  - migrate/direction
-  - migrate/file
   - source
 - name: github.com/mattn/go-colorable
-  version: acb9493f2794fd0f820de7a27a217dafbb1b65ea
+  version: a392f450ea64cee2b268dfaacdc2502b50a22b18
 - name: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/mgutz/ansi
@@ -94,7 +95,7 @@ imports:
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: 13d49d4606eb801b8f01ae542b4afc4c6ee3d84a
+  version: 3b00596b2e9ee541bbd72dc50cc0c60e2b46c69c
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/pmezard/go-difflib
@@ -112,7 +113,7 @@ imports:
 - name: github.com/spf13/cast
   version: ce135a4ebeee6cfe9a26c93ee0d37825f26113c7
 - name: github.com/spf13/cobra
-  version: 16c014f1a19d865b765b420e74508f80eb831ada
+  version: 7be4beda01ec05d0b93d80b3facd2b6f44080d94
 - name: github.com/spf13/jwalterweatherman
   version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
 - name: github.com/spf13/pflag
@@ -156,6 +157,4 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
   repo: https://github.com/go-yaml/yaml.git
-testImports:
-- name: github.com/kardianos/osext
-  version: 9d302b58e975387d0b4d9be876622c86cefe64be
+testImports: []

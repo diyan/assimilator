@@ -1,7 +1,6 @@
 package template
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -115,7 +114,7 @@ func RegisterTags() {
 	pongo2.RegisterTag("endfeature", noOpParser)
 }
 
-func (node *noOpNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Buffer) *pongo2.Error {
+func (node *noOpNode) Execute(ctx *pongo2.ExecutionContext, writer pongo2.TemplateWriter) *pongo2.Error {
 	return nil
 }
 
@@ -123,13 +122,13 @@ func noOpParser(doc *pongo2.Parser, start *pongo2.Token, arguments *pongo2.Parse
 	return &noOpNode{}, nil
 }
 
-func (node *reactConfigNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Buffer) *pongo2.Error {
+func (node *reactConfigNode) Execute(ctx *pongo2.ExecutionContext, writer pongo2.TemplateWriter) *pongo2.Error {
 	bytes, err := json.Marshal(node.Config)
 	if err != nil {
 		panic(err)
 	}
 	// TODO investigate how to disable HTML encoding in the config.user.avatarUrl
-	buffer.Write(bytes)
+	writer.Write(bytes)
 	return nil
 }
 
@@ -168,8 +167,8 @@ func getReactConfigParser(doc *pongo2.Parser, start *pongo2.Token, arguments *po
 	return node, nil
 }
 
-func (node *publicDsnNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Buffer) *pongo2.Error {
-	buffer.WriteString(node.DSN)
+func (node *publicDsnNode) Execute(ctx *pongo2.ExecutionContext, writer pongo2.TemplateWriter) *pongo2.Error {
+	writer.WriteString(node.DSN)
 	return nil
 }
 
@@ -184,7 +183,7 @@ type convertToJSONNode struct {
 	name string
 }
 
-func (node *convertToJSONNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Buffer) *pongo2.Error {
+func (node *convertToJSONNode) Execute(ctx *pongo2.ExecutionContext, writer pongo2.TemplateWriter) *pongo2.Error {
 	obj, ok := ctx.Public[node.name]
 	if !ok {
 		// TODO return pongo's error or write to the log
@@ -194,7 +193,7 @@ func (node *convertToJSONNode) Execute(ctx *pongo2.ExecutionContext, buffer *byt
 	if err != nil {
 		panic(err)
 	}
-	buffer.Write(bytes)
+	writer.Write(bytes)
 	return nil
 }
 
@@ -215,7 +214,7 @@ func convertToJSONParser(doc *pongo2.Parser, start *pongo2.Token, arguments *pon
 	return node, nil
 }
 
-func (node *getUserContextNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Buffer) *pongo2.Error {
+func (node *getUserContextNode) Execute(ctx *pongo2.ExecutionContext, writer pongo2.TemplateWriter) *pongo2.Error {
 	_, ok := ctx.Public[node.name]
 	if !ok {
 		// TODO return pongo's error or write to the log
@@ -231,7 +230,7 @@ func (node *getUserContextNode) Execute(ctx *pongo2.ExecutionContext, buffer *by
 	if err != nil {
 		panic(err)
 	}
-	buffer.Write(bytes)
+	writer.Write(bytes)
 	return nil
 }
 
@@ -292,7 +291,7 @@ def public_dsn():
 //    'current', 'latest', 'update_available', 'build',
 // ])
 
-func (node *assetURLNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Buffer) *pongo2.Error {
+func (node *assetURLNode) Execute(ctx *pongo2.ExecutionContext, writer pongo2.TemplateWriter) *pongo2.Error {
 	// TODO log on error, consider to return it
 	url := ""
 	if node.absolute {
@@ -300,7 +299,7 @@ func (node *assetURLNode) Execute(ctx *pongo2.ExecutionContext, buffer *bytes.Bu
 	} else {
 		url = "/_static/7a9894050589851ad3c1e1a2d1adb54ac08b8832/%s/%s"
 	}
-	buffer.WriteString(fmt.Sprintf(url, node.module, node.path))
+	writer.WriteString(fmt.Sprintf(url, node.module, node.path))
 	return nil
 }
 

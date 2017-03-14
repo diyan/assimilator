@@ -7,8 +7,9 @@ import:
   - log
   - middleware
 - package: github.com/echo-contrib/pongor
+# flosch/pongo2 v3.0 can not be used with go.rice; use master instead
 - package: github.com/flosch/pongo2
-  version: v3.0
+  version: master
 # gocraft/dbr v2.1 does not support *string, *int64; use master instead 
 - package: github.com/gocraft/dbr
   version: master
