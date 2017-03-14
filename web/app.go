@@ -3,22 +3,18 @@ package web
 import (
 	"strings"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/Sirupsen/logrus"
 	"github.com/diyan/assimilator/conf"
-	"github.com/diyan/assimilator/template"
+	"github.com/diyan/assimilator/web/renderer"
 	"github.com/diyan/echox/log"
-	"github.com/echo-contrib/pongor"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 
 	mwx "github.com/diyan/echox/middleware"
 	mw "github.com/labstack/echo/middleware"
 	logrusfmt "github.com/x-cray/logrus-prefixed-formatter"
 )
-
-func init() {
-	template.RegisterTags()
-	template.RegisterFilters()
-}
 
 func GetApp(config conf.Config) *echo.Echo {
 	e := echo.New()
@@ -26,10 +22,15 @@ func GetApp(config conf.Config) *echo.Echo {
 	e.Logger = log.Logrus()
 	// Register default error handler
 	e.HTTPErrorHandler = HTTPErrorHandler
-	e.Renderer = pongor.GetRenderer(pongor.PongorOption{Reload: true})
+	templateBox, err := rice.FindBox("templates")
+	if err != nil {
+		panic(errors.Wrap(err, "can not find template box"))
+	}
+	e.Renderer = renderer.New(templateBox)
 	e.Use(conf.NewMiddleware(config))
 	// TODO ForceColors only if codegangsta/gin detected
 	logrus.SetFormatter(&logrusfmt.TextFormatter{ShortTimestamp: true, ForceColors: true})
+	// TOOD add configuration flag to enable/disable access logs
 	// Register access log logger
 	e.Use(mwx.LogrusLogger(nil))
 	e.Use(RecoverMiddleware())

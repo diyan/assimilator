@@ -1,4 +1,4 @@
-package template
+package renderer
 
 import (
 	"encoding/json"
