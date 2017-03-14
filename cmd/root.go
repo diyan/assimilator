@@ -53,7 +53,9 @@ var RootCmd = &cobra.Command{
 		// TODO implement web.GetApp(), cron.GetApp(), smtp.GetApp() function
 		//   see https://docs.sentry.io/server/cli/run/
 		e := web.GetApp(config)
-		e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
+		if err := e.Start(fmt.Sprintf(":%d", config.Port)); err != nil {
+			e.Logger.Fatal(err)
+		}
 		return nil
 	},
 }
