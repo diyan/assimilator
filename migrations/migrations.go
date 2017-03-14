@@ -24,7 +24,7 @@ func UpgradeDB(databaseURL string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to upgrade database schema")
 	}
-	if err := m.Up(); err != nil {
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		return errors.Wrap(err, "failed to upgrade database schema")
 	}
 	return nil
