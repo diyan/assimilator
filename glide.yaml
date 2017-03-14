@@ -27,9 +27,8 @@ import:
   subpackages:
   - suite
 # mattes/migrate v1.3.0 can not be used with go.rice
-# mattes/migrate v3.0.0-rc2 failed to install; use master instead
 - package: github.com/mattes/migrate
-  version: master
+  version: v3.0.0-rc2
 - package: github.com/intelekshual/go-simpleflake
 - package: github.com/parnurzeal/gorequest
   version: v0.2.14
@@ -48,3 +47,5 @@ import:
   version: v5
 - package: github.com/satori/go.uuid
   version: v1.1.0
+- package: github.com/GeertJohan/go.rice
+- package: github.com/daaku/go.zipexe
