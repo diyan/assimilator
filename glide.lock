@@ -1,5 +1,5 @@
-hash: fbba472dc2f5eb0e4cbee9193af14a40991285ee31207f95b2754fb2e1d49eb3
-updated: 2017-03-14T20:32:50.304297925+02:00
+hash: 8844a071f2b29f74646b854327a82b8c98b0f28450cafeb7084aee243123c10d
+updated: 2017-03-14T21:12:15.313689173+02:00
 imports:
 - name: github.com/AlekSi/pointer
   version: 08a25bac605b3fcb6cc27f3917b2c2c87451963d
@@ -20,8 +20,6 @@ imports:
   subpackages:
   - log
   - middleware
-- name: github.com/echo-contrib/pongor
-  version: 40d20fccf83835a3f872e5dfbe4f20ac62352375
 - name: github.com/flosch/pongo2
   version: 1d0f0d3af150c4a65dfd424d742f7374819e7d29
 - name: github.com/fsnotify/fsnotify
