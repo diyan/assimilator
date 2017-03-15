@@ -1,51 +1,18 @@
-package web
+package recover
 
 import (
 	"fmt"
-	"net/http"
-	"os"
 	"runtime"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/diyan/assimilator/conf"
 	simpleflake "github.com/intelekshual/go-simpleflake"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
-type stackTracer interface {
-	StackTrace() errors.StackTrace
-}
-
-func HTTPErrorHandler(err error, c echo.Context) {
-	code := http.StatusInternalServerError
-	msg := http.StatusText(code)
-	if he, ok := err.(*echo.HTTPError); ok {
-		code = he.Code
-		msg = he.Message
-	}
-	if we, ok := err.(stackTracer); ok {
-		fmt.Fprintf(os.Stderr, "\n%+v\n\n", we)
-	}
-	//if e.Debug {
-	//	msg = err.Error()
-	//}
-	msg = err.Error()
-	if !c.Response().Committed {
-		// TODO Consider use `http.MethodHead` from Go 1.6+ and drop Go 1.5
-		if c.Request().Method == "HEAD" { // Issue #608
-			c.NoContent(code)
-		} else {
-			c.String(code, msg)
-		}
-	}
-	//e.Logger.Error(err)
-
-	//logrus.ErrorLevel()
-	//debug.PrintStack()
-	logrus.Error(err)
-}
-
-func RecoverMiddleware() echo.MiddlewareFunc {
+// NewMiddleware creates middleware that recover from panics
+func NewMiddleware(config conf.Config) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			defer func() {

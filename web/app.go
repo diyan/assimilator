@@ -5,6 +5,7 @@ import (
 
 	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/log"
+	"github.com/diyan/assimilator/web/recover"
 	"github.com/diyan/assimilator/web/renderer"
 
 	"github.com/GeertJohan/go.rice"
@@ -17,8 +18,7 @@ func GetApp(config conf.Config) *echo.Echo {
 	e := echo.New()
 	e.Debug = true
 	e.Logger = log.NewEchoLogger(config)
-	// Register default error handler
-	e.HTTPErrorHandler = HTTPErrorHandler
+	e.HTTPErrorHandler = recover.NewEchoErrorHandler(config)
 	templateBox, err := rice.FindBox("templates")
 	if err != nil {
 		panic(errors.Wrap(err, "can not find template box"))
@@ -26,7 +26,7 @@ func GetApp(config conf.Config) *echo.Echo {
 	e.Renderer = renderer.New(templateBox)
 	e.Use(conf.NewMiddleware(config))
 	e.Use(log.NewAccessLogMiddleware(config))
-	e.Use(RecoverMiddleware())
+	e.Use(recover.NewMiddleware(config))
 	// TODO setup route to serve static files
 	e.Static("/_static/7a9894050589851ad3c1e1a2d1adb54ac08b8832/sentry", "ui")
 	e.Pre(mw.AddTrailingSlashWithConfig(mw.TrailingSlashConfig{
