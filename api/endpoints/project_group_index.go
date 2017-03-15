@@ -9,8 +9,8 @@ import (
 
 	base32num "github.com/Dancapistan/gobase32"
 	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/db/tsdb"
 	"github.com/diyan/assimilator/models"
-	"github.com/diyan/assimilator/tsdb"
 	"github.com/diyan/assimilator/web/frontend"
 	"github.com/gocraft/dbr"
 	"github.com/k0kubun/pp"
