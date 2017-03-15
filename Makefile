@@ -33,13 +33,24 @@ get-go-tools:  ## Install Golang development tools
 get-atom-plugins:  ## Install plugins for Atom editor
 	apm install go-plus hyperclick go-debug go-signature-statusbar
 
+test-start-db:  ## Start PostgreSQL container for integration tests
+	docker rm -f asm_test_db || true
+	docker run \
+		--detach \
+		--rm \
+		-e POSTGRES_USER=postgres \
+		-e POSTGRES_PASSWORD= \
+		-p 5432:5432 \
+		-v /tmp/docker/volumes/asm_test_db:/var/lib/postgresql/data \
+		--name asm_test_db \
+		postgres:9.6-alpine
+
 test-go:  ## Run Go tests
 	ginkgo -r -cover
-
+	
 test-watch-go:  ## Continuous testing for Go sources
-	# goconvey -excludedDirs vendor,ui,.volumes,templates
-	ginkgo watch -r -notify
-
+	ginkgo watch -r -notify -cover
+	
 test-js:  ## Run JavaScript tests
 	@echo "--> Building static assets"
 	# cd ui && SENTRY_EXTRACT_TRANSLATIONS=1 node_modules/.bin/webpack -p
