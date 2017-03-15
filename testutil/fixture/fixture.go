@@ -4,7 +4,9 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/db/migrations"
+	"github.com/diyan/assimilator/log"
 	"github.com/diyan/assimilator/testutil/factory"
 	"github.com/diyan/assimilator/testutil/testclient"
 	"github.com/diyan/assimilator/web"
@@ -33,6 +35,8 @@ func TearDown(t *testing.T) {
 }
 
 func setupOnce(t *testing.T) {
+	config := conf.Config{}
+	log.Init(config)
 	// TODO check what is faster - re-create db or drop all tables?
 	// select 'drop table "' || tablename || '" cascade;'
 	// from pg_tables where schemaname = 'sentry_ci';

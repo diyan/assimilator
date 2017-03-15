@@ -3,21 +3,20 @@ package web
 import (
 	"strings"
 
-	"github.com/GeertJohan/go.rice"
 	"github.com/diyan/assimilator/conf"
+	"github.com/diyan/assimilator/log"
 	"github.com/diyan/assimilator/web/renderer"
-	"github.com/diyan/echox/log"
-	"github.com/labstack/echo"
-	"github.com/pkg/errors"
 
-	mwx "github.com/diyan/echox/middleware"
+	"github.com/GeertJohan/go.rice"
+	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
+	"github.com/pkg/errors"
 )
 
 func GetApp(config conf.Config) *echo.Echo {
 	e := echo.New()
 	e.Debug = true
-	e.Logger = log.Logrus()
+	e.Logger = log.NewEchoLogger(config)
 	// Register default error handler
 	e.HTTPErrorHandler = HTTPErrorHandler
 	templateBox, err := rice.FindBox("templates")
@@ -26,9 +25,7 @@ func GetApp(config conf.Config) *echo.Echo {
 	}
 	e.Renderer = renderer.New(templateBox)
 	e.Use(conf.NewMiddleware(config))
-	// TOOD add configuration flag to enable/disable access logs
-	// Register access log logger
-	e.Use(mwx.LogrusLogger(nil))
+	e.Use(log.NewAccessLogMiddleware(config))
 	e.Use(RecoverMiddleware())
 	// TODO setup route to serve static files
 	e.Static("/_static/7a9894050589851ad3c1e1a2d1adb54ac08b8832/sentry", "ui")
