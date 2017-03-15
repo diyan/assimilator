@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/Sirupsen/logrus"
 	"github.com/diyan/assimilator/conf"
 	"github.com/diyan/assimilator/web/renderer"
 	"github.com/diyan/echox/log"
@@ -13,7 +12,6 @@ import (
 
 	mwx "github.com/diyan/echox/middleware"
 	mw "github.com/labstack/echo/middleware"
-	logrusfmt "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 func GetApp(config conf.Config) *echo.Echo {
@@ -28,8 +26,6 @@ func GetApp(config conf.Config) *echo.Echo {
 	}
 	e.Renderer = renderer.New(templateBox)
 	e.Use(conf.NewMiddleware(config))
-	// TODO ForceColors only if codegangsta/gin detected
-	logrus.SetFormatter(&logrusfmt.TextFormatter{ShortTimestamp: true, ForceColors: true})
 	// TOOD add configuration flag to enable/disable access logs
 	// Register access log logger
 	e.Use(mwx.LogrusLogger(nil))

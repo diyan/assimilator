@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/diyan/assimilator/migrations"
+	"github.com/diyan/assimilator/db/migrations"
 	"github.com/diyan/assimilator/testutil/factory"
 	"github.com/diyan/assimilator/testutil/testclient"
 	"github.com/diyan/assimilator/web"

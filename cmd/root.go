@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/diyan/assimilator/conf"
-	"github.com/diyan/assimilator/migrations"
+	"github.com/diyan/assimilator/db/migrations"
 	"github.com/diyan/assimilator/web"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	log "github.com/Sirupsen/logrus"
+	logrusfmt "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 func init() {
@@ -44,12 +47,14 @@ var RootCmd = &cobra.Command{
 		if err := viper.Unmarshal(&config); err != nil {
 			return errors.Wrap(err, "can not load configuration")
 		}
+		// TODO ForceColors only if codegangsta/gin detected
+		log.SetFormatter(&logrusfmt.TextFormatter{ShortTimestamp: true, ForceColors: true})
 
-		fmt.Println("Upgrading database schema, please wait...")
+		log.Info("Upgrading database schema, please wait...")
 		if err := migrations.UpgradeDB(config.DatabaseURL); err != nil {
 			return err
 		}
-		fmt.Print("Database is up to date. Starting web app...")
+		log.Info("Database is up to date. Starting web app...")
 		// TODO implement web.GetApp(), cron.GetApp(), smtp.GetApp() function
 		//   see https://docs.sentry.io/server/cli/run/
 		e := web.GetApp(config)

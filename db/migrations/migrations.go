@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/diyan/assimilator/migrations/source"
+	"github.com/diyan/assimilator/db/migrations/source"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/mattes/migrate"
