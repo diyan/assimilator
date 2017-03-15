@@ -12,7 +12,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/models"
-	"github.com/k0kubun/pp"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
 )
@@ -86,15 +85,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 			if eventIDRegex.MatchString(eventID) {
 				event.EventID = eventID
 			} else {
-				log.WithFields(log.Fields{
-					"event_id":     event.EventID,
-					"event_id_len": len(event.EventID),
-				}).Debug("Discarded invalid value for event_id")
-				event.Errors = append(event.Errors, models.EventError{
-					Type:  models.EventErrorInvalidData,
-					Name:  "event_id",
-					Value: event.EventID,
-				})
+				trackError(event, "event_id", eventID, errors.New("value does not match regex pattern"))
 				event.EventID = newUUIDHexString()
 			}
 		} else {
@@ -124,15 +115,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 
 	if timestamp, ok := rawEvent["timestamp"]; ok {
 		if err := bindTimestamp(timestamp, event); err != nil {
-			log.WithFields(log.Fields{
-				"timestamp": timestamp,
-				"err":       err,
-			}).Debug("Discarded invalid value for timestamp")
-			event.Errors = append(event.Errors, models.EventError{
-				Type:  models.EventErrorInvalidData,
-				Name:  "timestamp",
-				Value: timestamp,
-			})
+			trackError(event, "timestamp", timestamp, err)
 		}
 	}
 
@@ -157,15 +140,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 			invalidFingerprint = true
 		}
 		if invalidFingerprint {
-			log.WithFields(log.Fields{
-				"fingerprint": rawFingerprint,
-				"err":         "array of booleans, numbers, strings is expected",
-			}).Debug("Discarded invalid value for fingerprint")
-			event.Errors = append(event.Errors, models.EventError{
-				Type:  models.EventErrorInvalidData,
-				Name:  "fingerprint",
-				Value: rawFingerprint,
-			})
+			trackError(event, "fingerprint", rawFingerprint, errors.New("array of booleans, numbers, strings is expected"))
 			event.Fingerprint = nil // all or nothing
 		}
 	}
@@ -174,15 +149,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 		if modules, ok := rawModules.(map[string]interface{}); ok {
 			event.Modules = modules
 		} else {
-			log.WithFields(log.Fields{
-				"modules": modules,
-				"err":     "type is not map[string]interface{}",
-			}).Debug("Discarded invalid value for modules")
-			event.Errors = append(event.Errors, models.EventError{
-				Type:  models.EventErrorInvalidData,
-				Name:  "modules",
-				Value: rawModules,
-			})
+			trackError(event, "modules", rawModules, errors.New("type is not map[string]interface{}"))
 		}
 	}
 
@@ -191,15 +158,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 			// TODO HTTP POST uses `extra` name but HTTP GET uses `context` name
 			event.Context = extra
 		} else {
-			log.WithFields(log.Fields{
-				"extra": extra,
-				"err":   "type is not map[string]interface{}",
-			}).Debug("Discarded invalid value for extra")
-			event.Errors = append(event.Errors, models.EventError{
-				Type:  models.EventErrorInvalidData,
-				Name:  "extra",
-				Value: rawExtra,
-			})
+			trackError(event, "extra", rawExtra, errors.New("type is not map[string]interface{}"))
 		}
 	}
 
@@ -222,22 +181,26 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 				})
 			}
 		} else {
-			log.WithFields(log.Fields{
-				"tags": rawTags,
-				"err":  "type is neither map[string]interface{} nor []interface{}",
-			}).Debug("Discarded invalid value for tags")
-			event.Errors = append(event.Errors, models.EventError{
-				Type:  models.EventErrorInvalidData,
-				Name:  "tags",
-				Value: rawTags,
-			})
+			trackError(event, "tags", rawTags, errors.New("type is neither map[string]interface{} nor []interface{}"))
 		}
 	}
 
 	// TODO handle error
 	event.EventInterfaces.UnmarshalAPI(rawEvent)
-	pp.Print(event)
+	//pp.Print(event)
 	return nil
+}
+
+func trackError(event *EventDetails, name string, value interface{}, err error) {
+	log.WithFields(log.Fields{
+		name:  value,
+		"err": err,
+	}).Debug("Discarded invalid value")
+	event.Errors = append(event.Errors, models.EventError{
+		Type:  models.EventErrorInvalidData,
+		Name:  name,
+		Value: value,
+	})
 }
 
 func storePostView(c echo.Context) error {
