@@ -1,1 +1,2 @@
 ui/* linguist-vendored
+migrations/sentry_*_dump.sql linguist-vendored
