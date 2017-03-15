@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func GetApp(config conf.Config) *echo.Echo {
+func NewApp(config conf.Config) *echo.Echo {
 	e := echo.New()
 	e.Debug = true
 	e.Logger = log.NewEchoLogger(config)

@@ -52,9 +52,9 @@ var RootCmd = &cobra.Command{
 			return err
 		}
 		logrus.Info("Database is up to date. Starting web app...")
-		// TODO implement web.GetApp(), cron.GetApp(), smtp.GetApp() function
+		// TODO implement web.NewApp(), cron.NewApp(), smtp.NewApp() function
 		//   see https://docs.sentry.io/server/cli/run/
-		e := web.GetApp(config)
+		e := web.NewApp(config)
 		if err := e.Start(fmt.Sprintf(":%d", config.Port)); err != nil {
 			e.Logger.Fatal(err)
 		}

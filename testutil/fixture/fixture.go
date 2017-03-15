@@ -21,7 +21,7 @@ var factories = map[*testing.T]factory.TestFactory{}
 
 func Setup(t *testing.T) (*gorequest.SuperAgent, factory.TestFactory) {
 	once.Do(func() { setupOnce(t) })
-	app := web.GetApp(factory.MakeAppConfig())
+	app := web.NewApp(factory.MakeAppConfig())
 	// TODO TestFactory does a side effect which is used by TestClient
 	//  make this code more explicit
 	tf := factory.New(t, app)
