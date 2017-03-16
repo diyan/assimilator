@@ -16,7 +16,7 @@ func RegisterAPIRoutes(g *echo.Group) {
 
 	// Broadcasts
 	g.GET("/broadcasts/", api.BroadcastIndexGetEndpoint)
-	g.GET("/broadcasts/", api.BroadcastIndexPutEndpoint)
+	g.PUT("/broadcasts/", api.BroadcastIndexPutEndpoint)
 
 	// Users
 	// TODO implement
