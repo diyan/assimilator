@@ -16,7 +16,7 @@ func TestStaticJavaScript_Get(t *testing.T) {
 	assert.Equal(t, 200, res.StatusCode)
 	assert.Contains(t, bodyStr, "Welcome to Sentry")
 	assert.Contains(t, bodyStr, "https://github.com/getsentry/sentry")
-	assert.Equal(t, res.Header.Get("Content-Type"), "application/x-javascript")
+	assert.Equal(t, "application/x-javascript", res.Header.Get("Content-Type"))
 	assert.InDelta(t, 4000000, res.ContentLength, 1000000, "app.js should be ~4MB in size")
 }
 
