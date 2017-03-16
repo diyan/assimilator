@@ -23,9 +23,9 @@ func init() {
 	RootCmd.Flags().String("initial-key", "763a78a695424ed687cf8b7dc26d3161:763a78a695424ed687cf8b7dc26d3161", "Set a key for the above project so you can set DSN in your client, e.g. public:secret")
 	RootCmd.Flags().String("initial-platform", "python", "Indicates a platform for the above initial project")
 
-	viper.SetEnvPrefix("assimilator")
+	viper.SetEnvPrefix("asm")
 	viper.AutomaticEnv()
-	// ASSIMILATOR_PORT env var is for user, PORT is for codegangsta/gin tool
+	// ASM_PORT env var is for user, PORT is for codegangsta/gin tool
 	viper.BindEnv("port", "PORT")
 	viper.BindPFlag("port", RootCmd.Flags().Lookup("port"))
 	viper.BindPFlag("db_url", RootCmd.Flags().Lookup("db-url"))
