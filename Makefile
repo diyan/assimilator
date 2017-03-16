@@ -3,6 +3,12 @@
 .DEFAULT_GOAL := help
 
 build-go:  ## Build Golang project
+	# TODO ui/ contains folder that should not be embedded. Only those are needed:
+	# - sentry/dist/*
+	# - sentry/js/* (sentry/js/ads.js to be more precise)
+	#rice --import-path=github.com/diyan/assimilator/web \
+	#       --import-path=github.com/diyan/assimilator/db/migrations \
+	#       embed-go
 	go build -o bin/assimilator
 
 watch-go:  ## Live reload Golang code
@@ -47,7 +53,7 @@ test-start-db:  ## Start PostgreSQL container for integration tests
 
 test-go:  ## Run Go tests
 	ginkgo -r -cover
-	
+
 test-watch-go:  ## Continuous testing for Go sources
 	ginkgo watch -r -notify -cover
 	
