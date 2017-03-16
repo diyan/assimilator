@@ -1,4 +1,4 @@
-package web_test
+package renderer_test
 
 import (
 	"testing"
