@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestServerSideTemplateRenderer_Get(t *testing.T) {
+func TestServerSideRenderer_Get(t *testing.T) {
 	client, factory := fixture.Setup(t)
 	defer fixture.TearDown(t)
 
 	factory.SaveOrganization(factory.MakeOrganization())
 
-	res, bodyStr, errs := client.Get("http://example.com//acme-team/").End()
+	res, bodyStr, errs := client.Get("http://example.com/acme-team/").End()
 	assert.Nil(t, errs)
 	assert.Equal(t, 200, res.StatusCode)
 	assert.Contains(t, res.Header.Get("Content-Type"), "text/html")
