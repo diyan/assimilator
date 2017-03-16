@@ -1,5 +1,5 @@
-hash: 8844a071f2b29f74646b854327a82b8c98b0f28450cafeb7084aee243123c10d
-updated: 2017-03-14T21:12:15.313689173+02:00
+hash: 51efbb4b2f9d69247c0638236b31c0f21718fda473358f61ca5bd73a286951d8
+updated: 2017-03-16T14:17:44.743422613+02:00
 imports:
 - name: github.com/AlekSi/pointer
   version: 08a25bac605b3fcb6cc27f3917b2c2c87451963d
@@ -93,7 +93,7 @@ imports:
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: 3b00596b2e9ee541bbd72dc50cc0c60e2b46c69c
+  version: fee7787d3f811af92276f5ff10107092e95b7a1d
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/pmezard/go-difflib
@@ -117,7 +117,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: github.com/spf13/viper
-  version: 7538d73b4eb9511d85a9f1dfef202eeb8ac260f4
+  version: 84f94806c67f59dd7ae87bc5351f7a9c94a4558d
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:

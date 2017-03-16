@@ -48,4 +48,3 @@ import:
 - package: github.com/satori/go.uuid
   version: v1.1.0
 - package: github.com/GeertJohan/go.rice
-- package: github.com/daaku/go.zipexe
