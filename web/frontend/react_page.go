@@ -43,7 +43,7 @@ func getReactPageView(c echo.Context) error {
 	//orgSlug := c.Param("organization-slug")
 	//log.Print(orgSlug, " is an organization-slug")
 	// TODO implement generic ReactPageView
-	return c.Render(http.StatusOK, "react.html", map[string]interface{}{
+	return c.Render(http.StatusOK, "sentry/bases/react.html", map[string]interface{}{
 		"request":        struct{ LANGUAGE_CODE string }{LANGUAGE_CODE: "en"},
 		"sentry_version": struct{ build string }{build: "8.12.0"},
 		// TODO this does not work because foo is not exported
