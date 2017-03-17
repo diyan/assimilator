@@ -1,33 +1,23 @@
 package interfaces
 
-import (
-	pickle "github.com/hydrogen18/stalecucumber"
-	"github.com/pkg/errors"
-)
-
 type SDK struct {
-	Name     string   `json:"name" pickle:"name"`
-	Version  string   `json:"version" pickle:"version"`
-	ClientIP string   `json:"clientIP" pickle:"client_ip"`
-	Upstream Upstream `json:"upstream" pickle:"-"`
+	Name     string   `json:"name" node:"name"`
+	Version  string   `json:"version" node:"version"`
+	ClientIP string   `json:"clientIP" node:"client_ip"`
+	Upstream Upstream `json:"upstream"`
 }
 
 type Upstream struct {
-	Name    string `json:"name" pickle:"-"`
-	URL     string `json:"url" pickle:"-"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
 	IsNewer bool   `json:"isNewer"`
 }
 
 func (sdk *SDK) UnmarshalRecord(nodeBlob interface{}) error {
-	// TODO safe cast to map[interface{}]interface{}
-	// TODO safe get from map using `sdk` alias key
-	// TODO safe get from map using `sentry.interfaces.Sdk` canonical key
-	if err := pickle.UnpackInto(&sdk).From(nodeBlob.(map[interface{}]interface{})["sdk"], nil); err != nil {
-		return errors.Wrapf(err, "can not convert node blob to sentry.interfaces.Sdk")
-	}
+	err := DecodeRecord("sdk", "sentry.interfaces.Sdk", nodeBlob, sdk)
 	sdk.Upstream.Name = sdk.Name                                // TODO check original code
 	sdk.Upstream.URL = "https://docs.sentry.io/clients/python/" // TODO remove hardcode
-	return nil
+	return err
 }
 
 func (sdk *SDK) UnmarshalAPI(rawEvent map[string]interface{}) error {
