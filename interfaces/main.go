@@ -1,6 +1,11 @@
 package interfaces
 
-import "github.com/diyan/assimilator/models"
+import (
+	"fmt"
+
+	"github.com/diyan/assimilator/models"
+	"github.com/pkg/errors"
+)
 
 type EventInterfaces struct {
 	// Built-in interfaces, sorted by name
@@ -20,6 +25,22 @@ type EventInterfaces struct {
 	Template         models.Marshaler
 	Threads          models.Marshaler
 	User             models.Marshaler
+}
+
+func DecodeRecord(keyAlias, keyCanonical string, record interface{}, target interface{}) error {
+	recordMap, ok := record.(map[interface{}]interface{})
+	if !ok {
+		return nil
+	}
+	value, ok := recordMap[keyAlias]
+	if !ok {
+		value, ok = recordMap[keyCanonical]
+		if !ok {
+			return nil
+		}
+	}
+	err := models.DecodeRecord(value, target)
+	return errors.Wrapf(err, fmt.Sprintf("can not decode node record to %s", keyCanonical))
 }
 
 func (event *EventInterfaces) UnmarshalRecord(nodeBlob interface{}) error {
