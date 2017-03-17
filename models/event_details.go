@@ -1,10 +1,12 @@
 package models
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
-	"github.com/AlekSi/pointer"
 	pickle "github.com/hydrogen18/stalecucumber"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 
@@ -20,13 +22,13 @@ type Marshaler interface {
 //  size, dateReceived, entries (type message and type stacktrace),
 //  context, contexts
 type EventDetails struct {
-	EventID      string
+	EventID      string `node:"event_id"`
 	ProjectID    int
 	Logger       string
 	Platform     string
 	Culprit      string
-	Ref          int
-	RefVersion   int
+	Ref          int `node:"_ref"`
+	RefVersion   int `node:"_ref_version"`
 	Version      string
 	Release      *string
 	DateCreated  time.Time
@@ -36,13 +38,12 @@ type EventDetails struct {
 	Size         int
 	Errors       []EventError
 	Tags         []TagKeyValue
-	ReceivedTime time.Time
+	ReceivedTime time.Time `node:"received"`
 	Packages     map[string]string
 	Metadata     map[string]string
-	Context      map[string]interface{} // TODO ensure type is not map[string]string
+	Extra        map[string]interface{} // TODO ensure type is not map[string]string
 	// TODO move Entries to the API model
 	//Entries         []interface{}               `json:"entries"`
-	User       *string
 	UserReport *string
 }
 
@@ -63,51 +64,109 @@ type eventDetailsAPI struct {
 	UserReport *string       `json:"userReport"` // TODO type?
 }
 
-type eventDetailsRecord struct {
-	Ref          int                         `pickle:"_ref"`
-	RefVersion   int                         `pickle:"_ref_version"`
-	Version      string                      `pickle:"version"`
-	Release      *string                     `pickle:"release"`
-	Type         string                      `pickle:"type"`
-	Errors       []EventError                `pickle:"errors"` // TODO type?
-	Tags         [][]string                  `pickle:"tags"`
-	ReceivedTime float64                     `pickle:"received"`
-	Packages     map[interface{}]interface{} `pickle:"modules"`
-	Metadata     map[interface{}]interface{} `pickle:"metadata"`
-	Extra        map[interface{}]interface{} `pickle:"extra"`
-	Fingerprint  []string                    `pickle:"fingerprint"`
+func TimeDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if t != reflect.TypeOf(time.Time{}) {
+		return data, nil
+	}
+	if timeFloat, ok := data.(float64); ok {
+		return time.Unix(int64(timeFloat), 0).UTC(), nil
+	} else if timeString, ok := data.(string); ok {
+		time, err := time.Parse(time.RFC3339, timeString)
+		if err != nil {
+			return nil, err
+		}
+		return time, nil
+	}
+	return nil, fmt.Errorf("type is neither float64 nor string")
+}
+
+func TagsDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if t != reflect.TypeOf([]TagKeyValue{}) {
+		return data, nil
+	}
+	tags := []TagKeyValue{}
+	// Valid tags are both {"tagKey": "tagValue"} and [["tagKey", "tagValue"]]
+	if tagsMap, ok := data.(map[string]interface{}); ok {
+		for k, v := range tagsMap {
+			// TODO check length of tag key and tag value
+			tags = append(tags, TagKeyValue{
+				Key: anyTypeToString(k), Value: anyTypeToString(v),
+			})
+		}
+	} else if tagsSlice, ok := data.([]interface{}); ok {
+		for _, tagBlob := range tagsSlice {
+			// TODO safe type assertion
+			tag := tagBlob.([]interface{})
+			// TODO check length of tag key and tag value
+			tags = append(tags, TagKeyValue{
+				Key: anyTypeToString(tag[0]), Value: anyTypeToString(tag[1]),
+			})
+		}
+	} else {
+		return nil, fmt.Errorf("type is neither map[string]interface{} nor []interface{}")
+	}
+	return tags, nil
+}
+
+// TODO Hook works but looks like we have to traverse maps and slices
+func PickleNoneDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f != reflect.TypeOf(pickle.PickleNone{}) {
+		return data, nil
+	}
+	//fmt.Printf("PickleNoneDecodeHook, f = %v, t = %v\n", f, t)
+	return nil, nil
+}
+
+func StringMapDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if !(f == reflect.TypeOf(map[interface{}]interface{}{}) &&
+		t == reflect.TypeOf(map[string]interface{}{})) {
+		return data, nil
+	}
+	return nil, nil
+}
+
+func anyTypeToString(v interface{}) string {
+	if v != nil {
+		return fmt.Sprint(v)
+	}
+	return ""
+}
+
+// TODO move func to another package
+func DecodeRecord(record interface{}, target interface{}) error {
+	metadata := mapstructure.Metadata{}
+	decodeHook := mapstructure.ComposeDecodeHookFunc(TimeDecodeHook, TagsDecodeHook, PickleNoneDecodeHook)
+	config := mapstructure.DecoderConfig{
+		DecodeHook:       decodeHook,
+		Metadata:         &metadata,
+		WeaklyTypedInput: false,
+		TagName:          "node",
+		Result:           target,
+	}
+	decoder, err := mapstructure.NewDecoder(&config)
+	if err != nil {
+		return errors.Wrapf(err, "can not decode node record")
+	}
+	err = decoder.Decode(record)
+	return errors.Wrapf(err, "can not decode node record")
 }
 
 func (event *EventDetails) UnmarshalRecord(nodeBlob interface{}) error {
-	record := eventDetailsRecord{}
-	if err := pickle.UnpackInto(&record).From(nodeBlob, nil); err != nil {
-		return errors.Wrapf(err, "can not convert node blob to event details")
+	if err := DecodeRecord(nodeBlob, event); err != nil {
+		return err
 	}
-	event.Ref = record.Ref
-	event.RefVersion = record.RefVersion
-	event.Version = record.Version
-	event.Release = record.Release
-	event.Type = record.Type
-	event.Errors = record.Errors
+	// TODO iterate unused keys, convert them to canonical interface path;
+	//   if it's not interface - trackError
+	//pp.Print("metadata.Unused", metadata.Unused)
+
 	event.Size = 6597 // TODO remove hardcode
 	// TOOD Entries is a field of API object
 	//event.Entries = append(event.Entries, map[string]interface{}{
 	//	"type": "message",
 	//	"data": map[string]string{"message": rv.Message.Message},
 	//})
-	for _, tag := range record.Tags {
-		event.Tags = append(event.Tags, TagKeyValue{
-			tag[0],
-			tag[1],
-		})
-	}
-	event.ReceivedTime = time.Unix(int64(record.ReceivedTime), 0).UTC()
-	event.Packages = toStringMapString(record.Packages)
-	event.Metadata = toStringMapString(record.Metadata)
-	event.Context = toStringMap(record.Extra)
-	event.Fingerprint = record.Fingerprint
 	// TOOD Entries is a field of API object
-	//rv.Entries = append(rv.Entries, map[string]interface{}{
+	//event.Entries = append(rv.Entries, map[string]interface{}{
 	//	"type": "stacktrace",
 	//	"data": rv.Stacktrace,
 	//})
@@ -123,82 +182,4 @@ func (eventDetails *EventDetails) MarshalAPI() ([]byte, error) {
 type TagKeyValue struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
-}
-
-// TODO toBool, toInt functions is copied between models and interfaces package
-func toBool(value interface{}) bool {
-	switch typedValue := value.(type) {
-	case bool:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected bool type %T", typedValue))
-	}
-}
-
-func toInt(value interface{}) int {
-	switch typedValue := value.(type) {
-	case int64:
-		return int(typedValue)
-	case int:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected int type %T", typedValue))
-	}
-}
-
-func toIntPtr(value interface{}) *int {
-	_, isPickleNone := value.(pickle.PickleNone)
-	if value == nil || isPickleNone {
-		return nil
-	}
-	return pointer.ToInt(toInt(value))
-}
-
-func toString(value interface{}) string {
-	switch typedValue := value.(type) {
-	case string:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected string type %T", typedValue))
-	}
-}
-
-func toStringPtr(value interface{}) *string {
-	_, isPickleNone := value.(pickle.PickleNone)
-	if value == nil || isPickleNone {
-		return nil
-	}
-	return pointer.ToString(toString(value))
-}
-
-func toStringSlice(value interface{}) (rv []string) {
-	if sliceValue, ok := value.([]interface{}); ok {
-		for _, item := range sliceValue {
-			rv = append(rv, toString(item))
-		}
-	}
-	return
-}
-
-func toStringMapString(value interface{}) (rv map[string]string) {
-	if mapValue, ok := value.(map[interface{}]interface{}); ok {
-		rv = map[string]string{}
-		for key, value := range mapValue {
-			rv[toString(key)] = toString(value)
-		}
-	}
-	return
-}
-
-func toStringMap(value interface{}) (rv map[string]interface{}) {
-	if mapValue, ok := value.(map[interface{}]interface{}); ok {
-		rv = map[string]interface{}{}
-		for key, value := range mapValue {
-			rv[toString(key)] = value
-		}
-	}
-	return
 }
