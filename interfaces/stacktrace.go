@@ -9,28 +9,32 @@ import (
 )
 
 type Stacktrace struct {
-	HasSystemFrames bool    `json:"hasSystemFrames"`
-	FramesOmitted   *bool   `json:"framesOmitted"` // TODO type?
-	Frames          []Frame `json:"frames"`
+	HasSystemFrames bool    `node:"has_system_frames" json:"hasSystemFrames"`
+	FramesOmitted   *bool   `node:"frames_omitted" json:"framesOmitted"` // TODO type?
+	Frames          []Frame `node:"frames" json:"frames"`
 }
 
 type Frame struct {
-	ColumnNumber       *int                   `json:"colNo"`
-	LineNumber         int                    `json:"lineNo"`
-	InstructionOffset  *int                   `json:"instructionOffset"` // TODO type?
-	InstructionAddress *string                `json:"instructionAddr"`   // TODO type?
-	Symbol             *string                `json:"symbol"`            // TODO type?
-	SymbolAddress      *string                `json:"symbolAddr"`        // TODO type?
-	AbsolutePath       string                 `json:"absPath"`
-	Module             string                 `json:"module"`
-	Package            *string                `json:"package"`
-	Platform           *string                `json:"platform"` // TODO type?
-	Errors             *string                `json:"errors"`   // TODO type?
-	InApp              bool                   `json:"inApp"`
-	Filename           string                 `json:"filename"`
-	Function           string                 `json:"function"`
-	Context            FrameContext           `json:"context"`
-	Variables          map[string]interface{} `json:"vars"`
+	ColumnNumber       *int                        `node:"colno" json:"colNo"`
+	LineNumber         int                         `node:"lineno" json:"lineNo"`
+	InstructionOffset  *int                        `node:"-" json:"instructionOffset"`              // TODO type?
+	InstructionAddress *string                     `node:"instruction_addr" json:"instructionAddr"` // TODO type?
+	Symbol             *string                     `node:"symbol" json:"symbol"`                    // TODO type?
+	SymbolAddress      *string                     `node:"symbol_addr" json:"symbolAddr"`           // TODO type?
+	AbsolutePath       string                      `node:"abs_path" json:"absPath"`
+	Module             string                      `node:"module" json:"module"`
+	Package            *string                     `node:"package" json:"package"`
+	Platform           *string                     `node:"platform" json:"platform"` // TODO type?
+	Errors             *string                     `node:"errors" json:"errors"`     // TODO type?
+	InApp              bool                        `node:"in_app" json:"inApp"`
+	Filename           string                      `node:"filename" json:"filename"`
+	Function           string                      `node:"function" json:"function"`
+	Context            FrameContext                `node:"-" json:"context"`
+	ContextLineNode    string                      `node:"context_line" json:"-"`
+	PreContextNode     []string                    `node:"pre_context" json:"-"`
+	PostContextNode    []string                    `node:"post_context" json:"-"`
+	Variables          map[string]interface{}      `node:"-" json:"vars"`
+	VariablesNode      map[interface{}]interface{} `node:"vars" json:"-"`
 }
 
 type FrameContext []FrameContextLine
@@ -40,78 +44,37 @@ type FrameContextLine struct {
 	Line       string
 }
 
-type stacktraceRecord struct {
-	HasSystemFrames bool          `pickle:"has_system_frames"`
-	FramesOmitted   *bool         `pickle:"frames_omitted"` // TODO type?
-	Frames          []frameRecord `pickle:"frames"`
-}
-
-type frameRecord struct {
-	ColumnNumber       *int                        `pickle:"colno"`
-	LineNumber         int                         `pickle:"lineno"`
-	InstructionAddress *string                     `pickle:"instruction_addr"` // TODO type?
-	Symbol             *string                     `pickle:"symbol"`           // TODO type?
-	SymbolAddress      *string                     `pickle:"symbol_addr"`      // TODO type?
-	AbsolutePath       string                      `pickle:"abs_path"`
-	Module             string                      `pickle:"module"`
-	Package            *string                     `pickle:"package"`
-	Platform           *string                     `pickle:"platform"` // TODO type?
-	Errors             *string                     `pickle:"errors"`   // TODO type?
-	InApp              bool                        `pickle:"in_app"`
-	Filename           string                      `pickle:"filename"`
-	Function           string                      `pickle:"function"`
-	ContextLine        string                      `pickle:"context_line"`
-	PreContext         []string                    `pickle:"pre_context"`
-	PostContext        []string                    `pickle:"post_context"`
-	Variables          map[interface{}]interface{} `pickle:"vars"`
-}
-
 func (contextLine FrameContextLine) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]interface{}{contextLine.LineNumber, contextLine.Line})
 }
 
 func (stacktrace *Stacktrace) UnmarshalRecord(nodeBlob interface{}) error {
-	// TODO safe cast to map[interface{}]interface{}
-	// TODO safe get from map using `stacktrace` alias key
-	// TODO safe get from map using `sentry.interfaces.Stacktrace` canonical key
-	record := stacktraceRecord{}
-	if err := pickle.UnpackInto(&record).From(nodeBlob.(map[interface{}]interface{})["sentry.interfaces.Stacktrace"], nil); err != nil {
-		return errors.Wrapf(err, "can not convert node blob to sentry.interfaces.Stacktrace")
-	}
-	for _, frameRecord := range record.Frames {
-		frame := Frame{
-			ColumnNumber:       frameRecord.ColumnNumber,
-			LineNumber:         frameRecord.LineNumber,
-			InstructionAddress: frameRecord.InstructionAddress,
-			Symbol:             frameRecord.Symbol,
-			SymbolAddress:      frameRecord.SymbolAddress,
-			AbsolutePath:       frameRecord.AbsolutePath,
-			Module:             frameRecord.Module,
-			Package:            frameRecord.Package,
-			Platform:           frameRecord.Platform,
-			Errors:             frameRecord.Errors,
-			InApp:              frameRecord.InApp,
-			Filename:           frameRecord.Filename,
-			Function:           frameRecord.Function,
-		}
-		//frame.InstructionAddress = padHexAddr(frameRecord.InstructionAddress, padAddr)
-		//frame.SymbolAddress = padHexAddr(frameRecord.SymbolAddressRaw, padAddr)
+	err := DecodeRecord("stacktrace", "sentry.interfaces.Stacktrace", nodeBlob, stacktrace)
+	for i := 0; i < len(stacktrace.Frames); i++ {
+		frame := &stacktrace.Frames[i]
+		//frame.InstructionAddress = padHexAddr(frame.InstructionAddress, padAddr)
+		//frame.SymbolAddress = padHexAddr(frame.SymbolAddressRaw, padAddr)
+		// TODO refactor getFrameContext into `decodeFrameContext(frame Frame)`
 		frame.Context = getFrameContext(
-			frameRecord.LineNumber,
-			frameRecord.ContextLine,
-			frameRecord.PreContext,
-			frameRecord.PostContext,
-			frameRecord.Filename,
-			frameRecord.Module,
+			frame.LineNumber,
+			frame.ContextLineNode,
+			frame.PreContextNode,
+			frame.PostContextNode,
+			frame.Filename,
+			frame.Module,
 		)
+		frame.ContextLineNode = ""
+		frame.PreContextNode = nil
+		frame.PostContextNode = nil
 		frame.Variables = map[string]interface{}{}
-		err := fillTypedVars(frameRecord.Variables, frame.Variables)
+
+		err := fillTypedVars(frame.VariablesNode, frame.Variables)
 		if err != nil {
 			return errors.Wrap(err, "failed to decode frame variables")
 		}
-		stacktrace.Frames = append(stacktrace.Frames, frame)
+		frame.VariablesNode = nil
 	}
-	return nil
+	return err
 }
 
 func getFrameContext(
@@ -156,91 +119,13 @@ func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]int
 			destMap[name] = nil
 		case int64:
 			destMap[name] = int(value)
-		case []interface{}, string, bool:
+		case []interface{}, string, bool, nil:
 			destMap[name] = value
 		default:
 			return errors.Errorf("unexpected type %T", value)
 		}
 	}
 	return nil
-}
-
-// TODO toBool, toInt functions is copied between models and interfaces package
-func toBool(value interface{}) bool {
-	switch typedValue := value.(type) {
-	case bool:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected bool type %T", typedValue))
-	}
-}
-
-func toInt(value interface{}) int {
-	switch typedValue := value.(type) {
-	case int64:
-		return int(typedValue)
-	case int:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected int type %T", typedValue))
-	}
-}
-
-func toIntPtr(value interface{}) *int {
-	_, isPickleNone := value.(pickle.PickleNone)
-	if value == nil || isPickleNone {
-		return nil
-	}
-	return pointer.ToInt(toInt(value))
-}
-
-func toString(value interface{}) string {
-	switch typedValue := value.(type) {
-	case string:
-		return typedValue
-	default:
-		// TODO remove panic one all use-cases are checked
-		panic(errors.Errorf("unexpected string type %T", typedValue))
-	}
-}
-
-func toStringPtr(value interface{}) *string {
-	_, isPickleNone := value.(pickle.PickleNone)
-	if value == nil || isPickleNone {
-		return nil
-	}
-	return pointer.ToString(toString(value))
-}
-
-func toStringSlice(value interface{}) (rv []string) {
-	if sliceValue, ok := value.([]interface{}); ok {
-		for _, item := range sliceValue {
-			rv = append(rv, toString(item))
-		}
-	}
-	return
-}
-
-func toStringMapString(value interface{}) (rv map[string]string) {
-	if mapValue, ok := value.(map[interface{}]interface{}); ok {
-		rv = map[string]string{}
-		for key, value := range mapValue {
-			rv[toString(key)] = toString(value)
-		}
-	}
-	return
-}
-
-func toStringMap(value interface{}) (rv map[string]interface{}) {
-	if mapValue, ok := value.(map[interface{}]interface{}); ok {
-		rv = map[string]interface{}{}
-		for key, value := range mapValue {
-			rv[toString(key)] = value
-		}
-	}
-	return
 }
 
 // NOTE We are expecting here rawStacktrace instead of rawEvent
