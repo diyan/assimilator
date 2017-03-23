@@ -1,7 +1,5 @@
 package interfaces
 
-import "fmt"
-
 // User is an interface which describes the authenticated User for a request.
 //
 // You should provide **at least** either an `id` (a unique identifier for
@@ -17,34 +15,21 @@ import "fmt"
 //     "optional": "value"
 // }
 type User struct {
-	ID        string `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	IPAddress string `json:"ip_address"`
-	// Is Sentry allows arbitrary key/value pairs for User interface?
-	Extra map[string]string `json:"-"`
+	ID        string `input:"id"         json:"id"`
+	Username  string `input:"username"   json:"username"`
+	Email     string `input:"email"      json:"email"`
+	IPAddress string `input:"ip_address" json:"ip_address"`
+	// TODO Does Sentry allows arbitrary key/value pairs for User interface?
+	Extra map[string]string `input:"-"   json:"-"`
 }
 
-func (user *User) UnmarshalRecord(nodeBlob interface{}) error {
+func (user *User) DecodeRecord(record interface{}) error {
 	return nil
 }
 
-func (user *User) UnmarshalAPI(rawEvent map[string]interface{}) error {
-	if rawUser, ok := rawEvent["user"].(map[string]interface{}); ok {
-		// TODO validate input
-		user.ID = anyTypeToString(rawUser["id"])
-		user.Username = anyTypeToString(rawUser["username"])
-		user.Email = anyTypeToString(rawUser["email"])
-		user.IPAddress = anyTypeToString(rawUser["ip_address"])
-		// TODO process extra fields
-	}
-	return nil
-}
-
-// TODO duplicated code in interfaces and web/api/store_event.go
-func anyTypeToString(v interface{}) string {
-	if v != nil {
-		return fmt.Sprint(v)
-	}
-	return ""
+func (user *User) DecodeRequest(request map[string]interface{}) error {
+	err := DecodeRequest("user", "sentry.interfaces.User", request, user)
+	// TODO validate input
+	// TODO process extra fields
+	return err
 }
