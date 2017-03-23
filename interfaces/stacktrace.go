@@ -3,38 +3,37 @@ package interfaces
 import (
 	"encoding/json"
 
-	"github.com/AlekSi/pointer"
 	pickle "github.com/hydrogen18/stalecucumber"
 	"github.com/pkg/errors"
 )
 
 type Stacktrace struct {
-	HasSystemFrames bool    `node:"has_system_frames" json:"hasSystemFrames"`
-	FramesOmitted   *bool   `node:"frames_omitted" json:"framesOmitted"` // TODO type?
-	Frames          []Frame `node:"frames" json:"frames"`
+	HasSystemFrames bool    `node:"has_system_frames" input:"-"      json:"hasSystemFrames"`
+	FramesOmitted   *bool   `node:"frames_omitted"    input:"-"      json:"framesOmitted"` // TODO type?
+	Frames          []Frame `node:"frames"            input:"frames" json:"frames"`
 }
 
 type Frame struct {
-	ColumnNumber       *int                        `node:"colno" json:"colNo"`
-	LineNumber         int                         `node:"lineno" json:"lineNo"`
-	InstructionOffset  *int                        `node:"-" json:"instructionOffset"`              // TODO type?
-	InstructionAddress *string                     `node:"instruction_addr" json:"instructionAddr"` // TODO type?
-	Symbol             *string                     `node:"symbol" json:"symbol"`                    // TODO type?
-	SymbolAddress      *string                     `node:"symbol_addr" json:"symbolAddr"`           // TODO type?
-	AbsolutePath       string                      `node:"abs_path" json:"absPath"`
-	Module             string                      `node:"module" json:"module"`
-	Package            *string                     `node:"package" json:"package"`
-	Platform           *string                     `node:"platform" json:"platform"` // TODO type?
-	Errors             *string                     `node:"errors" json:"errors"`     // TODO type?
-	InApp              bool                        `node:"in_app" json:"inApp"`
-	Filename           string                      `node:"filename" json:"filename"`
-	Function           string                      `node:"function" json:"function"`
-	Context            FrameContext                `node:"-" json:"context"`
-	ContextLineNode    string                      `node:"context_line" json:"-"`
-	PreContextNode     []string                    `node:"pre_context" json:"-"`
-	PostContextNode    []string                    `node:"post_context" json:"-"`
-	Variables          map[string]interface{}      `node:"-" json:"vars"`
-	VariablesNode      map[interface{}]interface{} `node:"vars" json:"-"`
+	ColumnNumber       *int                        `node:"colno"            input:"colno"    json:"colNo"`
+	LineNumber         int                         `node:"lineno"           input:"lineno"   json:"lineNo"`
+	InstructionOffset  *int                        `node:"-"                input:"-"        json:"instructionOffset"` // TODO type?
+	InstructionAddress *string                     `node:"instruction_addr" input:"-"        json:"instructionAddr"`   // TODO type?
+	Symbol             *string                     `node:"symbol"           input:"-"        json:"symbol"`            // TODO type?
+	SymbolAddress      *string                     `node:"symbol_addr"      input:"-"        json:"symbolAddr"`        // TODO type?
+	AbsolutePath       string                      `node:"abs_path"         input:"-"        json:"absPath"`
+	Module             string                      `node:"module"           input:"-"        json:"module"`
+	Package            *string                     `node:"package"          input:"-"        json:"package"`
+	Platform           *string                     `node:"platform"         input:"-"        json:"platform"` // TODO type?
+	Errors             *string                     `node:"errors"           input:"-"        json:"errors"`   // TODO type?
+	InApp              bool                        `node:"in_app"           input:"in_app"   json:"inApp"`
+	Filename           string                      `node:"filename"         input:"filename" json:"filename"`
+	Function           string                      `node:"function"         input:"function" json:"function"`
+	Context            FrameContext                `node:"-"                input:"-"        json:"context"`
+	ContextLineNode    string                      `node:"context_line"     input:"-"        json:"-"`
+	PreContextNode     []string                    `node:"pre_context"      input:"-"        json:"-"`
+	PostContextNode    []string                    `node:"post_context"     input:"-"        json:"-"`
+	Variables          map[string]interface{}      `node:"-"                input:"-"        json:"vars"`
+	VariablesNode      map[interface{}]interface{} `node:"vars"             input:"-"        json:"-"`
 }
 
 type FrameContext []FrameContextLine
@@ -48,8 +47,8 @@ func (contextLine FrameContextLine) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]interface{}{contextLine.LineNumber, contextLine.Line})
 }
 
-func (stacktrace *Stacktrace) UnmarshalRecord(nodeBlob interface{}) error {
-	err := DecodeRecord("stacktrace", "sentry.interfaces.Stacktrace", nodeBlob, stacktrace)
+func (stacktrace *Stacktrace) DecodeRecord(record interface{}) error {
+	err := DecodeRecord("stacktrace", "sentry.interfaces.Stacktrace", record, stacktrace)
 	for i := 0; i < len(stacktrace.Frames); i++ {
 		frame := &stacktrace.Frames[i]
 		//frame.InstructionAddress = padHexAddr(frame.InstructionAddress, padAddr)
@@ -128,23 +127,6 @@ func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]int
 	return nil
 }
 
-// NOTE We are expecting here rawStacktrace instead of rawEvent
-func (stacktrace *Stacktrace) UnmarshalAPI(rawStacktrace map[string]interface{}) error {
-	rawFrames, ok := rawStacktrace["frames"].([]interface{})
-	if !ok {
-		return nil
-	}
-	for _, rawFrame := range rawFrames {
-		frameMap := rawFrame.(map[string]interface{})
-		frame := Frame{
-			Filename:     frameMap["filename"].(string),
-			Function:     frameMap["function"].(string),
-			LineNumber:   int(frameMap["lineno"].(float64)),
-			ColumnNumber: pointer.ToInt(int(frameMap["colno"].(float64))),
-			InApp:        frameMap["in_app"].(bool),
-		}
-		stacktrace.Frames = append(stacktrace.Frames, frame)
-	}
-
+func (stacktrace *Stacktrace) DecodeRequest(request map[string]interface{}) error {
 	return nil
 }

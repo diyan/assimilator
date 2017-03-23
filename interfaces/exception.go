@@ -25,48 +25,32 @@ package interfaces
 //    Values should be sent oldest to newest, this includes both the stacktrace
 //    and the exception itself.
 type Exception struct {
-	Values          []ExceptionValue `json:"values"`
-	HasSystemFrames bool             `json:"hasSystemFrames"`
-	ExcOmitted      bool             `json:"excOmitted"`
+	Values          []ExceptionValue `input:"values" json:"values"`
+	HasSystemFrames bool             `input:"-"      json:"hasSystemFrames"`
+	ExcOmitted      bool             `input:"-"      json:"excOmitted"`
 }
 
 type ExceptionValue struct {
-	Type            string      `json:"type"`
-	Value           string      `json:"value"`
-	Module          string      `json:"module"`
-	Mechanism       interface{} `json:"mechanism"`
-	Stacktrace      Stacktrace  `json:"stacktrace"`
-	HasSystemFrames bool        `json:"hasSystemFrames"` // TODO ?
-	SlimFrames      bool        `json:"slimFrames"`      // TODO ?
+	Type            string      `input:"type"       json:"type"`
+	Value           string      `input:"value"      json:"value"`
+	Module          string      `input:"module"     json:"module"`
+	Mechanism       interface{} `input:"mechanism"  json:"mechanism"`
+	Stacktrace      Stacktrace  `input:"stacktrace" json:"stacktrace"`
+	HasSystemFrames bool        `input:"-"          json:"hasSystemFrames"` // TODO ?
+	SlimFrames      bool        `input:"-"          json:"slimFrames"`      // TODO ?
 }
 
-func (exception *Exception) UnmarshalRecord(nodeBlob interface{}) error {
+func (exception *Exception) DecodeRecord(record interface{}) error {
 	return nil
 }
 
-func (exception *Exception) UnmarshalAPI(rawEvent map[string]interface{}) error {
-	rawException, ok := rawEvent["exception"].(map[string]interface{})
-	if !ok {
-		rawException, ok = rawEvent["sentry.interfaces.Exception"].(map[string]interface{})
-		if !ok {
-			return nil
-		}
-	}
-	// TODO validate that `values` is present and type is []interface{}
-	hasSystemFrames := hasSystemFrames(rawException)
-	for _, rawErrValue := range rawException["values"].([]interface{}) {
-		errMap := rawErrValue.(map[string]interface{})
-		errValue := ExceptionValue{
-			HasSystemFrames: hasSystemFrames,
-			SlimFrames:      false,
-		}
-		// TODO handle error
-		errValue.Stacktrace.UnmarshalAPI(errMap["stacktrace"].(map[string]interface{}))
-		exception.Values = append(exception.Values, errValue)
-	}
+func (exception *Exception) DecodeRequest(request map[string]interface{}) error {
+	err := DecodeRequest("exception", "sentry.interfaces.Exception", request, exception)
+	// hasSystemFrames := hasSystemFrames(rawException)
+	// TODO iterate values, set HasSystemFrames
 	// TODO process `exc_omitted` if provided
 	// TODO call `func slimExceptionData(exception *Exception)`
-	return nil
+	return err
 }
 
 //  TODO implement
