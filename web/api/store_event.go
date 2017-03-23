@@ -8,10 +8,7 @@ import (
 
 	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/models"
-	"github.com/k0kubun/pp"
 	"github.com/labstack/echo"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -58,23 +55,8 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 	// Ensure all keys are expected
 	// Bind event attributes
 	// Bind event interfaces
-
-	metadata := mapstructure.Metadata{}
-	decodeHook := mapstructure.ComposeDecodeHookFunc(models.TimeDecodeHook, models.TagsDecodeHook)
-	config := mapstructure.DecoderConfig{
-		DecodeHook:       decodeHook,
-		Metadata:         &metadata,
-		WeaklyTypedInput: false,
-		Result:           &event.EventDetails,
-	}
-	decoder, err := mapstructure.NewDecoder(&config)
-	if err != nil {
-		pp.Print(err)
-		return errors.Wrapf(err, "can not parse request body to event details")
-	}
-	if err := decoder.Decode(rawEvent); err != nil {
-		pp.Print(err)
-		errors.Wrapf(err, "can not parse request body to event details")
+	if err := models.DecodeRequest(rawEvent, event); err != nil {
+		return err
 	}
 	if !validPlatforms[event.Platform] {
 		event.Platform = "other"
@@ -83,7 +65,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 	//pp.Print(event)
 
 	// TODO handle error
-	event.EventInterfaces.UnmarshalAPI(rawEvent)
+	event.EventInterfaces.DecodeRequest(rawEvent)
 	return nil
 }
 
