@@ -22,6 +22,10 @@ type Event struct {
 	NextEventID     *string `json:"nextEventID"`
 }
 
+type NodeRef struct {
+	NodeID string `node:"node_id"`
+}
+
 func unpickleZippedBase64String(blob string) (interface{}, error) {
 	zippedBytes, err := base64.StdEncoding.DecodeString(blob)
 	if err != nil {
@@ -57,17 +61,15 @@ func GroupEventsLatestGetEndpoint(c echo.Context) error {
 		return err
 	}
 	if event.Data != nil {
-		nodeInfo, err := unpickleZippedBase64String(*event.Data)
+		rawNodeRef, err := unpickleZippedBase64String(*event.Data)
 		if err != nil {
-			return errors.Wrap(err, "failed to decode event's node info")
+			return errors.Wrap(err, "failed to decode event's node reference")
 		}
-		// TODO do a safe type assertion for map and for map key
-		// TODO do a safe get from the map
-		// errors.New("failed to decode event data. 'node_id' key not found")
-		// Can we just use Event.EventID field?
-		nodeID := nodeInfo.(map[interface{}]interface{})["node_id"].(string)
-
-		nodeBlobRow, err := eventStore.GetNodeBlob(nodeID)
+		nodeRef := NodeRef{}
+		if err := models.DecodeRecord(rawNodeRef, &nodeRef); err != nil {
+			return errors.Wrap(err, "failed to decode event's node reference")
+		}
+		nodeBlobRow, err := eventStore.GetNodeBlob(nodeRef.NodeID)
 		if err != nil {
 			return errors.Wrap(err, "failed to load event's blob from node store")
 		}
@@ -76,12 +78,12 @@ func GroupEventsLatestGetEndpoint(c echo.Context) error {
 			return errors.Wrap(err, "failed to decode event's blob")
 		}
 		apiEvent := Event{Event: event}
-		// TODO we can hide UnmarshalRecord method inside eventStore
+		// TODO we can hide DecodeRecord method inside eventStore
 		//   but we need this convention for interfaces
-		if err := apiEvent.EventDetails.UnmarshalRecord(nodeBlob); err != nil {
+		if err := apiEvent.EventDetails.DecodeRecord(nodeBlob); err != nil {
 			return err
 		}
-		if err := apiEvent.EventInterfaces.UnmarshalRecord(nodeBlob); err != nil {
+		if err := apiEvent.EventInterfaces.DecodeRecord(nodeBlob); err != nil {
 			return err
 		}
 		return c.JSON(http.StatusOK, apiEvent)
