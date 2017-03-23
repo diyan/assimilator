@@ -43,38 +43,50 @@ func DecodeRecord(keyAlias, keyCanonical string, record interface{}, target inte
 	return errors.Wrapf(err, fmt.Sprintf("can not decode node record to %s", keyCanonical))
 }
 
-func (event *EventInterfaces) UnmarshalRecord(nodeBlob interface{}) error {
+func DecodeRequest(keyAlias, keyCanonical string, request map[string]interface{}, target interface{}) error {
+	value, ok := request[keyAlias].(map[string]interface{})
+	if !ok {
+		value, ok = request[keyCanonical].(map[string]interface{})
+		if !ok {
+			return nil
+		}
+	}
+	err := models.DecodeRequest(value, target)
+	return errors.Wrapf(err, fmt.Sprintf("can not decode request to %s", keyCanonical))
+}
+
+func (event *EventInterfaces) DecodeRecord(record interface{}) error {
 	// TODO too many known types here, use interfaces instead
 	// TODO add error handling
 	event.Request = &HTTP{}
-	event.Request.UnmarshalRecord(nodeBlob)
+	event.Request.DecodeRecord(record)
 	event.User = &User{}
-	event.User.UnmarshalRecord(nodeBlob)
+	event.User.DecodeRecord(record)
 	event.Breadcrumbs = &Breadcrumbs{}
-	event.Breadcrumbs.UnmarshalRecord(nodeBlob)
+	event.Breadcrumbs.DecodeRecord(record)
 	event.SDK = &SDK{}
-	event.SDK.UnmarshalRecord(nodeBlob)
+	event.SDK.DecodeRecord(record)
 	event.Exception = &Exception{}
-	event.Exception.UnmarshalRecord(nodeBlob)
+	event.Exception.DecodeRecord(record)
 	event.Stacktrace = &Stacktrace{}
-	event.Stacktrace.UnmarshalRecord(nodeBlob)
+	event.Stacktrace.DecodeRecord(record)
 	return nil
 }
 
-func (event *EventInterfaces) UnmarshalAPI(rawEvent map[string]interface{}) error {
+func (event *EventInterfaces) DecodeRequest(request map[string]interface{}) error {
 	// TODO too many known types here, use interfaces instead
 	// TODO add error handling
 	event.Request = &HTTP{}
-	event.Request.UnmarshalAPI(rawEvent)
+	event.Request.DecodeRequest(request)
 	event.User = &User{}
-	event.User.UnmarshalAPI(rawEvent)
+	event.User.DecodeRequest(request)
 	event.Breadcrumbs = &Breadcrumbs{}
-	event.Breadcrumbs.UnmarshalAPI(rawEvent)
+	event.Breadcrumbs.DecodeRequest(request)
 	event.SDK = &SDK{}
-	event.SDK.UnmarshalAPI(rawEvent)
+	event.SDK.DecodeRequest(request)
 	event.Exception = &Exception{}
-	event.Exception.UnmarshalAPI(rawEvent)
+	event.Exception.DecodeRequest(request)
 	event.Stacktrace = &Stacktrace{}
-	event.Stacktrace.UnmarshalAPI(rawEvent)
+	event.Stacktrace.DecodeRequest(request)
 	return nil
 }
