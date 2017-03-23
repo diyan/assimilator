@@ -10,12 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// TODO how about MarshalUnmarshaller name similar to ReadWriter?
+// TODO pick a better name
 type Marshaler interface {
-	//MarshalAPI() ([]byte, error)
-	//MarshalStore() (interface{}, error)
-	UnmarshalAPI(map[string]interface{}) error
-	UnmarshalRecord(interface{}) error
+	//EncodeResponse() ([]byte, error)
+	//EncodeRecord() (interface{}, error)
+	DecodeRequest(map[string]interface{}) error
+	DecodeRecord(interface{}) error
 }
 
 // TODO add fields release, message (getter of MessageInfo.Message),
@@ -42,26 +42,9 @@ type EventDetails struct {
 	Packages     map[string]string
 	Metadata     map[string]string
 	Extra        map[string]interface{} // TODO ensure type is not map[string]string
-	// TODO move Entries to the API model
+	// TODO Entries belongs to the API model
 	//Entries         []interface{}               `json:"entries"`
 	UserReport *string
-}
-
-type eventDetailsAPI struct {
-	Release *string       `json:"release"`
-	Type    string        `json:"type"`
-	Size    int           `json:"size"`                   // TODO how to unpickle
-	Errors  []EventError  `json:"errors" pickle:"errors"` // TODO type?
-	Tags    []TagKeyValue `json:"tags"`
-	//SDK          SDKInterface           `json:"sdk"`
-	ReceivedTime time.Time              `json:"dateReceived"` // TODO check
-	Packages     map[string]string      `json:"packages"`
-	Metadata     map[string]string      `json:"metadata"`
-	Context      map[string]interface{} `json:"context"`
-	//Contexts     ContextsInterface      `json:"contexts"`
-	Entries    []interface{} `json:"entries"`
-	User       *string       `json:"user"`       // TODO type?
-	UserReport *string       `json:"userReport"` // TODO type?
 }
 
 func TimeDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
@@ -132,7 +115,6 @@ func anyTypeToString(v interface{}) string {
 	return ""
 }
 
-// TODO move func to another package
 func DecodeRecord(record interface{}, target interface{}) error {
 	metadata := mapstructure.Metadata{}
 	decodeHook := mapstructure.ComposeDecodeHookFunc(TimeDecodeHook, TagsDecodeHook, PickleNoneDecodeHook)
@@ -151,8 +133,8 @@ func DecodeRecord(record interface{}, target interface{}) error {
 	return errors.Wrapf(err, "can not decode node record")
 }
 
-func (event *EventDetails) UnmarshalRecord(nodeBlob interface{}) error {
-	if err := DecodeRecord(nodeBlob, event); err != nil {
+func (event *EventDetails) DecodeRecord(record interface{}) error {
+	if err := DecodeRecord(record, event); err != nil {
 		return err
 	}
 	// TODO iterate unused keys, convert them to canonical interface path;
@@ -173,7 +155,26 @@ func (event *EventDetails) UnmarshalRecord(nodeBlob interface{}) error {
 	return nil
 }
 
-func (eventDetails *EventDetails) MarshalAPI() ([]byte, error) {
+// TODO Consider use interface{} instead of map[string]interface{}
+func DecodeRequest(request map[string]interface{}, target interface{}) error {
+	metadata := mapstructure.Metadata{}
+	decodeHook := mapstructure.ComposeDecodeHookFunc(TimeDecodeHook, TagsDecodeHook)
+	config := mapstructure.DecoderConfig{
+		DecodeHook:       decodeHook,
+		Metadata:         &metadata,
+		WeaklyTypedInput: true,
+		TagName:          "input",
+		Result:           target,
+	}
+	decoder, err := mapstructure.NewDecoder(&config)
+	if err != nil {
+		return errors.Wrapf(err, "can not parse request body")
+	}
+	err = decoder.Decode(request)
+	return errors.Wrapf(err, "can not parse request body")
+}
+
+func (eventDetails *EventDetails) EncodeResponse() ([]byte, error) {
 	// TODO map eventDetails root struct to the eventDetailsAPI
 	// Is []byte correct return type?
 	return nil, nil

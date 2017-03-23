@@ -5,10 +5,10 @@ type HTTP struct {
 	URL     string            `json:"url"`
 }
 
-func (request *HTTP) UnmarshalRecord(nodeBlob interface{}) error {
+func (request *HTTP) DecodeRecord(record interface{}) error {
 	return nil
 }
 
-func (request *HTTP) UnmarshalAPI(rawEvent map[string]interface{}) error {
+func (request *HTTP) DecodeRequest(rawRequest map[string]interface{}) error {
 	return nil
 }

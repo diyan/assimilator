@@ -3,14 +3,10 @@ package interfaces
 type Message struct {
 }
 
-type messageRecord struct {
-	Message string `pickle:"message"`
-}
-
-func (message *Message) UnmarshalRecord(nodeBlob interface{}) error {
+func (message *Message) DecodeRecord(record interface{}) error {
 	return nil
 }
 
-func (message *Message) UnmarshalAPI(rawEvent map[string]interface{}) error {
+func (message *Message) DecodeRequest(request map[string]interface{}) error {
 	return nil
 }
