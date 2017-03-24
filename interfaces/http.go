@@ -10,5 +10,6 @@ func (request *HTTP) DecodeRecord(record interface{}) error {
 }
 
 func (request *HTTP) DecodeRequest(rawRequest map[string]interface{}) error {
-	return nil
+	err := DecodeRequest("request", "sentry.interfaces.Http", rawRequest, request)
+	return err
 }
