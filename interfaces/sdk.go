@@ -1,10 +1,16 @@
 package interfaces
 
+// The SDK used to transmit this event.
+//
+// {
+//     "name": "sentry-unity",
+//     "version": "1.0"
+// }
 type SDK struct {
-	Name     string   `node:"name"      json:"name"`
-	Version  string   `node:"version"   json:"version"`
-	ClientIP string   `node:"client_ip" json:"clientIP"`
-	Upstream Upstream `json:"upstream"`
+	Name     string   `kv:"name"      in:"name"    json:"name"`
+	Version  string   `kv:"version"   in:"version" json:"version"`
+	ClientIP string   `kv:"client_ip" in:"-"       json:"clientIP"`
+	Upstream Upstream `json:"upstream"  in:"-"`
 }
 
 type Upstream struct {
@@ -21,5 +27,6 @@ func (sdk *SDK) DecodeRecord(record interface{}) error {
 }
 
 func (sdk *SDK) DecodeRequest(request map[string]interface{}) error {
-	return nil
+	err := DecodeRequest("sdk", "sentry.interfaces.Sdk", request, sdk)
+	return err
 }

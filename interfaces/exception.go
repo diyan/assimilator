@@ -25,19 +25,19 @@ package interfaces
 //    Values should be sent oldest to newest, this includes both the stacktrace
 //    and the exception itself.
 type Exception struct {
-	Values          []ExceptionValue `input:"values" json:"values"`
-	HasSystemFrames bool             `input:"-"      json:"hasSystemFrames"`
-	ExcOmitted      bool             `input:"-"      json:"excOmitted"`
+	Values          []ExceptionValue `in:"values" json:"values"`
+	HasSystemFrames bool             `in:"-"      json:"hasSystemFrames"`
+	ExcOmitted      bool             `in:"-"      json:"excOmitted"`
 }
 
 type ExceptionValue struct {
-	Type            string      `input:"type"       json:"type"`
-	Value           string      `input:"value"      json:"value"`
-	Module          string      `input:"module"     json:"module"`
-	Mechanism       interface{} `input:"mechanism"  json:"mechanism"`
-	Stacktrace      Stacktrace  `input:"stacktrace" json:"stacktrace"`
-	HasSystemFrames bool        `input:"-"          json:"hasSystemFrames"` // TODO ?
-	SlimFrames      bool        `input:"-"          json:"slimFrames"`      // TODO ?
+	Type            string      `in:"type"       json:"type"`
+	Value           string      `in:"value"      json:"value"`
+	Module          string      `in:"module"     json:"module"`
+	Mechanism       interface{} `in:"mechanism"  json:"mechanism"`
+	Stacktrace      Stacktrace  `in:"stacktrace" json:"stacktrace"`
+	HasSystemFrames bool        `in:"-"          json:"hasSystemFrames"` // TODO ?
+	SlimFrames      bool        `in:"-"          json:"slimFrames"`      // TODO ?
 }
 
 func (exception *Exception) DecodeRecord(record interface{}) error {

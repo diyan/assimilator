@@ -15,12 +15,12 @@ package interfaces
 //     "optional": "value"
 // }
 type User struct {
-	ID        string `input:"id"         json:"id"`
-	Username  string `input:"username"   json:"username"`
-	Email     string `input:"email"      json:"email"`
-	IPAddress string `input:"ip_address" json:"ip_address"`
+	ID        string `in:"id"         json:"id"`
+	Username  string `in:"username"   json:"username"`
+	Email     string `in:"email"      json:"email"`
+	IPAddress string `in:"ip_address" json:"ip_address"`
 	// TODO Does Sentry allows arbitrary key/value pairs for User interface?
-	Extra map[string]string `input:"-"   json:"-"`
+	Extra map[string]string `in:"-"   json:"-"`
 }
 
 func (user *User) DecodeRecord(record interface{}) error {

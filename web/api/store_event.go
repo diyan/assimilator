@@ -55,7 +55,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 	// Ensure all keys are expected
 	// Bind event attributes
 	// Bind event interfaces
-	if err := models.DecodeRequest(rawEvent, event); err != nil {
+	if err := models.DecodeRequest(rawEvent, &event.EventDetails); err != nil {
 		return err
 	}
 	if !validPlatforms[event.Platform] {

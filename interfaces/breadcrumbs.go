@@ -18,17 +18,17 @@ import (
 //     }
 // ], ...}
 type Breadcrumbs struct {
-	Values []Breadcrumb `input:"values" json:"values"`
+	Values []Breadcrumb `in:"values" json:"values"`
 }
 
 type Breadcrumb struct {
-	Type      string                 `input:"type"      json:"type"`
-	Timestamp time.Time              `input:"timestamp" json:"timestamp"`
-	Level     interface{}            `input:"level"     json:"level,omitempty"`
-	Message   string                 `input:"message"   json:"message,omitempty"`
-	Category  string                 `input:"category"  json:"category,omitempty"`
-	Data      map[string]interface{} `input:"data"      json:"data,omitempty"`
-	EventID   interface{}            `input:"event_id"  json:"event_id,omitempty"`
+	Type      string                 `in:"type"      json:"type"`
+	Timestamp time.Time              `in:"timestamp" json:"timestamp"`
+	Level     interface{}            `in:"level"     json:"level,omitempty"`
+	Message   string                 `in:"message"   json:"message,omitempty"`
+	Category  string                 `in:"category"  json:"category,omitempty"`
+	Data      map[string]interface{} `in:"data"      json:"data,omitempty"`
+	EventID   interface{}            `in:"event_id"  json:"event_id,omitempty"`
 }
 
 func (breadcrumbs *Breadcrumbs) DecodeRecord(record interface{}) error {

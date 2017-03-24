@@ -8,32 +8,34 @@ import (
 )
 
 type Stacktrace struct {
-	HasSystemFrames bool    `node:"has_system_frames" input:"-"      json:"hasSystemFrames"`
-	FramesOmitted   *bool   `node:"frames_omitted"    input:"-"      json:"framesOmitted"` // TODO type?
-	Frames          []Frame `node:"frames"            input:"frames" json:"frames"`
+	HasSystemFrames bool    `kv:"has_system_frames" in:"-"      json:"hasSystemFrames"`
+	FramesOmitted   *bool   `kv:"frames_omitted"    in:"-"      json:"framesOmitted"` // TODO type?
+	Frames          []Frame `kv:"frames"            in:"frames" json:"frames"`
 }
 
+// TODO https://docs.sentry.io/clientdev/interfaces/stacktrace/ image_addr symbol?
 type Frame struct {
-	ColumnNumber       *int                        `node:"colno"            input:"colno"    json:"colNo"`
-	LineNumber         int                         `node:"lineno"           input:"lineno"   json:"lineNo"`
-	InstructionOffset  *int                        `node:"-"                input:"-"        json:"instructionOffset"` // TODO type?
-	InstructionAddress *string                     `node:"instruction_addr" input:"-"        json:"instructionAddr"`   // TODO type?
-	Symbol             *string                     `node:"symbol"           input:"-"        json:"symbol"`            // TODO type?
-	SymbolAddress      *string                     `node:"symbol_addr"      input:"-"        json:"symbolAddr"`        // TODO type?
-	AbsolutePath       string                      `node:"abs_path"         input:"-"        json:"absPath"`
-	Module             string                      `node:"module"           input:"-"        json:"module"`
-	Package            *string                     `node:"package"          input:"-"        json:"package"`
-	Platform           *string                     `node:"platform"         input:"-"        json:"platform"` // TODO type?
-	Errors             *string                     `node:"errors"           input:"-"        json:"errors"`   // TODO type?
-	InApp              bool                        `node:"in_app"           input:"in_app"   json:"inApp"`
-	Filename           string                      `node:"filename"         input:"filename" json:"filename"`
-	Function           string                      `node:"function"         input:"function" json:"function"`
-	Context            FrameContext                `node:"-"                input:"-"        json:"context"`
-	ContextLineNode    string                      `node:"context_line"     input:"-"        json:"-"`
-	PreContextNode     []string                    `node:"pre_context"      input:"-"        json:"-"`
-	PostContextNode    []string                    `node:"post_context"     input:"-"        json:"-"`
-	Variables          map[string]interface{}      `node:"-"                input:"-"        json:"vars"`
-	VariablesNode      map[interface{}]interface{} `node:"vars"             input:"-"        json:"-"`
+	ColumnNumber       *int    `kv:"colno"              in:"colno"              json:"colNo"`
+	LineNumber         int     `kv:"lineno"             in:"lineno"             json:"lineNo"`
+	InstructionOffset  *int    `kv:"instruction_offset" in:"instruction_offset" json:"instructionOffset"` // TODO type?
+	InstructionAddress *string `kv:"instruction_addr"   in:"instruction_addr"   json:"instructionAddr"`   // TODO type?
+	Symbol             *string `kv:"symbol"             in:"-"                  json:"symbol"`            // TODO type?
+	SymbolAddress      *string `kv:"symbol_addr"        in:"symbol_addr"        json:"symbolAddr"`        // TODO type?
+	AbsolutePath       string  `kv:"abs_path"           in:"abs_path"           json:"absPath"`
+	Module             string  `kv:"module"             in:"module"             json:"module"`
+	Package            *string `kv:"package"            in:"package"            json:"package"`
+	Platform           *string `kv:"platform"           in:"platform"           json:"platform"` // TODO type?
+	Errors             *string `kv:"errors"             in:"-"                  json:"errors"`   // TODO type?
+	InApp              bool    `kv:"in_app"             in:"in_app"             json:"inApp"`
+	Filename           string  `kv:"filename"           in:"filename"           json:"filename"`
+	Function           string  `kv:"function"           in:"function"           json:"function"`
+
+	Context         FrameContext                `kv:"-"            in:"-"            json:"context"`
+	ContextLineNode string                      `kv:"context_line" in:"context_line" json:"-"`
+	PreContextNode  []string                    `kv:"pre_context"  in:"pre_context"  json:"-"`
+	PostContextNode []string                    `kv:"post_context" in:"post_context" json:"-"`
+	Variables       map[string]interface{}      `kv:"-"            in:"vars"         json:"vars"`
+	VariablesNode   map[interface{}]interface{} `kv:"vars"         in:"-"            json:"-"`
 }
 
 type FrameContext []FrameContextLine
@@ -128,5 +130,6 @@ func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]int
 }
 
 func (stacktrace *Stacktrace) DecodeRequest(request map[string]interface{}) error {
-	return nil
+	err := DecodeRequest("stacktrace", "sentry.interfaces.Stacktrace", request, stacktrace)
+	return err
 }

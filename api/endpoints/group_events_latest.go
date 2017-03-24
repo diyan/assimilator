@@ -23,7 +23,7 @@ type Event struct {
 }
 
 type NodeRef struct {
-	NodeID string `node:"node_id"`
+	NodeID string `kv:"node_id"`
 }
 
 func unpickleZippedBase64String(blob string) (interface{}, error) {

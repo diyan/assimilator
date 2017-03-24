@@ -22,13 +22,13 @@ type Marshaler interface {
 //  size, dateReceived, entries (type message and type stacktrace),
 //  context, contexts
 type EventDetails struct {
-	EventID      string `node:"event_id"`
+	EventID      string `kv:"event_id" in:"event_id"`
 	ProjectID    int
 	Logger       string
 	Platform     string
 	Culprit      string
-	Ref          int `node:"_ref"`
-	RefVersion   int `node:"_ref_version"`
+	Ref          int `kv:"_ref"`
+	RefVersion   int `kv:"_ref_version"`
 	Version      string
 	Release      *string
 	DateCreated  time.Time
@@ -38,7 +38,7 @@ type EventDetails struct {
 	Size         int
 	Errors       []EventError
 	Tags         []TagKeyValue
-	ReceivedTime time.Time `node:"received"`
+	ReceivedTime time.Time `kv:"received"`
 	Packages     map[string]string
 	Metadata     map[string]string
 	Extra        map[string]interface{} // TODO ensure type is not map[string]string
@@ -122,15 +122,15 @@ func DecodeRecord(record interface{}, target interface{}) error {
 		DecodeHook:       decodeHook,
 		Metadata:         &metadata,
 		WeaklyTypedInput: false,
-		TagName:          "node",
+		TagName:          "kv",
 		Result:           target,
 	}
 	decoder, err := mapstructure.NewDecoder(&config)
 	if err != nil {
-		return errors.Wrapf(err, "can not decode node record")
+		return errors.Wrapf(err, "can not decode record from key/value node store")
 	}
 	err = decoder.Decode(record)
-	return errors.Wrapf(err, "can not decode node record")
+	return errors.Wrapf(err, "can not decode record from key/value node store")
 }
 
 func (event *EventDetails) DecodeRecord(record interface{}) error {
@@ -163,7 +163,7 @@ func DecodeRequest(request map[string]interface{}, target interface{}) error {
 		DecodeHook:       decodeHook,
 		Metadata:         &metadata,
 		WeaklyTypedInput: true,
-		TagName:          "input",
+		TagName:          "in",
 		Result:           target,
 	}
 	decoder, err := mapstructure.NewDecoder(&config)
