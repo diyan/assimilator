@@ -40,13 +40,12 @@ var validPlatforms = map[string]bool{
 }
 
 type EventDetails struct {
-	ProjectID int
-	EventID   string
-	models.EventDetails
+	ProjectID           int
+	EventID             string `in:"event_id"`
+	models.EventDetails `in:",squash"`
 	interfaces.EventInterfaces
 }
 
-// TODO implement interfaces for breadcrumbs, request, user (used by JavaScript client)
 func bindRequest(project models.Project, requestBody io.ReadCloser, event *EventDetails) error {
 	event.ProjectID = project.ID
 
@@ -55,7 +54,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 		return err
 	}
 	// Ensure all keys are expected
-	if err := models.DecodeRequest(rawEvent, &event.EventDetails); err != nil {
+	if err := models.DecodeRequest(rawEvent, &event); err != nil {
 		return err
 	}
 	if !validPlatforms[event.Platform] {
