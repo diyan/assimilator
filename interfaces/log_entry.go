@@ -15,16 +15,23 @@ package interfaces
 //     "params": ["this"]
 // }
 type LogEntry struct {
-	Message   string        `kv:"message"   in:"message"   json:"-"`
+	Message   string        `kv:"message"   in:"message"   json:"message"`
 	Formatted string        `kv:"formatted" in:"formatted" json:"-"`
 	Params    []interface{} `kv:"params"    in:"params"    json:"-"`
 }
 
+func (*LogEntry) KeyAlias() string {
+	return "logentry"
+}
+
+func (*LogEntry) KeyCanonical() string {
+	return "sentry.interfaces.Message"
+}
+
 func (entry *LogEntry) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, entry)
 }
 
 func (entry *LogEntry) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("logentry", "sentry.interfaces.Message", request, entry)
-	return err
+	return DecodeRequest(request, entry)
 }

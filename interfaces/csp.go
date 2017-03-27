@@ -3,11 +3,18 @@ package interfaces
 type CSP struct {
 }
 
+func (*CSP) KeyAlias() string {
+	return "csp"
+}
+
+func (*CSP) KeyCanonical() string {
+	return "sentry.interfaces.Csp"
+}
+
 func (csp *CSP) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, csp)
 }
 
 func (csp *CSP) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("csp", "sentry.interfaces.Csp", request, csp)
-	return err
+	return DecodeRequest(request, csp)
 }

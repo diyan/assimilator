@@ -45,12 +45,24 @@ type FrameContextLine struct {
 	Line       string
 }
 
+func (*Stacktrace) KeyAlias() string {
+	return "stacktrace"
+}
+
+func (*Stacktrace) KeyCanonical() string {
+	return "sentry.interfaces.Stacktrace"
+}
+
 func (contextLine FrameContextLine) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]interface{}{contextLine.LineNumber, contextLine.Line})
 }
 
 func (stacktrace *Stacktrace) DecodeRecord(record interface{}) error {
-	err := DecodeRecord("stacktrace", "sentry.interfaces.Stacktrace", record, stacktrace)
+	err := DecodeRecord(record, stacktrace)
+	// TODO remove hardcoded value
+	if stacktrace.FramesOmitted != nil && !*stacktrace.FramesOmitted {
+		stacktrace.FramesOmitted = nil
+	}
 	for i := 0; i < len(stacktrace.Frames); i++ {
 		frame := &stacktrace.Frames[i]
 		//frame.InstructionAddress = padHexAddr(frame.InstructionAddress, padAddr)
@@ -130,6 +142,5 @@ func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]int
 }
 
 func (stacktrace *Stacktrace) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("stacktrace", "sentry.interfaces.Stacktrace", request, stacktrace)
-	return err
+	return DecodeRequest(request, stacktrace)
 }

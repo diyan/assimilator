@@ -3,11 +3,19 @@ package interfaces
 type Template struct {
 }
 
+func (*Template) KeyAlias() string {
+	return "template"
+}
+
+func (*Template) KeyCanonical() string {
+	return "sentry.interfaces.Template"
+}
+
 func (template *Template) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, template)
+
 }
 
 func (template *Template) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("template", "sentry.interfaces.Template", request, template)
-	return err
+	return DecodeRequest(request, template)
 }

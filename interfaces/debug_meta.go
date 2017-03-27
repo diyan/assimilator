@@ -3,11 +3,18 @@ package interfaces
 type DebugMeta struct {
 }
 
+func (*DebugMeta) KeyAlias() string {
+	return "debug_meta"
+}
+
+func (*DebugMeta) KeyCanonical() string {
+	return "sentry.interfaces.DebugMeta"
+}
+
 func (debug *DebugMeta) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, debug)
 }
 
 func (debug *DebugMeta) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("debug_meta", "sentry.interfaces.DebugMeta", request, debug)
-	return err
+	return DecodeRequest(request, debug)
 }

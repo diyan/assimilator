@@ -3,11 +3,18 @@ package interfaces
 type Query struct {
 }
 
+func (*Query) KeyAlias() string {
+	return "query"
+}
+
+func (*Query) KeyCanonical() string {
+	return "sentry.interfaces.Query"
+}
+
 func (query *Query) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, query)
 }
 
 func (query *Query) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("query", "sentry.interfaces.Query", request, query)
-	return err
+	return DecodeRequest(request, query)
 }

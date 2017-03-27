@@ -20,11 +20,18 @@ type Repo struct {
 	Revision *string `kv:"revision" in:"revision" json:"revision"`
 }
 
+func (*Repos) KeyAlias() string {
+	return "repos"
+}
+
+func (*Repos) KeyCanonical() string {
+	return "sentry.interfaces.Repos"
+}
+
 func (repos *Repos) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, repos)
 }
 
 func (repos *Repos) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("repos", "sentry.interfaces.Repos", request, repos)
-	return err
+	return DecodeRequest(request, repos)
 }

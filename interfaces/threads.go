@@ -3,11 +3,19 @@ package interfaces
 type Threads struct {
 }
 
+func (*Threads) KeyAlias() string {
+	return "thread"
+}
+
+func (*Threads) KeyCanonical() string {
+	return "sentry.interfaces.Threads"
+}
+
 func (threads *Threads) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, threads)
+
 }
 
 func (threads *Threads) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("threads", "sentry.interfaces.Threads", request, threads)
-	return err
+	return DecodeRequest(request, threads)
 }

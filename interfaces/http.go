@@ -5,11 +5,18 @@ type HTTP struct {
 	URL     string            `json:"url"`
 }
 
+func (*HTTP) KeyAlias() string {
+	return "request"
+}
+
+func (*HTTP) KeyCanonical() string {
+	return "sentry.interfaces.Http"
+}
+
 func (request *HTTP) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, request)
 }
 
 func (request *HTTP) DecodeRequest(rawRequest map[string]interface{}) error {
-	err := DecodeRequest("request", "sentry.interfaces.Http", rawRequest, request)
-	return err
+	return DecodeRequest(rawRequest, request)
 }

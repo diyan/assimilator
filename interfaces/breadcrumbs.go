@@ -31,13 +31,21 @@ type Breadcrumb struct {
 	EventID   interface{}            `in:"event_id"  json:"event_id,omitempty"`
 }
 
+func (*Breadcrumbs) KeyAlias() string {
+	return "breadcrumbs"
+}
+
+func (*Breadcrumbs) KeyCanonical() string {
+	return "sentry.interfaces.Breadcrumbs"
+}
+
 func (breadcrumbs *Breadcrumbs) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, breadcrumbs)
 }
 
 func (breadcrumbs *Breadcrumbs) DecodeRequest(request map[string]interface{}) error {
 	// TODO Try to unmarshal each value in the array; if failed - skip one record, not all of them
-	err := DecodeRequest("breadcrumbs", "sentry.interfaces.Breadcrumbs", request, breadcrumbs)
+	err := DecodeRequest(request, breadcrumbs)
 	for i := 0; i < len(breadcrumbs.Values); i++ {
 		breadcrumb := &breadcrumbs.Values[i]
 		breadcrumb.Message = TrimLength(breadcrumb.Message, 4096)

@@ -40,12 +40,20 @@ type ExceptionValue struct {
 	SlimFrames      bool        `in:"-"          json:"slimFrames"`      // TODO ?
 }
 
+func (*Exception) KeyAlias() string {
+	return "exception"
+}
+
+func (*Exception) KeyCanonical() string {
+	return "sentry.interfaces.Exception"
+}
+
 func (exception *Exception) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, exception)
 }
 
 func (exception *Exception) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("exception", "sentry.interfaces.Exception", request, exception)
+	err := DecodeRequest(request, exception)
 	// hasSystemFrames := hasSystemFrames(rawException)
 	// TODO iterate values, set HasSystemFrames
 	// TODO process `exc_omitted` if provided

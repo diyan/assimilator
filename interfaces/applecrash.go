@@ -3,11 +3,18 @@ package interfaces
 type AppleCrashReport struct {
 }
 
+func (*AppleCrashReport) KeyAlias() string {
+	return "applecrashreport"
+}
+
+func (*AppleCrashReport) KeyCanonical() string {
+	return "sentry.interfaces.AppleCrashReport"
+}
+
 func (report *AppleCrashReport) DecodeRecord(record interface{}) error {
-	return nil
+	return DecodeRecord(record, report)
 }
 
 func (report *AppleCrashReport) DecodeRequest(request map[string]interface{}) error {
-	err := DecodeRequest("applecrashreport", "sentry.interfaces.AppleCrashReport", request, report)
-	return err
+	return DecodeRequest(request, report)
 }
