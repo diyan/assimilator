@@ -22,8 +22,6 @@ func TestGroupEventsLatests_Get(t *testing.T) {
 	assert.Nil(t, errs)
 	assert.Equal(t, 200, res.StatusCode)
 	assert.NotEmpty(t, bodyStr)
-	// TODO implement API marshaler that will init `entries` array
-	t.Skip("Not yet implemented")
 	// TODO dateReceived 2017-02-24T09:25:39Z -> 2999-01-01T00:00:00Z
 	// TODO eventID dcf8c1d1cd284d3fbfeffb43ddb7c0f7 or 8b76c9e141134b38a1e5f67d8709618d -> 44444444333322221111000000000000
 	assert.JSONEq(t, `{
