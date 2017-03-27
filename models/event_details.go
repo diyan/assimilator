@@ -12,39 +12,39 @@ import (
 
 // TODO pick a better name
 type Marshaler interface {
-	//EncodeResponse() ([]byte, error)
-	//EncodeRecord() (interface{}, error)
+	KeyAlias() string
+	KeyCanonical() string
+
 	DecodeRequest(map[string]interface{}) error
 	DecodeRecord(interface{}) error
+	//EncodeResponse() ([]byte, error)
+	//EncodeRecord() (interface{}, error)
 }
 
-// TODO add fields release, message (getter of MessageInfo.Message),
-//  size, dateReceived, entries (type message and type stacktrace),
-//  context, contexts
 type EventDetails struct {
-	EventID      string `kv:"event_id" in:"event_id"`
-	ProjectID    int
-	Logger       string
-	Platform     string
-	Culprit      string
-	Ref          int `kv:"_ref"`
-	RefVersion   int `kv:"_ref_version"`
-	Version      string
-	Release      *string
-	DateCreated  time.Time
-	Fingerprint  []string
-	Modules      map[string]interface{} // TODO ensure type is not map[string]string
-	Type         string
-	Size         int
-	Errors       []EventError
-	Tags         []TagKeyValue
-	ReceivedTime time.Time `kv:"received"`
-	Packages     map[string]string
-	Metadata     map[string]string
-	Extra        map[string]interface{} // TODO ensure type is not map[string]string
-	// TODO Entries belongs to the API model
-	//Entries         []interface{}               `json:"entries"`
-	UserReport *string
+	Ref         int           `kv:"_ref"         in:"-"           json:"-"`
+	RefVersion  int           `kv:"_ref_version" in:"-"           json:"-"`
+	Server      string        `kv:"server_name"  in:"server_name" json:"-"`
+	Logger      string        `kv:"logger"       in:"logger"      json:"-"`
+	Level       string        `kv:"level"        in:"level"       json:"-"`
+	Culprit     string        `kv:"culprit"      in:"culprit"     json:"-"`
+	Platform    string        `kv:"platform"     in:"platform"    json:"-"`
+	Release     *string       `kv:"release"      in:"release"     json:"release"`
+	Tags        []TagKeyValue `kv:"tags"         in:"tags"        json:"tags"`
+	Environment string        `kv:"environment"  in:"environment" json:"-"`
+	Fingerprint []string      `kv:"fingerprint"  in:"fingerprint" json:"-"`
+
+	Modules map[string]string      `kv:"modules" in:"modules" json:"packages"`
+	Extra   map[string]interface{} `kv:"extra"   in:"extra"   json:"context"`
+
+	// TODO those fields was not mentioned at https://docs.sentry.io/clientdev/attributes/
+	Version      string            `kv:"version"  in:"-" json:"-"`
+	Type         string            `kv:"type"            json:"type"`
+	Size         int               `kv:"-"               json:"size"`
+	Errors       []EventError      `kv:"errors"   in:"-" json:"errors"`
+	ReceivedTime time.Time         `kv:"received" in:"-" json:"dateReceived"`
+	Metadata     map[string]string `kv:"metadata" in:"-" json:"metadata"`
+	UserReport   *string           `kv:"-"               json:"userReport"`
 }
 
 func TimeDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
@@ -96,7 +96,6 @@ func PickleNoneDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (int
 	if f != reflect.TypeOf(pickle.PickleNone{}) {
 		return data, nil
 	}
-	//fmt.Printf("PickleNoneDecodeHook, f = %v, t = %v\n", f, t)
 	return nil, nil
 }
 
@@ -137,11 +136,16 @@ func (event *EventDetails) DecodeRecord(record interface{}) error {
 	if err := DecodeRecord(record, event); err != nil {
 		return err
 	}
+	if event.Level == "" {
+		event.Level = "error"
+	}
 	// TODO iterate unused keys, convert them to canonical interface path;
 	//   if it's not interface - trackError
 	//pp.Print("metadata.Unused", metadata.Unused)
 
-	event.Size = 6597 // TODO remove hardcode
+	// TODO remove hardcode
+	event.Size = 6597
+	//event.DateCreated = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
 	// TOOD Entries is a field of API object
 	//event.Entries = append(event.Entries, map[string]interface{}{
 	//	"type": "message",
@@ -155,7 +159,6 @@ func (event *EventDetails) DecodeRecord(record interface{}) error {
 	return nil
 }
 
-// TODO Consider use interface{} instead of map[string]interface{}
 func DecodeRequest(request map[string]interface{}, target interface{}) error {
 	metadata := mapstructure.Metadata{}
 	decodeHook := mapstructure.ComposeDecodeHookFunc(TimeDecodeHook, TagsDecodeHook)
