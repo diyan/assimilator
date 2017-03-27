@@ -40,6 +40,8 @@ var validPlatforms = map[string]bool{
 }
 
 type EventDetails struct {
+	ProjectID int
+	EventID   string
 	models.EventDetails
 	interfaces.EventInterfaces
 }
@@ -53,17 +55,12 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 		return err
 	}
 	// Ensure all keys are expected
-	// Bind event attributes
-	// Bind event interfaces
 	if err := models.DecodeRequest(rawEvent, &event.EventDetails); err != nil {
 		return err
 	}
 	if !validPlatforms[event.Platform] {
 		event.Platform = "other"
 	}
-	//pp.Print(metadata.Unused)
-	//pp.Print(event)
-
 	// TODO handle error
 	event.EventInterfaces.DecodeRequest(rawEvent)
 	return nil
