@@ -10,8 +10,8 @@ import (
 var errNoValue = errors.New("value was not provided")
 
 type EventEntry struct {
-	Type  string           `json:"type"`
-	Value models.Marshaler `json:"data"`
+	Type  string           `kv:"-" in:"-" json:"type"`
+	Value models.Marshaler `kv:"-" in:"-" json:"data"`
 }
 
 type EventInterfaces struct {
@@ -58,7 +58,7 @@ func DecodeRequest(request map[string]interface{}, target models.Marshaler) erro
 	if !ok {
 		value, ok = request[target.KeyCanonical()].(map[string]interface{})
 		if !ok {
-			return nil
+			return errNoValue
 		}
 	}
 	err := models.DecodeRequest(value, target)
@@ -142,38 +142,71 @@ func (event *EventInterfaces) DecodeRecord(record interface{}) error {
 func (event *EventInterfaces) DecodeRequest(request map[string]interface{}) error {
 	// TODO too many known types here, use interfaces instead
 	// TODO add error handling
-	event.AppleCrashReport = &AppleCrashReport{}
-	event.AppleCrashReport.DecodeRequest(request)
-	event.Breadcrumbs = &Breadcrumbs{}
-	event.Breadcrumbs.DecodeRequest(request)
-	event.Contexts = &Contexts{}
-	event.Contexts.DecodeRequest(request)
-	event.CSP = &CSP{}
-	event.CSP.DecodeRequest(request)
-	event.DebugMeta = &DebugMeta{}
-	event.DebugMeta.DecodeRequest(request)
-	event.Device = &Device{}
-	event.Device.DecodeRequest(request)
-	event.Exception = &Exception{}
-	event.Exception.DecodeRequest(request)
-	event.Request = &HTTP{}
-	event.Request.DecodeRequest(request)
-	event.LogEntry = &LogEntry{}
-	event.LogEntry.DecodeRequest(request)
-	event.Query = &Query{}
-	event.Query.DecodeRequest(request)
-	event.Repos = &Repos{}
-	event.Repos.DecodeRequest(request)
-	event.SDK = &SDK{}
-	event.SDK.DecodeRequest(request)
-	event.Stacktrace = &Stacktrace{}
-	event.Stacktrace.DecodeRequest(request)
-	event.Template = &Template{}
-	event.Template.DecodeRequest(request)
-	event.Threads = &Threads{}
-	event.Threads.DecodeRequest(request)
-	event.User = &User{}
-	event.User.DecodeRequest(request)
+	var value models.Marshaler = &AppleCrashReport{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.AppleCrashReport = value
+	}
+	value = &Breadcrumbs{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Breadcrumbs = value
+	}
+	value = &Contexts{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Contexts = value
+	}
+	value = &CSP{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.CSP = value
+	}
+	value = &DebugMeta{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.DebugMeta = value
+	}
+	value = &Device{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Device = value
+	}
+	value = &Exception{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Exception = value
+	}
+	value = &HTTP{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Request = value
+	}
+	value = &LogEntry{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.LogEntry = value
+	}
+	value = &Query{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Query = value
+	}
+	value = &Repos{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Repos = value
+	}
+	value = &SDK{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.SDK = value
+	}
+	value = &Stacktrace{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Stacktrace = value
+	}
+	value = &Template{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Template = value
+	}
+	value = &Threads{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.Threads = value
+	}
+	value = &User{}
+	if err := value.DecodeRequest(request); err == nil {
+		event.User = value
+	}
+
 	return nil
 }
 
