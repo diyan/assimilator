@@ -40,28 +40,27 @@ var validPlatforms = map[string]bool{
 }
 
 type EventDetails struct {
-	ProjectID           int
-	EventID             string `in:"event_id"`
-	models.EventDetails `in:",squash"`
-	interfaces.EventInterfaces
+	ProjectID                  int
+	EventID                    string `in:"event_id"`
+	models.EventDetails        `in:",squash"`
+	interfaces.EventInterfaces `in:",squash"`
 }
 
 func bindRequest(project models.Project, requestBody io.ReadCloser, event *EventDetails) error {
 	event.ProjectID = project.ID
 
-	rawEvent := map[string]interface{}{}
-	if err := json.NewDecoder(requestBody).Decode(&rawEvent); err != nil {
+	eventMap := map[string]interface{}{}
+	if err := json.NewDecoder(requestBody).Decode(&eventMap); err != nil {
 		return err
 	}
-	// Ensure all keys are expected
-	if err := models.DecodeRequest(rawEvent, &event); err != nil {
+	// TODO Ensure all keys are expected
+	eventMap = interfaces.ToAliasKeys(eventMap)
+	if err := models.DecodeRequest(eventMap, &event); err != nil {
 		return err
 	}
 	if !validPlatforms[event.Platform] {
 		event.Platform = "other"
 	}
-	// TODO handle error
-	event.EventInterfaces.DecodeRequest(rawEvent)
 	return nil
 }
 
@@ -73,6 +72,7 @@ func storePostView(c echo.Context) error {
 	if err := bindRequest(project, c.Request().Body, &event); err != nil {
 		return err
 	}
+	//pp.Print(event)
 	return c.JSON(200, map[string]string{"id": event.EventID})
 }
 
