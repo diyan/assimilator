@@ -5,20 +5,25 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/diyan/assimilator/lib/weakconv"
 	pickle "github.com/hydrogen18/stalecucumber"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 
-// TODO pick a better name
-type Marshaler interface {
+type Identifier interface {
 	KeyAlias() string
 	KeyCanonical() string
-
-	DecodeRequest(map[string]interface{}) error
-	DecodeRecord(interface{}) error
 	//EncodeResponse() ([]byte, error)
 	//EncodeRecord() (interface{}, error)
+}
+
+type RequestDecoder interface {
+	DecodeRequest(map[string]interface{}) error
+}
+
+type RecordDecoder interface {
+	DecodeRecord(map[string]interface{}) error
 }
 
 type EventDetails struct {
@@ -73,7 +78,7 @@ func TagsDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface
 		for k, v := range tagsMap {
 			// TODO check length of tag key and tag value
 			tags = append(tags, TagKeyValue{
-				Key: anyTypeToString(k), Value: anyTypeToString(v),
+				Key: weakconv.String(k), Value: weakconv.String(v),
 			})
 		}
 	} else if tagsSlice, ok := data.([]interface{}); ok {
@@ -82,7 +87,7 @@ func TagsDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (interface
 			tag := tagBlob.([]interface{})
 			// TODO check length of tag key and tag value
 			tags = append(tags, TagKeyValue{
-				Key: anyTypeToString(tag[0]), Value: anyTypeToString(tag[1]),
+				Key: weakconv.String(tag[0]), Value: weakconv.String(tag[1]),
 			})
 		}
 	} else {
@@ -107,14 +112,7 @@ func StringMapDecodeHook(f reflect.Type, t reflect.Type, data interface{}) (inte
 	return nil, nil
 }
 
-func anyTypeToString(v interface{}) string {
-	if v != nil {
-		return fmt.Sprint(v)
-	}
-	return ""
-}
-
-func DecodeRecord(record interface{}, target interface{}) error {
+func DecodeRecord(record map[string]interface{}, target interface{}) error {
 	metadata := mapstructure.Metadata{}
 	decodeHook := mapstructure.ComposeDecodeHookFunc(TimeDecodeHook, TagsDecodeHook, PickleNoneDecodeHook)
 	config := mapstructure.DecoderConfig{
@@ -132,30 +130,16 @@ func DecodeRecord(record interface{}, target interface{}) error {
 	return errors.Wrapf(err, "can not decode record from key/value node store")
 }
 
-func (event *EventDetails) DecodeRecord(record interface{}) error {
+func (event *EventDetails) DecodeRecord(record map[string]interface{}) error {
 	if err := DecodeRecord(record, event); err != nil {
 		return err
 	}
 	if event.Level == "" {
 		event.Level = "error"
 	}
-	// TODO iterate unused keys, convert them to canonical interface path;
-	//   if it's not interface - trackError
-	//pp.Print("metadata.Unused", metadata.Unused)
-
 	// TODO remove hardcode
 	event.Size = 6597
 	//event.DateCreated = time.Date(2999, time.January, 1, 0, 0, 0, 0, time.UTC)
-	// TOOD Entries is a field of API object
-	//event.Entries = append(event.Entries, map[string]interface{}{
-	//	"type": "message",
-	//	"data": map[string]string{"message": rv.Message.Message},
-	//})
-	// TOOD Entries is a field of API object
-	//event.Entries = append(rv.Entries, map[string]interface{}{
-	//	"type": "stacktrace",
-	//	"data": rv.Stacktrace,
-	//})
 	return nil
 }
 
@@ -175,12 +159,6 @@ func DecodeRequest(request map[string]interface{}, target interface{}) error {
 	}
 	err = decoder.Decode(request)
 	return errors.Wrapf(err, "can not parse request body")
-}
-
-func (eventDetails *EventDetails) EncodeResponse() ([]byte, error) {
-	// TODO map eventDetails root struct to the eventDetailsAPI
-	// Is []byte correct return type?
-	return nil, nil
 }
 
 type TagKeyValue struct {
