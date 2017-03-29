@@ -20,18 +20,14 @@ type LogEntry struct {
 	Params    []interface{} `kv:"params"    in:"params"    json:"-"`
 }
 
+func init() {
+	Register(&LogEntry{})
+}
+
 func (*LogEntry) KeyAlias() string {
 	return "logentry"
 }
 
 func (*LogEntry) KeyCanonical() string {
 	return "sentry.interfaces.Message"
-}
-
-func (entry *LogEntry) DecodeRecord(record interface{}) error {
-	return DecodeRecord(record, entry)
-}
-
-func (entry *LogEntry) DecodeRequest(request map[string]interface{}) error {
-	return DecodeRequest(request, entry)
 }

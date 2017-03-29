@@ -23,6 +23,10 @@ type User struct {
 	Extra map[string]string `in:"-"   json:"-"`
 }
 
+func init() {
+	Register(&User{})
+}
+
 func (*User) KeyAlias() string {
 	return "user"
 }
@@ -31,11 +35,7 @@ func (*User) KeyCanonical() string {
 	return "sentry.interfaces.User"
 }
 
-func (user *User) DecodeRecord(record interface{}) error {
-	return DecodeRecord(record, user)
-}
-
 func (user *User) DecodeRequest(request map[string]interface{}) error {
-	return DecodeRequest(request, user)
 	// TODO process extra fields
+	return nil
 }

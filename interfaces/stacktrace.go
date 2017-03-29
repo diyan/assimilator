@@ -45,6 +45,10 @@ type FrameContextLine struct {
 	Line       string
 }
 
+func init() {
+	Register(&Stacktrace{})
+}
+
 func (*Stacktrace) KeyAlias() string {
 	return "stacktrace"
 }
@@ -57,8 +61,7 @@ func (contextLine FrameContextLine) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]interface{}{contextLine.LineNumber, contextLine.Line})
 }
 
-func (stacktrace *Stacktrace) DecodeRecord(record interface{}) error {
-	err := DecodeRecord(record, stacktrace)
+func (stacktrace *Stacktrace) DecodeRecord(record map[string]interface{}) error {
 	// TODO remove hardcoded value
 	if stacktrace.FramesOmitted != nil && !*stacktrace.FramesOmitted {
 		stacktrace.FramesOmitted = nil
@@ -87,7 +90,7 @@ func (stacktrace *Stacktrace) DecodeRecord(record interface{}) error {
 		}
 		frame.VariablesNode = nil
 	}
-	return err
+	return nil
 }
 
 func getFrameContext(
@@ -139,8 +142,4 @@ func fillTypedVars(sourceMap map[interface{}]interface{}, destMap map[string]int
 		}
 	}
 	return nil
-}
-
-func (stacktrace *Stacktrace) DecodeRequest(request map[string]interface{}) error {
-	return DecodeRequest(request, stacktrace)
 }

@@ -19,6 +19,10 @@ type Upstream struct {
 	IsNewer bool   `json:"isNewer"`
 }
 
+func init() {
+	Register(&SDK{})
+}
+
 func (*SDK) KeyAlias() string {
 	return "sdk"
 }
@@ -27,13 +31,8 @@ func (*SDK) KeyCanonical() string {
 	return "sentry.interfaces.Sdk"
 }
 
-func (sdk *SDK) DecodeRecord(record interface{}) error {
-	err := DecodeRecord(record, sdk)
+func (sdk *SDK) DecodeRecord(record map[string]interface{}) error {
 	sdk.Upstream.Name = sdk.Name                                // TODO check original code
 	sdk.Upstream.URL = "https://docs.sentry.io/clients/python/" // TODO remove hardcode
-	return err
-}
-
-func (sdk *SDK) DecodeRequest(request map[string]interface{}) error {
-	return DecodeRequest(request, sdk)
+	return nil
 }

@@ -31,6 +31,10 @@ type Breadcrumb struct {
 	EventID   interface{}            `in:"event_id"  json:"event_id,omitempty"`
 }
 
+func init() {
+	Register(&Breadcrumbs{})
+}
+
 func (*Breadcrumbs) KeyAlias() string {
 	return "breadcrumbs"
 }
@@ -39,13 +43,8 @@ func (*Breadcrumbs) KeyCanonical() string {
 	return "sentry.interfaces.Breadcrumbs"
 }
 
-func (breadcrumbs *Breadcrumbs) DecodeRecord(record interface{}) error {
-	return DecodeRecord(record, breadcrumbs)
-}
-
 func (breadcrumbs *Breadcrumbs) DecodeRequest(request map[string]interface{}) error {
 	// TODO Try to unmarshal each value in the array; if failed - skip one record, not all of them
-	err := DecodeRequest(request, breadcrumbs)
 	for i := 0; i < len(breadcrumbs.Values); i++ {
 		breadcrumb := &breadcrumbs.Values[i]
 		breadcrumb.Message = TrimLength(breadcrumb.Message, 4096)
@@ -65,7 +64,7 @@ func (breadcrumbs *Breadcrumbs) DecodeRequest(request map[string]interface{}) er
 			}
 		}
 	}
-	return err
+	return nil
 }
 
 // TrimLength truncates string up to length characters.
