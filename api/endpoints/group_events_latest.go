@@ -1,18 +1,12 @@
 package api
 
 import (
-	"bytes"
-	"compress/zlib"
-	"encoding/base64"
 	"net/http"
 
 	"github.com/diyan/assimilator/db/store"
 	"github.com/diyan/assimilator/interfaces"
-	"github.com/diyan/assimilator/lib/conv"
 	"github.com/diyan/assimilator/models"
-	pickle "github.com/hydrogen18/stalecucumber"
 	"github.com/labstack/echo"
-	"github.com/pkg/errors"
 )
 
 type Event struct {
@@ -21,28 +15,6 @@ type Event struct {
 	interfaces.EventInterfaces `kv:",squash"`
 	PreviousEventID            *string `json:"previousEventID"`
 	NextEventID                *string `json:"nextEventID"`
-}
-
-type NodeRef struct {
-	NodeID string `kv:"node_id"`
-}
-
-func unpickleZippedBase64String(blob string) (map[string]interface{}, error) {
-	zippedBytes, err := base64.StdEncoding.DecodeString(blob)
-	if err != nil {
-		return nil, errors.Wrap(err, "base64 decode failed")
-	}
-	zlibReader, err := zlib.NewReader(bytes.NewReader(zippedBytes))
-	if err != nil {
-		return nil, errors.Wrap(err, "unzip stream failed")
-	}
-	defer zlibReader.Close()
-	unpickledBlob, err := pickle.Unpickle(zlibReader)
-	if err != nil {
-		return nil, errors.Wrap(err, "unpickle failed")
-	}
-	unpickledMap := conv.StringMap(unpickledBlob)
-	return unpickledMap, nil
 }
 
 func GroupEventsLatestGetEndpoint(c echo.Context) error {
@@ -62,33 +34,19 @@ func GroupEventsLatestGetEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if event.Data != nil {
-		nodeRefMap, err := unpickleZippedBase64String(*event.Data)
+	apiEvent := Event{Event: *event}
+	if event.DetailsRef != nil {
+		detailsMap, err := eventStore.GetEventDetailsMap(*event.DetailsRef)
 		if err != nil {
-			return errors.Wrap(err, "failed to decode event's node reference")
-		}
-		nodeRef := NodeRef{}
-		if err := models.DecodeRecord(nodeRefMap, &nodeRef); err != nil {
-			return errors.Wrap(err, "failed to decode event's node reference")
-		}
-		nodeBlobRow, err := eventStore.GetNodeBlob(nodeRef.NodeID)
-		if err != nil {
-			return errors.Wrap(err, "failed to load event's blob from node store")
-		}
-		eventMap, err := unpickleZippedBase64String(nodeBlobRow.Data)
-		if err != nil {
-			return errors.Wrap(err, "failed to decode event's blob")
-		}
-		apiEvent := Event{Event: event}
-		// TODO we can hide DecodeRecord method inside eventStore
-		//   but we need this convention for interfaces
-		if err := models.DecodeRecord(interfaces.ToAliasKeys(eventMap), &apiEvent); err != nil {
 			return err
 		}
-		if err := apiEvent.EventDetails.DecodeRecord(eventMap); err != nil {
+		if err := models.DecodeRecord(detailsMap, &apiEvent); err != nil {
 			return err
 		}
-		if err := apiEvent.EventInterfaces.DecodeRecord(eventMap); err != nil {
+		if err := apiEvent.EventDetails.DecodeRecord(detailsMap); err != nil {
+			return err
+		}
+		if err := apiEvent.EventInterfaces.DecodeRecord(detailsMap); err != nil {
 			return err
 		}
 		return c.JSON(http.StatusOK, apiEvent)

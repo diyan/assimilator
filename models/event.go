@@ -12,7 +12,8 @@ type Event struct {
 	Platform  *string `db:"platform" json:"platform"`
 	TimeSpent *int    `db:"time_spent" json:"-"`
 	// NOTE data has NodeField type
-	Data *string `db:"data" json:"-"`
+	DetailsRefRaw *string  `db:"data" json:"-"`
+	DetailsRef    *NodeRef `db:"-" json:"-"`
 	// TODO check that `dateCreated` is the name for JSON
 	DateCreated time.Time `db:"datetime" json:"dateCreated"`
 }
