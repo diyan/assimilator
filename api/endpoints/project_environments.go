@@ -3,14 +3,13 @@ package api
 import (
 	"net/http"
 
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/db/store"
-	"github.com/labstack/echo"
 )
 
-func ProjectEnvironmentsGetEndpoint(c echo.Context) error {
-	project := GetProject(c)
-	projectStore := store.NewProjectStore(c)
-	environments, err := projectStore.GetEnvironments(project.ID)
+func ProjectEnvironmentsGetEndpoint(c context.Project) error {
+	projectStore := store.NewProjectStore()
+	environments, err := projectStore.GetEnvironments(c.Tx, c.Project.ID)
 	if err != nil {
 		return err
 	}

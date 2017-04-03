@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/diyan/assimilator/conf"
+	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/db/migrations"
 	"github.com/diyan/assimilator/log"
 	"github.com/diyan/assimilator/testutil/factory"
@@ -21,10 +22,15 @@ var factories = map[*testing.T]factory.TestFactory{}
 
 func Setup(t *testing.T) (*gorequest.SuperAgent, factory.TestFactory) {
 	once.Do(func() { setupOnce(t) })
-	app := web.NewApp(factory.MakeAppConfig())
-	// TODO TestFactory does a side effect which is used by TestClient
-	//  make this code more explicit
-	tf := factory.New(t, app)
+	config := factory.MakeAppConfig()
+	tx, err := db.New(config)
+	require.NoError(t, err)
+	// Custom db.TxMakerFunc starts transaction on test setup and
+	//   does rollback on tear down
+	dbTxMaker := func() (*dbr.Tx, error) { return tx, err }
+	app := web.NewAppCustom(config, dbTxMaker)
+
+	tf := factory.New(t, app, tx)
 	// TODO factories map must be safe for concurrent access
 	factories[t] = tf
 	return testclient.New(app), tf

@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"io"
 	"regexp"
+	"time"
 
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/models"
 	"github.com/labstack/echo"
@@ -64,7 +66,7 @@ func bindRequest(project models.Project, requestBody io.ReadCloser, event *Event
 	return nil
 }
 
-func storePostView(c echo.Context) error {
+func storePostView(c context.Base) error {
 	// TODO move GetProject to the package shared between api/endpoints and web/api
 	//project := GetProject(c)
 	project := models.Project{ID: 1}
@@ -72,6 +74,27 @@ func storePostView(c echo.Context) error {
 	if err := bindRequest(project, c.Request().Body, &event); err != nil {
 		return err
 	}
+	group := models.Group{
+		ID:        1,
+		ProjectID: &project.ID,
+		Logger:    event.Logger,
+		Level:     20, // TODO event.Level is a string, use enum type
+		Message:   event.Message,
+		Culprit:   &event.Culprit,
+		Status:    0, // TODO add enum type
+		TimesSeen: 1,
+		LastSeen:  time.Now(),
+		FirstSeen: time.Now(),
+		//Data:      "",
+		Score: 1485348661, // TODO what does this mean?
+	}
+	_ = group
+	//pp.Print(group.Data)
+	//store := store.NewProjectStore()
+	//if err := store.SaveEventGroup(c.Tx, group); err != nil {
+	//	return err
+	//}
+	// TODO save event group, event, event node blob
 	//pp.Print(event)
 	return c.JSON(200, map[string]string{"id": event.EventID})
 }

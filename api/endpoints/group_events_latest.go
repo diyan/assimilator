@@ -3,10 +3,10 @@ package api
 import (
 	"net/http"
 
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/db/store"
 	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/models"
-	"github.com/labstack/echo"
 )
 
 type Event struct {
@@ -17,26 +17,26 @@ type Event struct {
 	NextEventID                *string `json:"nextEventID"`
 }
 
-func GroupEventsLatestGetEndpoint(c echo.Context) error {
+func GroupEventsLatestGetEndpoint(c context.Base) error {
 	// TODO
 	// 1. ? get default project to filter out issues by issue_id
 	// 2. get latest event_id for issue_id that was provided in url segment
 	// 3. call ProjectEventDetailsGetEndpoint and provide event_id
-	projectStore := store.NewProjectStore(c)
-	project, err := projectStore.GetProject("acme-team", "acme")
+	projectStore := store.NewProjectStore()
+	project, err := projectStore.GetProject(c.Tx, "acme-team", "acme")
 	if err != nil {
 		return err
 	}
 	eventID := 1
 	// TODO move all code below to the ProjectEventDetailsGetEndpoint handler
-	eventStore := store.NewEventStore(c)
-	event, err := eventStore.GetEvent(project.ID, eventID)
+	eventStore := store.NewEventStore()
+	event, err := eventStore.GetEvent(c.Tx, project.ID, eventID)
 	if err != nil {
 		return err
 	}
 	apiEvent := Event{Event: *event}
 	if event.DetailsRef != nil {
-		detailsMap, err := eventStore.GetEventDetailsMap(*event.DetailsRef)
+		detailsMap, err := eventStore.GetEventDetailsMap(c.Tx, *event.DetailsRef)
 		if err != nil {
 			return err
 		}

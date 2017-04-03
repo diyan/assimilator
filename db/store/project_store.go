@@ -1,27 +1,21 @@
 package store
 
 import (
-	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/models"
-	"github.com/labstack/echo"
+	"github.com/gocraft/dbr"
 	"github.com/pkg/errors"
 )
 
 type ProjectStore struct {
-	c echo.Context
 }
 
-func NewProjectStore(c echo.Context) ProjectStore {
-	return ProjectStore{c: c}
+func NewProjectStore() ProjectStore {
+	return ProjectStore{}
 }
 
-func (s ProjectStore) GetProject(orgSlug, projectSlug string) (models.Project, error) {
-	db, err := db.FromE(s.c)
+func (s ProjectStore) GetProject(tx *dbr.Tx, orgSlug, projectSlug string) (models.Project, error) {
 	project := models.Project{}
-	if err != nil {
-		return project, errors.Wrap(err, "can not get project")
-	}
-	_, err = db.SelectBySql(`
+	_, err := tx.SelectBySql(`
             select p.*
                 from sentry_project p
                     join sentry_organization o on p.organization_id = o.id
@@ -35,13 +29,9 @@ func (s ProjectStore) GetProject(orgSlug, projectSlug string) (models.Project, e
 	return project, nil
 }
 
-func (s ProjectStore) GetEnvironments(projectID int) ([]models.Environment, error) {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not read project environments")
-	}
+func (s ProjectStore) GetEnvironments(tx *dbr.Tx, projectID int) ([]models.Environment, error) {
 	environments := []models.Environment{}
-	_, err = db.SelectBySql(`
+	_, err := tx.SelectBySql(`
 		select se.*
 			from sentry_environment se
 		where se.project_id = ?
@@ -54,13 +44,9 @@ func (s ProjectStore) GetEnvironments(projectID int) ([]models.Environment, erro
 	return environments, nil
 }
 
-func (s ProjectStore) GetTags(projectID int) ([]*models.TagKey, error) {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not read project tags")
-	}
+func (s ProjectStore) GetTags(tx *dbr.Tx, projectID int) ([]*models.TagKey, error) {
 	tags := []*models.TagKey{}
-	_, err = db.SelectBySql(`
+	_, err := tx.SelectBySql(`
 		select fk.*
 			from sentry_filterkey fk
 		where fk.project_id = ? and fk.status = ?`,
@@ -76,12 +62,8 @@ func (s ProjectStore) GetTags(projectID int) ([]*models.TagKey, error) {
 	return tags, nil
 }
 
-func (s ProjectStore) SaveProject(project models.Project) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save project")
-	}
-	_, err = db.InsertInto("sentry_project").
+func (s ProjectStore) SaveProject(tx *dbr.Tx, project models.Project) error {
+	_, err := tx.InsertInto("sentry_project").
 		Columns("id", "team_id", "organization_id", "name", "slug",
 			"public", "status", "first_event", "date_added").
 		Record(project).
@@ -89,53 +71,37 @@ func (s ProjectStore) SaveProject(project models.Project) error {
 	return errors.Wrap(err, "failed to save project")
 }
 
-func (s ProjectStore) SaveEnvironment(environment models.Environment) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save project environment")
-	}
-	_, err = db.InsertInto("sentry_environment").
+func (s ProjectStore) SaveEnvironment(tx *dbr.Tx, environment models.Environment) error {
+	_, err := tx.InsertInto("sentry_environment").
 		Columns("id", "project_id", "name", "date_added").
 		Record(environment).
 		Exec()
 	return errors.Wrap(err, "failed to save project environment")
 }
 
-func (s ProjectStore) SaveTags(tags ...*models.TagKey) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save project tags")
-	}
-	query := db.InsertInto("sentry_filterkey").
+func (s ProjectStore) SaveTags(tx *dbr.Tx, tags ...*models.TagKey) error {
+	query := tx.InsertInto("sentry_filterkey").
 		Columns("id", "project_id", "key", "values_seen", "label", "status")
 	for _, tag := range tags {
 		query = query.Record(tag)
 	}
 	// TODO can we just ignore rv / sql.Result?
-	_, err = query.Exec()
+	_, err := query.Exec()
 	return errors.Wrap(err, "failed to save project tags")
 }
 
-func (s ProjectStore) SaveSearches(searches ...models.SavedSearch) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save project searches")
-	}
-	query := db.InsertInto("sentry_savedsearch").
+func (s ProjectStore) SaveSearches(tx *dbr.Tx, searches ...models.SavedSearch) error {
+	query := tx.InsertInto("sentry_savedsearch").
 		Columns("id", "project_id", "name", "query", "date_added", "is_default")
 	for _, search := range searches {
 		query = query.Record(search)
 	}
-	_, err = query.Exec()
+	_, err := query.Exec()
 	return errors.Wrap(err, "failed to save project searches")
 }
 
-func (s ProjectStore) SaveEventGroup(group models.Group) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save groups of project issues")
-	}
-	_, err = db.InsertInto("sentry_groupedmessage").
+func (s ProjectStore) SaveEventGroup(tx *dbr.Tx, group models.Group) error {
+	_, err := tx.InsertInto("sentry_groupedmessage").
 		Columns(
 			"id", "logger", "level", "message", "view", "status", "times_seen",
 			"last_seen", "first_seen", "data", "score", "project_id",

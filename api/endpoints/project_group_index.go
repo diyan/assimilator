@@ -8,7 +8,7 @@ import (
 	"time"
 
 	base32num "github.com/Dancapistan/gobase32"
-	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/db/tsdb"
 	"github.com/diyan/assimilator/models"
 	"github.com/diyan/assimilator/web/frontend"
@@ -67,9 +67,7 @@ type GroupProjectInfo struct {
 	Slug string `json:"slug"`
 }
 
-func ProjectGroupIndexGetEndpoint(c echo.Context) error {
-	orgSlug := c.Param("organization_slug")
-	project := GetProject(c)
+func ProjectGroupIndexGetEndpoint(c context.Project) error {
 	statsPeriod := c.QueryParam("statsPeriod")
 	shortIDLookup, _ := strconv.ParseBool(c.QueryParam("shortIdLookup"))
 	// TODO return HTTP 400 if shortIdLookup has invalid format
@@ -78,19 +76,15 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		return c.JSON(400, map[string]string{"detail": errInvalidStatsPeriod})
 	}
 	query := strings.TrimSpace(c.QueryParam("query"))
-	db, err := db.FromE(c)
-	if err != nil {
-		return err
-	}
 	if query != "" {
 		var matchingGroupID int64
 		if len(query) == 32 {
 			// Check to see if we've got an event ID
-			matchingGroupID, _ = db.SelectBySql(`
+			matchingGroupID, _ = c.Tx.SelectBySql(`
 				select em.group_id
 					from sentry_eventmapping em
 				where em.project_id = ? and em.event_id = ?`,
-				project.ID, query).
+				c.Project.ID, query).
 				ReturnInt64()
 		} else if shortIDLookup && models.LooksLikeShortID(query) {
 			// If the query looks like a short id, we want to provide some
@@ -117,12 +111,12 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 	// TODO Implement `func GetSearchBackend()` that returns SearchBackend interface
 	// NOTE Sentry v8.10 implements only single DjangoSearchBackend
 	// TODO CONTINUE !!!
-	queryDto, err := buildQueryDto(c, project.ID)
+	queryDto, err := buildQueryDto(c, c.Project.ID)
 	if err != nil {
 		// TODO If validation error return JSON -> Response({'detail': six.text_type(exc)}, status=400)
 		return err
 	}
-	sb, err := buildSelectBuilder(queryDto, db)
+	sb, err := buildSelectBuilder(queryDto, c.Tx)
 	if err != nil {
 		return err
 	}
@@ -150,18 +144,18 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 		now := time.Now().UTC()
 		groupIDs := []int{}
 		for _, group := range groups {
-			if group.ProjectID != nil && *group.ProjectID == project.ID {
+			if group.ProjectID != nil && *group.ProjectID == c.Project.ID {
 				// TODO extract into getShareId func/method
 				group.ShareID = fmt.Sprintf(
 					"%x", fmt.Sprintf("%d.%d", *group.ProjectID, group.ID))
 				group.Project = GroupProjectInfo{
-					Name: project.Name,
-					Slug: project.Slug,
+					Name: c.Project.Name,
+					Slug: c.Project.Slug,
 				}
 			} else {
 				return errors.Errorf(
 					"Not implemented. Event group does not belong to the requested project. Group.ID=%d, Group.ProjectID=%d, Request.ProjectSlug=%s, Request.ProjectID=%d",
-					group.ID, *group.ProjectID, project.Slug, project.ID)
+					group.ID, *group.ProjectID, c.Project.Slug, c.Project.ID)
 			}
 			group.Logger = &group.Group.Logger
 			if *group.Logger == "" {
@@ -195,7 +189,7 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 			if group.Group.ShortID != nil {
 				group.ShortID = fmt.Sprintf(
 					"%s-%s",
-					strings.ToUpper(project.Slug),
+					strings.ToUpper(c.Project.Slug),
 					base32num.Encode(uint32(*group.Group.ShortID)))
 			}
 
@@ -203,7 +197,7 @@ func ProjectGroupIndexGetEndpoint(c echo.Context) error {
 			group.Permalink = fmt.Sprintf("%s://%s%s",
 				c.Request().URL.Scheme,
 				c.Request().URL.Host,
-				c.Echo().URI(frontend.GetSentryGroupView, orgSlug, group.Project.Slug, group.ID))
+				c.Echo().URI(frontend.GetSentryGroupView, c.Organization.Slug, group.Project.Slug, group.ID))
 			// TODO implement correct behavior for annotations, metadata, type
 			group.Annotations = []string{}
 			group.Metadata = map[string]string{

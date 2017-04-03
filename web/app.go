@@ -5,17 +5,27 @@ import (
 	"strings"
 
 	"github.com/diyan/assimilator/conf"
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/log"
 	"github.com/diyan/assimilator/web/recover"
 	"github.com/diyan/assimilator/web/renderer"
+	"github.com/gocraft/dbr"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/diyan/assimilator/db"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
 	"github.com/pkg/errors"
 )
 
 func NewApp(config conf.Config) *echo.Echo {
+	//dbTxMaker := db.TxMakerFunc{return db.New(config)}
+	dbTxMaker := func() (*dbr.Tx, error) { return db.New(config) }
+	return NewAppCustom(config, dbTxMaker)
+}
+
+// TODO use struct to pass settings and dependencies
+func NewAppCustom(config conf.Config, dbTxMaker db.TxMakerFunc) *echo.Echo {
 	e := echo.New()
 	e.Debug = true
 	e.Logger = log.NewEchoLogger(config)
@@ -25,8 +35,9 @@ func NewApp(config conf.Config) *echo.Echo {
 		panic(errors.Wrap(err, "can not find template box"))
 	}
 	e.Renderer = renderer.New(templateBox)
-	e.Use(conf.NewMiddleware(config))
-	e.Use(log.NewAccessLogMiddleware(config))
+	// TODO consider remove conf.FromE(...) and conf.NewMiddleware(...)
+	//e.Use(conf.NewMiddleware(config))
+	//e.Use(log.NewAccessLogMiddleware(config))
 	e.Use(recover.NewMiddleware(config))
 	uiBox, err := rice.FindBox("../ui")
 	if err != nil {
@@ -50,7 +61,7 @@ func NewApp(config conf.Config) *echo.Echo {
 			return false
 		}}))
 
-	RegisterRoutes(e)
-
+	bind := context.NewBinder(config, dbTxMaker)
+	RegisterRoutes(e, bind)
 	return e
 }

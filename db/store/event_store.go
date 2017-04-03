@@ -6,31 +6,25 @@ import (
 	"encoding/base64"
 
 	"github.com/AlekSi/pointer"
-	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/lib/conv"
 	"github.com/diyan/assimilator/models"
+	"github.com/gocraft/dbr"
 	pickle "github.com/hydrogen18/stalecucumber"
 	"github.com/k0kubun/pp"
-	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
 type EventStore struct {
-	c echo.Context
 }
 
-func NewEventStore(c echo.Context) EventStore {
-	return EventStore{c: c}
+func NewEventStore() EventStore {
+	return EventStore{}
 }
 
-func (s EventStore) GetEvent(projectID, eventID int) (*models.Event, error) {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not get issue event")
-	}
+func (s EventStore) GetEvent(tx *dbr.Tx, projectID, eventID int) (*models.Event, error) {
 	event := models.Event{}
-	_, err = db.SelectBySql(`
+	_, err := tx.SelectBySql(`
             select m.*
                 from sentry_message m
             where m.project_id  = ? and m.id = ?`,
@@ -53,13 +47,9 @@ func (s EventStore) GetEvent(projectID, eventID int) (*models.Event, error) {
 	return &event, nil
 }
 
-func (s EventStore) GetEventDetailsMap(nodeRef models.NodeRef) (map[string]interface{}, error) {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to load event details from node store")
-	}
+func (s EventStore) GetEventDetailsMap(tx *dbr.Tx, nodeRef models.NodeRef) (map[string]interface{}, error) {
 	nodeBlob := models.NodeBlob{}
-	_, err = db.SelectBySql(`
+	_, err := tx.SelectBySql(`
             select n.*
                 from nodestore_node n
             where n.id = ?`,
@@ -76,11 +66,7 @@ func (s EventStore) GetEventDetailsMap(nodeRef models.NodeRef) (map[string]inter
 	return interfaces.ToAliasKeys(eventMap), nil
 }
 
-func (s EventStore) SaveEvent(event models.Event) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save issue event")
-	}
+func (s EventStore) SaveEvent(tx *dbr.Tx, event models.Event) error {
 	if event.DetailsRef != nil {
 		// TODO extract into method v, err := toBase64ZipPickleString(*event.DetailsRef)
 		pickleBuffer := bytes.Buffer{} // io.Writer
@@ -104,7 +90,7 @@ func (s EventStore) SaveEvent(event models.Event) error {
 		event.DetailsRefRaw = pointer.ToString(base64.StdEncoding.EncodeToString(zlibBuffer.Bytes()))
 		event.DetailsRef = nil
 	}
-	_, err = db.InsertInto("sentry_message").
+	_, err := tx.InsertInto("sentry_message").
 		Columns("id", "group_id", "message_id", "project_id", "message",
 			"platform", "time_spent", "data", "datetime").
 		Record(event).
@@ -113,12 +99,8 @@ func (s EventStore) SaveEvent(event models.Event) error {
 }
 
 // TODO move to the nodeStore
-func (s EventStore) SaveNodeBlob(nodeBlob models.NodeBlob) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save node blob")
-	}
-	_, err = db.InsertInto("nodestore_node").
+func (s EventStore) SaveNodeBlob(tx *dbr.Tx, nodeBlob models.NodeBlob) error {
+	_, err := tx.InsertInto("nodestore_node").
 		Columns("id", "data", "timestamp").
 		Record(nodeBlob).
 		Exec()

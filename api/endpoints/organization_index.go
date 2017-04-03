@@ -3,21 +3,15 @@ package api
 import (
 	"net/http"
 
-	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/models"
-
-	"github.com/labstack/echo"
 )
 
-func OrganizationIndexGetEndpoint(c echo.Context) error {
+func OrganizationIndexGetEndpoint(c context.Base) error {
 	// TODO implement memberOnly flag
 	//memberOnly := c.Param("member")
-	db, err := db.FromE(c)
-	if err != nil {
-		return err
-	}
 	orgs := []models.Organization{}
-	_, err = db.SelectBySql(`
+	_, err := c.Tx.SelectBySql(`
 		select o.* from sentry_organization o`).
 		LoadStructs(&orgs)
 	if err != nil {

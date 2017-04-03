@@ -1,9 +1,12 @@
 package frontend
 
-import "github.com/labstack/echo"
+import (
+	"github.com/diyan/assimilator/context"
+	"github.com/labstack/echo"
+)
 
 // RegisterFrontendRoutes add routes with frontend views to the Echo's root router
-func RegisterFrontendRoutes(e *echo.Echo) {
+func RegisterFrontendRoutes(e *echo.Echo, bind context.Binder) {
 	e.POST("/api/hooks/mailgun/inbound/", mailgunInboundWebhookPostView)
 	e.POST("/api/hooks/release/:plugin_id/:project_id/:signature/", releaseWebhookPostView)
 	g := e.Group("/api/embed/error-page/")
@@ -189,7 +192,7 @@ func RegisterFrontendRoutes(e *echo.Echo) {
 	e.GET("/avatar/:avatar_id/", getUserAvatarPhotoView)
 
 	// Generic
-	e.GET("/", getHomeView)
+	e.GET("/", bind.Base(getHomeView))
 
 	// Generic API
 	// TODO disable auth on ReactPageView for 2 routes below

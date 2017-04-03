@@ -3,27 +3,10 @@ package db
 import (
 	"github.com/diyan/assimilator/conf"
 	"github.com/gocraft/dbr"
-	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
-// FromE returns DB transaction associated with echo's Context
-func FromE(c echo.Context) (*dbr.Tx, error) {
-	if tx, ok := c.Get("dbr.Tx").(*dbr.Tx); ok {
-		return tx, nil
-	}
-	tx, err := New(conf.FromE(c))
-	if err != nil {
-		return nil, err
-	}
-	ToE(c, tx)
-	return tx, nil
-}
-
-// ToE save DB transaction into provided echo's Context
-func ToE(c echo.Context, tx *dbr.Tx) {
-	c.Set("dbr.Tx", tx)
-}
+type TxMakerFunc func() (*dbr.Tx, error)
 
 // New starts new DB transactions
 func New(c conf.Config) (*dbr.Tx, error) {

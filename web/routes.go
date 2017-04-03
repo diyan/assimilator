@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	apiV0 "github.com/diyan/assimilator/api"
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/web/api"
 	"github.com/diyan/assimilator/web/frontend"
 	"github.com/diyan/assimilator/web/frontend/debug"
@@ -18,7 +19,7 @@ APIView base class has HTTP OPTIONS handler that respond with actual list of sup
 */
 
 // RegisterRoutes ..
-func RegisterRoutes(e *echo.Echo) {
+func RegisterRoutes(e *echo.Echo, bind context.Binder) {
 	// TODO call registerDebugViews only if getattr(settings, 'DEBUG_VIEWS', settings.DEBUG)
 	g := e.Group("/debug")
 	debug.RegisterDebugViews(g)
@@ -30,11 +31,11 @@ func RegisterRoutes(e *echo.Echo) {
 
 	// API
 	g = e.Group("/api")
-	api.RegisterAPIRoutes(g)
+	api.RegisterAPIRoutes(g, bind)
 	// API version 0
 	g = e.Group("/api/0")
-	apiV0.RegisterAPIRoutes(g)
-	frontend.RegisterFrontendRoutes(e)
+	apiV0.RegisterAPIRoutes(g, bind)
+	frontend.RegisterFrontendRoutes(e, bind)
 
 	// Legacy Redirects
 	e.GET("/docs/", func(c echo.Context) error {

@@ -3,11 +3,9 @@ package api
 import (
 	"net/http"
 
-	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/models"
 	"github.com/pkg/errors"
-
-	"github.com/labstack/echo"
 )
 
 // User ..
@@ -25,21 +23,16 @@ type UserOptions struct {
 	Clock24Hours    bool   `json:"clock24Hours"`
 }
 
-func ProjectMemberIndexGetEndpoint(c echo.Context) error {
-	project := GetProject(c)
-	db, err := db.FromE(c)
-	if err != nil {
-		return err
-	}
+func ProjectMemberIndexGetEndpoint(c context.Project) error {
 	// TODO not clear what this expr means -> Q(user__is_active=True) | Q(user__isnull=True)
 	users := []*User{}
-	_, err = db.SelectBySql(`
+	_, err := c.Tx.SelectBySql(`
 		select u.*
 			from auth_user u
 				join sentry_organizationmember om on u.id = om.user_id
 				join sentry_organization o on om.organization_id = o.id
 		where o.id = ? and u.is_active = true`,
-		project.OrganizationID).
+		c.Project.OrganizationID).
 		LoadStructs(&users)
 	if err != nil {
 		return errors.Wrap(err, "can not read project members")

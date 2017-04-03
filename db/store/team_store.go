@@ -1,38 +1,28 @@
 package store
 
 import (
-	"github.com/diyan/assimilator/db"
 	"github.com/diyan/assimilator/models"
-	"github.com/labstack/echo"
+	"github.com/gocraft/dbr"
 	"github.com/pkg/errors"
 )
 
 type TeamStore struct {
-	c echo.Context
 }
 
-func NewTeamStore(c echo.Context) TeamStore {
-	return TeamStore{c: c}
+func NewTeamStore() TeamStore {
+	return TeamStore{}
 }
 
-func (s TeamStore) SaveTeam(team models.Team) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save team")
-	}
-	_, err = db.InsertInto("sentry_team").
+func (s TeamStore) SaveTeam(tx *dbr.Tx, team models.Team) error {
+	_, err := tx.InsertInto("sentry_team").
 		Columns("id", "slug", "name", "date_added", "status", "organization_id").
 		Record(team).
 		Exec()
 	return errors.Wrap(err, "failed to save team")
 }
 
-func (s TeamStore) SaveMember(teamMember models.OrganizationMemberTeam) error {
-	db, err := db.FromE(s.c)
-	if err != nil {
-		return errors.Wrap(err, "failed to save organization team member")
-	}
-	_, err = db.InsertInto("sentry_organizationmember_teams").
+func (s TeamStore) SaveMember(tx *dbr.Tx, teamMember models.OrganizationMemberTeam) error {
+	_, err := tx.InsertInto("sentry_organizationmember_teams").
 		Columns("id", "organizationmember_id", "team_id", "is_active").
 		Record(teamMember).
 		Exec()

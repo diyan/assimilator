@@ -3,9 +3,8 @@ package frontend
 import (
 	"net/http"
 
-	"github.com/diyan/assimilator/db"
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/models"
-	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
@@ -14,11 +13,11 @@ type Organization struct {
 	Slug string
 }
 
-func getHomeView(c echo.Context) error {
+func getHomeView(c context.Base) error {
 	return redirectToOrg(c)
 }
 
-func redirectToOrg(c echo.Context) error {
+func redirectToOrg(c context.Base) error {
 	org, err := getActiveOrganization(c)
 	if err != nil {
 		return err
@@ -33,18 +32,14 @@ func redirectToOrg(c echo.Context) error {
 	return c.HTML(http.StatusNotImplemented, "sentry-create-organization page is not implemented")
 }
 
-func getActiveOrganization(c echo.Context) (*models.Organization, error) {
+func getActiveOrganization(c context.Base) (*models.Organization, error) {
 	// TODO get active organization for current user
 	// TODO this method should take an optional organizationSlug argument
 	orgSlug := c.Param("organization_slug")
 	userID := 1 // TODO get ID from context.request.user.id
 	onlyVisible := true
-	db, err := db.FromE(c)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not get db session")
-	}
 	org := models.Organization{}
-	query := db.SelectBySql(`
+	query := c.Tx.SelectBySql(`
 		select o.*
 		from sentry_organization o
 			join sentry_organizationmember om on o.id = om.organization_id
@@ -69,7 +64,7 @@ func getActiveOrganization(c echo.Context) (*models.Organization, error) {
 		err = errors.Wrap(err, "can not get active organization")
 		return &org, err
 	*/
-	err = query.Limit(1).LoadStruct(&org)
+	err := query.Limit(1).LoadStruct(&org)
 	err = errors.Wrap(err, "can not get active organization")
 	return &org, err
 }

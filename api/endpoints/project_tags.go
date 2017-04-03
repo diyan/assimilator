@@ -3,14 +3,13 @@ package api
 import (
 	"net/http"
 
+	"github.com/diyan/assimilator/context"
 	"github.com/diyan/assimilator/db/store"
-	"github.com/labstack/echo"
 )
 
-func ProjectTagsGetEndpoint(c echo.Context) error {
-	project := GetProject(c)
-	projectStore := store.NewProjectStore(c)
-	tags, err := projectStore.GetTags(project.ID)
+func ProjectTagsGetEndpoint(c context.Project) error {
+	projectStore := store.NewProjectStore()
+	tags, err := projectStore.GetTags(c.Tx, c.Project.ID)
 	if err != nil {
 		return err
 	}
