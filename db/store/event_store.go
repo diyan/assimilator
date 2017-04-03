@@ -32,7 +32,7 @@ func (s EventStore) GetEvent(tx *dbr.Tx, projectID, eventID int) (*models.Event,
 		return nil, errors.Wrap(err, "can not get issue event")
 	}
 	if event.DetailsRefRaw != nil {
-		nodeRefMap, err := unpickleZippedBase64String(*event.DetailsRefRaw)
+		nodeRefMap, err := fromBase64ZipPickleString(*event.DetailsRefRaw)
 		if err != nil {
 			return nil, errors.Wrap(err, "can not get issue event: failed to decode reference to the event details")
 		}
@@ -56,7 +56,7 @@ func (s EventStore) GetEventDetailsMap(tx *dbr.Tx, nodeRef models.NodeRef) (map[
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load event details from node store")
 	}
-	eventMap, err := unpickleZippedBase64String(nodeBlob.Data)
+	eventMap, err := fromBase64ZipPickleString(nodeBlob.Data)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode event details blob")
 	}
@@ -113,7 +113,7 @@ func toBase64ZipPickleString(value map[string]interface{}) (string, error) {
 	return base64.StdEncoding.EncodeToString(zlibBuffer.Bytes()), nil
 }
 
-func unpickleZippedBase64String(blob string) (map[string]interface{}, error) {
+func fromBase64ZipPickleString(blob string) (map[string]interface{}, error) {
 	zippedBytes, err := base64.StdEncoding.DecodeString(blob)
 	if err != nil {
 		return nil, errors.Wrap(err, "base64 decode failed")
