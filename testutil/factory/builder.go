@@ -199,7 +199,6 @@ func (tf TestFactory) MakeEvent() models.Event {
 		TimeSpent:   nil,
 		Platform:    pointer.ToString("python"),
 		DetailsRef:  &models.NodeRef{NodeID: "N0XToXlhRvyCOfYh1sRpZA=="},
-		//DetailsRefRaw: pointer.ToString("eJzTSCkw5ApWz8tPSY3PTFHnKjAC8vwMIkLyI3Iygsoqnf3TIjMMi4MKohxtbYHSxlzFegCg1g+U"),
 	}
 }
 

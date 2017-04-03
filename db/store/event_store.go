@@ -5,13 +5,11 @@ import (
 	"compress/zlib"
 	"encoding/base64"
 
-	"github.com/AlekSi/pointer"
 	"github.com/diyan/assimilator/interfaces"
 	"github.com/diyan/assimilator/lib/conv"
 	"github.com/diyan/assimilator/models"
 	"github.com/gocraft/dbr"
 	pickle "github.com/hydrogen18/stalecucumber"
-	"github.com/k0kubun/pp"
 	"github.com/pkg/errors"
 )
 
@@ -68,26 +66,15 @@ func (s EventStore) GetEventDetailsMap(tx *dbr.Tx, nodeRef models.NodeRef) (map[
 
 func (s EventStore) SaveEvent(tx *dbr.Tx, event models.Event) error {
 	if event.DetailsRef != nil {
-		// TODO extract into method v, err := toBase64ZipPickleString(*event.DetailsRef)
-		pickleBuffer := bytes.Buffer{} // io.Writer
 		// TODO how to re-use `kv` tag for pickler which uses `pickle` tag name?
-		//detailsMap := map[string]interface{}{
-		//	"node_id": event.DetailsRef.NodeID,
-		//}
-		//_, err := pickle.NewPickler(&pickleBuffer).Pickle(detailsMap)
-		_, err := pickle.NewPickler(&pickleBuffer).Pickle(event.DetailsRef)
-		if err != nil {
-			return errors.Wrap(err, "pickle failed")
+		detailsMap := map[string]interface{}{
+			"node_id": event.DetailsRef.NodeID,
 		}
-		zlibBuffer := bytes.Buffer{} // io.Writer
-		zlibWriter := zlib.NewWriter(&zlibBuffer)
-		//defer zlibWriter.Close()
-		pp.Print(string(pickleBuffer.Bytes()))
-		_, err = zlibWriter.Write(pickleBuffer.Bytes())
+		detailsRefRaw, err := toBase64ZipPickleString(detailsMap)
 		if err != nil {
-			return errors.Wrap(err, "zip stream failed")
+			errors.Wrap(err, "failed to save issue event: failed to encode reference to the event details")
 		}
-		event.DetailsRefRaw = pointer.ToString(base64.StdEncoding.EncodeToString(zlibBuffer.Bytes()))
+		event.DetailsRefRaw = &detailsRefRaw
 		event.DetailsRef = nil
 	}
 	_, err := tx.InsertInto("sentry_message").
@@ -105,6 +92,25 @@ func (s EventStore) SaveNodeBlob(tx *dbr.Tx, nodeBlob models.NodeBlob) error {
 		Record(nodeBlob).
 		Exec()
 	return errors.Wrap(err, "failed to save node blob")
+}
+
+func toBase64ZipPickleString(value map[string]interface{}) (string, error) {
+	pickleBuffer := bytes.Buffer{} // io.Writer
+	_, err := pickle.NewPickler(&pickleBuffer).Pickle(value)
+	if err != nil {
+		return "", errors.Wrap(err, "pickle failed")
+	}
+	zlibBuffer := bytes.Buffer{} // io.Writer
+	zlibWriter := zlib.NewWriter(&zlibBuffer)
+	_, err = zlibWriter.Write(pickleBuffer.Bytes())
+	if err != nil {
+		return "", errors.Wrap(err, "zip stream failed")
+	}
+	err = zlibWriter.Close()
+	if err != nil {
+		return "", errors.Wrap(err, "zip stream failed")
+	}
+	return base64.StdEncoding.EncodeToString(zlibBuffer.Bytes()), nil
 }
 
 func unpickleZippedBase64String(blob string) (map[string]interface{}, error) {

@@ -12,3 +12,5 @@ func StringMap(value interface{}) map[string]interface{} {
 	}
 	return nil
 }
+
+// TODO implement StringMapDeep(value interface{}) map[string]interface{}
