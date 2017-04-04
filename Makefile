@@ -47,9 +47,13 @@ test-start-db:  ## Start PostgreSQL container for integration tests
 		-e POSTGRES_USER=postgres \
 		-e POSTGRES_PASSWORD= \
 		-p 5432:5432 \
-		-v /tmp/docker/volumes/asm_test_db:/var/lib/postgresql/data \
-		--name asm_test_db \
-		postgres:9.6-alpine
+		--tmpfs=/var/lib/postgresql/data:rw \
+		--name=asm_test_db \
+		postgres:9.6-alpine \
+		postgres \
+		-c fsync=off \
+		-c synchronous_commit=off \
+		-c full_page_writes=off
 
 test-go:  ## Run Go tests
 	ginkgo -r -cover
