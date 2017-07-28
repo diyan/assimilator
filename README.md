@@ -5,7 +5,7 @@ WIP. An attempt to port minimum valuable subset of Sentry from Python to the Gol
 [![Travis Build](https://travis-ci.org/diyan/assimilator.svg?branch=master)](https://travis-ci.org/diyan/assimilator)
 [![Coverage](http://img.shields.io/coveralls/diyan/assimilator.svg)](https://coveralls.io/r/diyan/assimilator)
 [![Go Report Card](https://goreportcard.com/badge/diyan/assimilator)](http://goreportcard.com/report/diyan/assimilator)
-
+prometheus/prometheus/wiki/Default-port-allocations
 ### Setup development enviroment on Arch Linux
 
 ```bash
@@ -51,3 +51,5 @@ $ docker exec -ti acme_sentry_db \
 - Implement generic handler so "can not get project: query failed: dbr: not found", would be "can not get project. resource not found"
 - Move PostGet / PostInsert / etc handlers from db model to store
 - Hell of a lot things to do
+
+### Test Commit feature via Web UI
